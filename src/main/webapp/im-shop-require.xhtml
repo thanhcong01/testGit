@@ -1,0 +1,257 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frm">
+            <title>#{msg['imSubShopRequire']}</title>
+            <!--            <h2 ><p:outputLabel value="#{msg['imSubShopRequire']}"></p:outputLabel></h2>-->
+
+            <div class="EmptyBox10"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <div class="EmptyBox10"></div>
+            <div class="Pad10">
+                <p:growl id="messages" showDetail="true" />
+                <p:panel header="#{msg['transInfo']}" >
+                    <p:panelGrid  >
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel  value="#{msg['orderCode']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{imShopRequire.orderCode}" ></p:inputText>
+                            </p:column>
+							<!-- <p:column>
+                                <p:outputLabel  value="#{msg['createStaff']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.staff.staffName}" ></p:inputText>
+                            </p:column> -->
+                            <p:column>
+                                <p:outputLabel value="#{msg['requireShop']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{imShopRequire.shopCurrent.shopName}" ></p:inputText>
+                            </p:column>
+
+                            <p:column>
+                                <p:outputLabel value="#{msg['orderType']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:selectOneMenu styleClass="select Wid100" value="#{imShopRequire.typeId}"  >
+                                    <p:ajax event="valueChange" update=":frm" listener="#{imShopRequire.changeType()}"></p:ajax>
+                                    <f:selectItems value="#{imShopRequire.transType}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+
+
+
+                            <!--<p:column>-->
+                                <!--<p:outputLabel value="#{msg['shop.toshop']}"></p:outputLabel>-->
+                            <!--</p:column>-->
+
+                            <!--<p:column>-->
+                                <!--<p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.shop.shopName}" ></p:inputText>-->
+                            <!--</p:column>-->
+                        </p:row>
+                        <p:row>
+
+                            <p:column>
+                                <p:outputLabel  value="#{msg['createDate']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:calendar styleClass="Wid100" readonlyInput="false" disabled="true"
+                                            value="#{imShopRequire.actionDate}" id="actionDate"
+                                            converterMessage="#{msg['import.createDate.notFormat']}"
+                                            yearRange="c-70:c+70"
+                                            showOn="button" pattern="dd/MM/yyyy" navigator="true">
+                                </p:calendar>
+                            </p:column>
+
+                            <p:column>
+                                <p:outputLabel  value="#{msg['createStaff']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.staff.staffName}" ></p:inputText>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel header="#{msg['transInfo.tttb']}" >
+                    <p:panelGrid id="pgs"  >
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['equipment.group']}(*)"></p:outputLabel>
+                            </p:column>
+                            <p:column style="max-width:240px!important;">
+                                <p:selectOneMenu styleClass="select" style="width: 100%;" value="#{imShopRequire.goodsGroupId}"  >
+                                    <p:ajax event="valueChange" update=":frm" listener="#{imShopRequire.changeGoodsGroup()}"></p:ajax>
+                                    <f:selectItems value="#{sessionBean.lsgGroupActive}" var="c"
+                                                   itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['equipment.code']}(*)"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:autoComplete styleClass="ui-autocomplete-select" dropdown="true" value="#{imShopRequire.goods}"
+                                                completeMethod="#{imShopRequire.completeGoods}" >
+                                    <p:ajax event="itemSelect" listener="#{imShopRequire.goodsSelect}" update="@this, :frm:equipmentName, :frm:equipmentUnit" />
+                                </p:autoComplete>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['equipment.name']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText maxlength="7" id="equipmentName" disabled="true" styleClass="Wid100" value="#{imShopRequire.equipmentName}" >
+                                </p:inputText>
+                            </p:column>
+
+                        </p:row>
+                        <p:row>
+                         	<p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['equipment.unit']}"></p:outputLabel>
+                            </p:column>
+                            <p:column style="max-width:240px!important;">
+                                <p:inputText maxlength="7"  id="equipmentUnit" disabled="true" styleClass="Wid100" value="#{imShopRequire.unit}" >
+                                </p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['quantity']}(*)"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText maxlength="7" styleClass="Wid100" value="#{imShopRequire.quantity}" >
+                                </p:inputText>
+                            </p:column>
+                            <p:column ></p:column>
+                            <p:column>
+                                <p:commandButton icon="fa fa-eye Fs14 white" style="float: right" value="#{msg['viewStock']}" update=":leftform:viewStock" actionListener="#{viewStock.viewStockFromButton}" ></p:commandButton>
+                            	<p:commandButton icon="fa fa-plus Fs14 white" style="float: right" value="#{msg['add']}" update=":frm" actionListener="#{imShopRequire.add}" ></p:commandButton>
+
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}"  var="c" rowIndexVar="rowIndex" value="#{imShopRequire.ta.lsDetail}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtGoods" lazy="false" >
+                        <f:facet  name="header">
+                            <span class="dtHead" style="">#{msg['equipmentProfile.top.title']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtGoods"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="dtGoods" trigger="togglerdtGoods">
+                                <p:ajax event="toggle" listener="#{imShopRequire.onToggleActiveEtag}"
+                                        update="@([id$=dtGoods])"/>
+                            </p:columnToggler>
+                            <!--<p:columnToggler datasource="dtGoods" trigger="togglerdtGoods" />-->
+                        </f:facet>
+                        <p:column styleClass="index" visible="#{imShopRequire.visibleTable[0]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" visible="#{imShopRequire.visibleTable[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.group']}" />
+                            </f:facet>
+                            <h:outputText id="getGoodsGroupNameByGoods" value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                            <p:tooltip for="getGoodsGroupNameByGoods"
+                                       value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" visible="#{imShopRequire.visibleTable[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.code']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                            <p:tooltip for="getGoodsGroupNameByGoods"
+                                       value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" visible="#{imShopRequire.visibleTable[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.name']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileCode" value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                            <p:tooltip for="getEquipProfileCode"
+                                       value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                        </p:column>
+
+                        <!--<p:column >-->
+                            <!--<f:facet name="header">-->
+                                <!--<h:outputText value="#{msg['status']}" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}" />-->
+                        <!--</p:column>-->
+
+                        <p:column sortBy="#{c.specification}" visible="#{imShopRequire.visibleTable[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.spec']}" />
+                            </f:facet>
+                            <h:outputText id="specification" value="#{c.specification}" />
+                            <p:tooltip for="specification" value="#{c.specification}" />
+                        </p:column>
+
+                        <p:column sortBy="#{c.quantity}" visible="#{imShopRequire.visibleTable[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['quantity']}" />
+                            </f:facet>
+                            <h:outputText id="quantity" value="#{c.quantity}" />
+                            <p:tooltip for="quantity" value="#{c.quantity}" />
+                        </p:column>
+                        <p:column styleClass="deleteCol" visible="#{imShopRequire.visibleTable[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['delete']}" />
+                            </f:facet>
+                            <p:commandLink value="X" styleClass="delete" update=":frm" ajax="true" actionListener="#{imShopRequire.removeRs(c)}"></p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                    <p:panelGrid styleClass="Wid100">
+                        <p:column styleClass="Wid203"></p:column>
+                        <p:column style="width:79.6%">
+                            <div class="Fright">
+                                <p:commandButton icon="fa fa-check Fs14 white" value="#{msg['accept']}" disabled="#{imShopRequire.disableAdd}" id="save" update=":frm" actionListener="#{imShopRequire.save()}" styleClass="ui-priority-primary" >
+
+                                </p:commandButton>
+                                <p:commandButton icon="fa fa-undo Fs14 white" value="#{msg['cancel']}"  id="delete" update=":frm"  actionListener="#{imShopRequire.refresh()}" styleClass="ui-priority-primary cancel" />
+                                <!-- <p:commandButton icon="fa fa-camera Fs14 white" value="#{msg['print']}"   styleClass="ui-priority-primary" > 
+                                </p:commandButton>
+                                -->
+                                <p:commandButton icon="fa fa-times Fs14 white" value="#{msg['Exit']}"  action="index?faces-redirect=true" styleClass="ui-priority-primary" >
+                                </p:commandButton>
+                                <p:dialog widgetVar="cfImSReq" >
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid styleClass="pngConfirm">
+                                        <p:row>
+                                            <p:column><p:outputLabel value="#{msg['orderCode']}"></p:outputLabel></p:column>
+                                            <p:column><p:inputText styleClass="disableText" disabled="true" value="#{imShopRequire.ta.transactionActionCode}"></p:inputText></p:column>
+                                            <p:column><p:outputLabel value="#{msg['reason']}"></p:outputLabel></p:column>
+                                            <p:column><p:inputText styleClass="disableText" disabled="true" value="#{imShopRequire.ta.reasonName}"></p:inputText></p:column>
+                                        </p:row>
+                                        <p:row>
+                                            <p:column><p:outputLabel value="#{msg['note']}"></p:outputLabel></p:column>
+                                            <p:column colspan="3"> <p:inputTextarea rows="3" maxlength="200"  value="#{imShopRequire.description}"></p:inputTextarea></p:column>
+                                        </p:row>
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update="@all"  actionListener="#{imShopRequire.action}" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"  onclick="PF('cfImSReq').hide();" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+                            </div>
+                        </p:column>
+                    </p:panelGrid>
+                </p:panel>
+            </div>
+        </h:form>
+        <script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+        </script>
+    </ui:define>
+</ui:composition>

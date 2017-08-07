@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>#{msgs['page.title.login']}</title>
+	<meta name="viewport"
+		content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+	<h:outputScript name="js/login.js" library="sentinel-layout" />
+	<h:outputStylesheet name="css/font-icon-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="css/sentinel-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="css/core-layout.css"
+		library="sentinel-layout" />
+</h:head>
+
+<h:body class="fontRegular login-back white-back">
+
+	<div class="loginForm">
+		<div class="Container100 TexAlCenter">
+			<a href="#" id="login-logo">
+				<div>
+					<h:graphicImage name="images/logo.png" library="sentinel-layout" />
+				</div> <span class="Fs19 FontTitilliumSemiBoldItalic Fleft"><span
+					class="lightgray FontTitilliumSemiBoldItalic">VETC - </span><span
+					class="hardblue FontTitilliumSemiBoldItalic"> EQUIPMENT</span></span>
+			</a>
+			<div class="EmptyBox50"></div>
+		</div>
+
+
+		<p:focus context="frm_login" />
+		<h:form id="frm_login">
+			<p:growl id="messages" showDetail="true" />
+			<p:outputLabel style="display: none"
+				value="#{accessController.getRememberPassword()}"></p:outputLabel>
+			<div class="Container100 Fnone TexAlCenter OvHidden Pad50"
+				id="login-box">
+				<p:inputText id="username" placeholder="Username"
+					styleClass="Container100 Fnone MarAuto Fs18"
+					value="#{accessController.identityEntity.username}"
+					requiredMessage="Please enter your username"></p:inputText>
+				<p:message for="username" />
+				<div class="EmptyBox10"></div>
+
+
+				<p:inputText id="password" placeholder="Password" type="password"
+					styleClass="Container100 Fnone MarAuto Fs18"
+					value="#{accessController.identityEntity.password}"
+					requiredMessage="Please enter your username"></p:inputText>
+				<p:message for="password" />
+
+				<div class="Container100 Pad10 Fnone MarAuto softgray">
+					<p:selectBooleanCheckbox
+						value="#{accessController.rememberPasswordLg}" styleClass="Fleft"
+						itemLabel="Nhớ mật khẩu" />
+				</div>
+				<div class="EmptyBox5"></div>
+				<p:commandButton styleClass="Fs16"
+					action="#{accessController.login}" update="@([id$=frm_login])"
+					value="Đăng nhập"></p:commandButton>
+
+			</div>
+		</h:form>
+	</div>
+	<!-- LOGIN BOX COVER END -->
+
+</h:body>
+
+<ui:include
+	src="template/inventory-template/common/change-password.xhtml"></ui:include>
+</html>

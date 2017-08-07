@@ -1,0 +1,181 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['inven.general.selled.report']}</title>
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['stockGoodsInfo']}" styleClass="Container100">
+				
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['shop']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{createSelledGeneralReport.createShopId}">
+									<f:selectItems value="#{createSelledGeneralReport.listShop}"
+										var="c" itemLabel="#{c.shopName}" itemValue="#{c.shopId}" />
+									<p:ajax event="valueChange"
+										listener="#{createSelledGeneralReport.searchStockGood}"
+										update="frm"></p:ajax>
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100" disabled="true">
+									<f:selectItems
+										value="#{createSelledGeneralReport.listGoodStt}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['inven.selledd']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText disabled="true"
+									value="#{createSelledGeneralReport.soldSum}"></p:inputText>
+							</p:column>
+<!-- 							<p:column> -->
+<!-- 								<p:outputLabel value="#{msg['blockQuan']}"></p:outputLabel> -->
+<!-- 							</p:column> -->
+<!-- 							<p:column> -->
+<!-- 								<p:inputText disabled="true" -->
+<!-- 									value="#{createSelledGeneralReport.blockSum}"></p:inputText> -->
+<!-- 							</p:column> -->
+						</p:row>
+
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{createSelledGeneralReport.groupId}">
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<p:ajax event="valueChange" update="frm"
+										listener="#{createSelledGeneralReport.changeGoodsGroup}"></p:ajax>
+									<f:selectItems value="#{sessionBean.lsgGroup}" var="c"
+										itemLabel="#{c.goodsGroupName}" itemValue="#{c.goodsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100" id="listGoods"
+									value="#{createSelledGeneralReport.goodsId}">
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<p:ajax event="valueChange"
+										listener="#{createSelledGeneralReport.searchStockGood}"
+										update="frm"></p:ajax>
+									<f:selectItems value="#{createSelledGeneralReport.lsGoods}"
+										var="c" itemLabel="#{c.profileName}" itemValue="#{c.profileId}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<div class="Pad5">
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+							rowIndexVar="rowIndex"
+							value="#{createSelledGeneralReport.lsStockGoods}"
+							paginator="true" rows="5" paginatorPosition="bottom"
+							resizableColumns="true"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+							id="dtStockGoods">
+							<p:column styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column sortBy="#{c.goodsGroup}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goodsGroup']}" />
+								</f:facet>
+								<h:outputText id="goodsGroup" value="#{c.goodsGroup}" />
+								<p:tooltip  for="goodsGroup"
+											value="#{c.goodsGroup}" />
+							</p:column>
+							<p:column sortBy="#{c.profileName}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goods']}" />
+								</f:facet>
+								<h:outputText id="profileName" value="#{c.profileName}" />
+								<p:tooltip  for="profileName"
+											value="#{c.profileName}" />
+							</p:column>
+							<p:column sortBy="#{c.profileCode}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['profileCode']}" />
+								</f:facet>
+								<h:outputText id="profileCode" value="#{c.profileCode}" />
+								<p:tooltip  for="profileCode"
+											value="#{c.profileCode}" />
+							</p:column>
+							<p:column sortBy="#{c.goodsStatusName}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['status']}" />
+								</f:facet>
+								<h:outputText id="goodsStatusName" value="#{c.goodsStatusName}" />
+								<p:tooltip  for="goodsStatusName"
+											value="#{c.goodsStatusName}" />
+							</p:column>
+<!-- 							<p:column> -->
+<!-- 								<f:facet name="header"> -->
+<!-- 									<h:outputText value="#{msg['availableQuan']}" /> -->
+<!-- 								</f:facet> -->
+<!-- 								<h:outputText value="#{c.availableQuantity}" /> -->
+<!-- 							</p:column> -->
+<!-- 							<p:column> -->
+<!-- 								<f:facet name="header"> -->
+<!-- 									<h:outputText value="#{msg['blockQuan']}" /> -->
+<!-- 								</f:facet> -->
+<!-- 								<h:outputText value="#{c.quantityBlock}" /> -->
+<!-- 							</p:column> -->
+							<p:column sortBy="#{c.sold}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['inven.selledd']}" />
+								</f:facet>
+								<h:outputText id="sold" value="#{c.sold}" />
+								<p:tooltip  for="sold"
+											value="#{c.sold}" />
+							</p:column>
+						</p:dataTable>
+						<p:panelGrid styleClass="Wid100">
+							<p:column styleClass="Wid203"></p:column>
+							<p:column style="width:79.6%">
+								<div class="Fright">
+									<p:commandButton icon="fa fa-file-excel-o Fs14 white"
+										value="#{msg['inven.instock.report']}" ajax="true"
+										onclick="PrimeFaces.monitorDownload(start, stop);"
+										actionListener="#{createSelledGeneralReport.exportExcel}"
+										styleClass="ui-priority-primary">
+										<p:fileDownload value="#{createSelledGeneralReport.fileExport}" />
+									</p:commandButton>
+									<p:commandButton icon="fa fa-times Fs14 white"
+										value="#{msg['Exit']}"  action="index?faces-redirect=true"
+										styleClass="ui-priority-primary">
+									</p:commandButton>
+								</div>
+							</p:column>
+						</p:panelGrid>
+					</div>
+					
+				</p:panel>
+			</div>
+			<div class="EmptyBox10"></div>
+		</h:form>
+	</ui:define>
+</ui:composition>

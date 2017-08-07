@@ -1,0 +1,306 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="EQUIPMENT.G.DEVICE" />
+		<h:form id="frmBr">
+			<!-- BreadCumb -->
+			 <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            
+		</h:form>
+        <div class="Pad7">
+		<p:outputPanel styleClass="Container100 Responsive100">
+			<div class="Container100 Pad5 Responsive100">
+				<p:panel styleClass="Container100" header="#{msg['equipmentGroup.top.title']}">
+					<div class="Container100 Pad3 Responsive50">
+
+						<h:form id="frmGG">
+							<p:outputPanel id="updateFormGG">
+								<div class="Container100 Responsive100">
+									<div class="EmptyBox5" />
+									<div style="float: right;">
+										<p:commandLink oncomplete="PF('dlSaveGG').show();"
+													   PRIVILEGE="INSERT"
+													   update="@([id$=dlSaveGG])">
+											<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+											<p:resetInput target="frmDialogGG:dlSaveGG" />
+											<f:setPropertyActionListener
+													target="#{equipmentsGroupBean.groupSelected}"
+													value="#{equipmentsGroupBean.reset()}" />
+											<f:setPropertyActionListener target="#{equipmentsGroupBean.type}"
+																		 value="#{equipmentsGroupBean.TYPE_ADD}" />
+										</p:commandLink>
+										<p:commandLink action="#{equipmentsGroupBean.beforeSave}"
+													   PRIVILEGE="UPDATE"
+													   update="@([id$=dlSaveGG])">
+											<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+											<p:resetInput target="frmDialogGG:dlSaveGG" />
+											<f:setPropertyActionListener target="#{equipmentsGroupBean.type}"
+																		 value="#{equipmentsGroupBean.TYPE_EDIT}" />
+										</p:commandLink>
+										<p:commandButton id="confirmButtonGG" style="display: none"
+														 action="#{equipmentsGroupBean.delete}"
+														 update="@([id$=tblGG]),@([id$=panelGGSearch])">
+											<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+													   message="#{msg['common.confirm.message']}" />
+										</p:commandButton>
+										<p:commandLink action="#{equipmentsGroupBean.beforeDelete}" PRIVILEGE="DELETE">
+											<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+										</p:commandLink>
+										<p:commandLink oncomplete="PF('dlSearchGG').show();"
+													   update="@([id$=dlSearchGG])">
+											<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+											<f:setPropertyActionListener
+													target="#{equipmentsGroupBean.groupSelected}"
+													value="#{equipmentsGroupBean.reset()}" />
+											<f:setPropertyActionListener target="#{equipmentsGroupBean.type}"
+																		 value="#{equipmentsGroupBean.TYPE_SEARCH}" />
+										</p:commandLink>
+										<p:spacer width="10" />
+									</div>
+
+									<div class="EmptyBox10" />
+
+									<p:dataTable var="gg" value="#{equipmentsGroupBean.listEquipmentsGroup}"
+												 id="tblGG" paginator="true"  rowIndexVar="rowCount"
+												 paginatorPosition="bottom"
+												 selection="#{equipmentsGroupBean.listGroupSelected}"
+												 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+												 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+												 rowKey="#{gg.equipmentsGroupId}" lazy="false" rows="20"
+												 emptyMessage="#{msg['common.table.emptymessage']}">
+										<!-- <p:ajax event="rowSelect" listener="#{goodsGroupBean.onRowSelect}" /> -->
+										<p:ajax event="toggleSelect"
+												listener="#{equipmentsGroupBean.onRowSelected}" update="@this" />
+										<p:ajax event="rowSelectCheckbox"
+												listener="#{equipmentsGroupBean.onRowSelected}" update="@this" />
+										<p:ajax event="rowUnselectCheckbox"
+												listener="#{equipmentsGroupBean.onRowSelected}" update="@this" />
+										<f:facet name="header">
+											<p:commandButton styleClass="toggler" id="togglertblGG"
+															 type="button" value="#{msg['chooseColumns']}"
+															 icon="ui-icon-calculator" />
+											<p:columnToggler datasource="tblGG" trigger="togglertblGG">
+												<p:ajax event="toggle" listener="#{equipmentsGroupBean.onToggleActiveEtag}"
+														update="@([id$=tblGG])"/>
+											</p:columnToggler>
+										</f:facet>
+										<p:column selectionMode="multiple" style="text-align: center"
+												  visible="#{equipmentsGroupBean.visibleTable[0]}" styleClass="Wid3" />
+										<p:column headerText="#{msg['commont.grid.indext']}"
+												  visible="#{equipmentsGroupBean.visibleTable[1]}"  styleClass="Wid7">
+											<h:outputText id="stt" value="#{rowCount + 1}" lable="#{rowCount + 1}"/>
+										</p:column>
+										<p:column headerText="#{msg['goodsgroup.table.column.type']}" visible="#{equipmentsGroupBean.visibleTable[2]}"
+												  sortBy="#{equipmentsGroupBean.getGroupTypeName(gg.equipmentsGroupType)}">
+											<h:outputText id="equipmentsGroupType" value="#{equipmentsGroupBean.getGroupTypeName(gg.equipmentsGroupType)}" />
+											<p:tooltip   for="equipmentsGroupType"
+														 value="#{equipmentsGroupBean.getGroupTypeName(gg.equipmentsGroupType)}" />
+
+											<!--<h:outputText value="#{gg.equipmentsGroupType==1?msg['goodsgroup.table.column.type.1L']:msg['goodsgroup.table.column.type.2L']}" />-->
+										</p:column>
+										<p:column headerText="#{msg['goodsgroup.table.column.code']}" visible="#{equipmentsGroupBean.visibleTable[3]}"
+												  sortBy="#{gg.equipmentsGroupCode}">
+											<h:outputText id="equipmentsGroupCode" value="#{gg.equipmentsGroupCode}" />
+											<p:tooltip   for="equipmentsGroupCode"
+														 value="#{gg.equipmentsGroupCode}" />
+										</p:column>
+										<p:column sortBy="#{gg.equipmentsGroupName}"
+												  visible="#{equipmentsGroupBean.visibleTable[4]}" headerText="#{msg['goodsgroup.table.column.name']}">
+											<h:outputText id="equipmentsGroupName" value="#{gg.equipmentsGroupName}" />
+											<p:tooltip   for="equipmentsGroupName"
+														 value="#{gg.equipmentsGroupName}" />
+										</p:column>
+										<p:column headerText="#{msg['common.status']}"
+												  visible="#{equipmentsGroupBean.visibleTable[5]}" sortBy="#{gg.equipmentsGroupStatus}">
+											<h:outputText id="equipmentsGroupStatus"
+													value="#{gg.equipmentsGroupStatus == 1?msg['common.status.1']:msg['common.status.0']}" />
+											<p:tooltip   for="equipmentsGroupStatus"
+														 value="#{gg.equipmentsGroupStatus == 1?msg['common.status.1']:msg['common.status.0']}" />
+										</p:column>
+										<!--<p:column headerText="#{msg['goodsgroup.table.column.maintanceScript']}">-->
+											<!--<h:outputText value="#{gg.maintanceScript}" />-->
+										<!--</p:column>-->
+									</p:dataTable>
+								</div>
+							</p:outputPanel>
+						</h:form>
+
+						<h:form id="frmDialogGG">
+							<p:confirmDialog widgetVar="dlgDeleteGG" global="true"
+											 showEffect="fade" hideEffect="fade">
+								<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+												 styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="#{msg['common.confirmdialog.no']}"
+												 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+
+							<p:dialog widgetVar="dlSaveGG" id="dlSaveGG" modal="true"
+									  resizable="false" closable="true" height="200"
+									  header="#{msg['goodsgroup.header']}">
+								<p:panelGrid id="panelGG" columns="2">
+
+									<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.type']} (*)" />
+										<!--<p:selectOneMenu id="type" style="width:250px;"-->
+														 <!--value="#{equipmentsGroupBean.groupSelected.equipmentsGroupType}">-->
+											<!--<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>-->
+											<!--<f:selectItem itemLabel="#{msg['goodsgroup.table.column.type.1L']}" itemValue="1" />-->
+											<!--<f:selectItem itemLabel="#{msg['goodsgroup.table.column.type.2L']}" itemValue="2"/>-->
+											<!--<f:attribute name="msglabel" value="#{msg['goodsgroup.table.column.type']}" />-->
+											<!--<f:validator validatorId="emtyValidator" />-->
+										<!--</p:selectOneMenu>-->
+
+									<p:selectOneMenu   id="type" value="#{equipmentsGroupBean.groupSelected.equipmentsGroupType}"
+													   disabled="#{equipmentsGroupBean.groupSelected.equipmentsGroupStatus==0?true:false}"
+													   validator="#{equipmentsGroupBean.validate}"
+													 style="width: 250px">
+										<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+										<f:selectItems value="#{equipmentsGroupBean.lstGroupType}" var="c"
+													   itemLabel="#{c.name}" itemValue="#{c.value}" />
+										<f:attribute name="msglabel" value="#{msg['goodsgroup.table.column.type']}" />
+										<f:validator validatorId="emtyValidator" />
+									</p:selectOneMenu>
+									<p:outputLabel />
+									<p:message id="msgType" for="type" />
+									<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.code']} (*)" />
+									<p:inputText style="width:250px;" id="codeGG"
+												 disabled="#{equipmentsGroupBean.groupSelected.equipmentsGroupStatus==0?true:false}"
+												 validator="#{equipmentsGroupBean.validate}"
+												 value="#{equipmentsGroupBean.groupSelected.equipmentsGroupCode}"
+												 maxlength="30">
+										<f:attribute name="msglabel" value="#{msg['goodsgroup.table.column.code']}" />
+										<f:validator validatorId="emtyValidator" />
+										<f:validator validatorId="codeValidator" />
+									</p:inputText>
+									<p:outputLabel />
+									<p:message id="msgCodeGG" for="codeGG" />
+
+									<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.name']} (*)" />
+									<p:inputText style="width:250px;" id="nameGG"
+												 disabled="#{equipmentsGroupBean.groupSelected.equipmentsGroupStatus==0?true:false}"
+												 value="#{equipmentsGroupBean.groupSelected.equipmentsGroupName}"
+												 maxlength="40">
+										<f:attribute name="msglabel" value="#{msg['goodsgroup.table.column.name']}" />
+										<f:validator validatorId="emtyValidator" />
+									</p:inputText>
+									<p:outputLabel />
+									<p:message id="msgNameGG" for="nameGG" />
+									<p:outputLabel style="font-size:12px;" value="#{msg['common.status']} (*)" />
+									<p:selectOneMenu id="frmStatus" style="width:250px;"
+													 value="#{equipmentsGroupBean.groupSelected.equipmentsGroupStatus}" disabled="true">
+										<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+										<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+									</p:selectOneMenu>
+									<p:outputLabel />
+									<p:message for="frmStatus" />
+
+									<!--<p:outputLabel style="font-size:12px;" value="Kịch bản bảo trì" />-->
+									<!--<p:inputText style="width:250px;" id="maintanceScript"-->
+												 <!--value="#{equipmentsGroupBean.groupSelected.maintanceScript}"-->
+												 <!--maxlength="100">-->
+									<!--</p:inputText>-->
+									<!--<p:outputLabel />-->
+									<!--<p:message id="msgMaintanceScript" for="maintanceScript" />-->
+									<!--<p:outputLabel />-->
+									<!--<p:message id="msgNameGG" for="nameGG" />-->
+									<!--<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.maintanceScript']}" />-->
+									<!--<p:inputTextarea cols="3" rows="3" style="width:250px; height: 100px" id="maintanceScript"-->
+												 <!--value="#{equipmentsGroupBean.groupSelected.maintanceScript}"-->
+												 <!--maxlength="500">-->
+									<!--</p:inputTextarea>-->
+									<!--<p:outputLabel />-->
+
+								</p:panelGrid>
+
+								<f:facet name="footer">
+									<p:commandButton icon="ui-icon-plus" action="#{equipmentsGroupBean.save}"
+													 disabled="#{equipmentsGroupBean.groupSelected.equipmentsGroupStatus==0?true:false}"
+													 value="#{msg['common.dialog.save']}"
+													 update="@([id$=tblGG]),@([id$=panelGG])">
+									</p:commandButton>
+									<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+													 oncomplete="PF('dlSaveGG').hide()">
+										<p:resetInput target="frmDialogGG:dlSaveGG" />
+									</p:commandButton>
+								</f:facet>
+							</p:dialog>
+
+						</h:form>
+
+						<h:form id="frmSearchGG">
+							<p:dialog widgetVar="dlSearchGG" id="dlSearchGG" modal="true"
+									  resizable="false" closable="true" height="150"
+									  header="#{msg['goodsgroup.header']}">
+								<p:panelGrid id="panelGGSearch" columns="2">
+									<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.type']}" />
+									<p:selectOneMenu   id="typeStr" value="#{equipmentsGroupBean.groupSelected.equipmentsGroupType}"
+													   style="width: 250px">
+										<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+										<f:selectItems value="#{equipmentsGroupBean.lstGroupType}" var="c"
+													   itemLabel="#{c.name}" itemValue="#{c.value}" />
+									</p:selectOneMenu>
+
+									<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.code']}" />
+									<p:inputText style="width:250px;"
+												 value="#{equipmentsGroupBean.groupSelected.equipmentsGroupCode}"
+												 maxlength="50">
+									</p:inputText>
+
+									<p:outputLabel style="font-size:12px;" value="#{msg['goodsgroup.table.column.name']}" />
+									<p:inputText style="width:250px;"
+												 value="#{equipmentsGroupBean.groupSelected.equipmentsGroupName}"
+												 maxlength="50">
+									</p:inputText>
+
+									<p:outputLabel style="font-size:12px;" value="#{msg['common.status']}" />
+									<p:selectOneMenu
+											value="#{equipmentsGroupBean.groupSelected.equipmentsGroupStatus}"
+											style="width:250px">
+										<f:selectItem itemLabel="" itemValue="" />
+										<f:selectItem itemLabel="#{msg['common.status.1']}"
+													  itemValue="1" />
+										<f:selectItem itemLabel="#{msg['common.status.0']}"
+													  itemValue="0" />
+									</p:selectOneMenu>
+
+									<!--<p:outputLabel style="font-size:12px;" value="Kịch bản bảo trì" />-->
+									<!--<p:inputText style="width:250px;"-->
+												 <!--value="#{equipmentsGroupBean.groupSelected.maintanceScript}"-->
+												 <!--maxlength="50">-->
+									<!--</p:inputText>-->
+
+								</p:panelGrid>
+								<f:facet name="footer">
+									<p:commandButton icon="ui-icon-search"
+													 action="#{equipmentsGroupBean.filterSearch}" value="#{msg['common.dialog.search']}"
+													 update="@([id$=tblGG]),@([id$=panelGGSearch])">
+									</p:commandButton>
+									<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+													 oncomplete="PF('dlSearchGG').hide()">
+										<p:resetInput target="tv:frmSearchGG:dlSearchGG" />
+									</p:commandButton>
+								</f:facet>
+							</p:dialog>
+						</h:form>
+
+					</div>
+
+				</p:panel>
+			</div>
+		</p:outputPanel>
+	  </div>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

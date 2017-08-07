@@ -1,0 +1,88 @@
+#leftform{
+    background: #FAFAFA;
+    padding-right: 1px;
+    z-index: 1; 
+    /* display: block; */
+}
+#sm-topmenu .ui-commandlink{
+    color: #FAFAFA !important;
+}
+
+.ui-growl{
+    left:79%;
+}
+.index{width: 80px !important;}
+.input-group{
+    position: relative;
+    display: table;
+    border-collapse: separate;
+    width: 100%;
+}
+input {
+    height: 25px !important;
+    line-height: 12px;
+    padding: 0 5px; 
+}
+.NoBor{
+    border: none !important;
+}
+.layout-menubarinner-box .ui-dialog{
+    width: 100% !important;
+    left: 0% !important;
+    overflow: scroll auto;
+    top: 0% !important;
+    box-shadow: 10px 0 0 0 rgba(255, 255, 255, 0.2);
+    height: 99% !important;
+}
+input {
+    width: 100%;
+    font-size: 14px;
+    height: 100% !important;
+    display: block;
+    top: 0px;
+    padding: 0 5px;
+    margin: 0px !important;
+    float: left !important;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+.ui-panelgrid {width:100%;}
+.dtHead{float:left;color: #505050;font-weight: bold;padding-left: 5px; text-transform: uppercase;} 
+.toggler {float:right;box-shadow: none;border: none;background: transparent;height: 100%}
+.toggler span{font-size: 11px;font-weight: bold;background: transparent;color: #505050}
+.ui-panel .ui-panel-title{color: #505050 !important}
+.cancel .ui-button-text{background: #00aff0}
+.reject .ui-button-text{background: #00aff0}
+.ui-columntoggler .ui-columntoggler-items{font-size: 13px;}
+.ui-inputfield{height: 24px !important;font-size:14px;}
+.ui-autocomplete-select{width: 100% !important}
+.textArena2{width:500px;}
+.ui-button-text{font-size: 11px;}
+.ui-datatable-tablewrapper table thead tr th{text-align:center !important}
+.index{width: 60px !important}
+.select{width: 100% !important}
+.pngBtn{float: right}
+.ui-selectonemenu .ui-selectonemenu-label{}
+.ui-autocomplete{width: 100%}
+#frm{min-height: 600px;}
+.ui-widget-header .ui-inputfield, .ui-widget-content .ui-inputfield{}
+.pngConfirm .ui-inputfield,.ui-calendar .ui-inputfield{width: 100%}
+.ui-datepicker-trigger,.ui-button{height: 100%}
+.ui-datatable .ui-selection-column .ui-chkbox-all{width: auto !important}
+.Wid13{width: 11%}
+.Wid9{width: 9%}
+.Wid7{width: 7%}
+.Wid203{width: 22.3%!important;}
+.Wid15{width: 15%}
+.Wid35{width: 35%}
+.Wid40{width: 40%}
+.disableText{color: #000 !important;}
+.ui-panel .ui-panel-titlebar{font-size: 14px !important}
+.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled{opacity: 0.67 !important;background: #f4f4f4}
+.deleteCol{text-align: center !important;font-weight: bold}
+.deleteCol a{font-size: 14px}
+.dtlistNotification .ui-datalist .ui-datalist-content .ui-datalist-data{padding: 10px 5px;}

@@ -1,0 +1,408 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['evaluateGoods']}</title>
+
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['evaluateGoods']}">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['evaluateType']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu disabled="#{evaluateGoods.disableType}"
+									styleClass="select Wid100" value="#{evaluateGoods.typeId}">
+									<p:ajax event="valueChange" update=":frm"
+										listener="#{evaluateGoods.changeType()}"></p:ajax>
+									<f:selectItems value="#{evaluateGoods.listEvalueType}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13"
+								rendered="#{!evaluateGoods.notRenderStatus}">
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203"
+								rendered="#{!evaluateGoods.notRenderStatus}">
+								<p:selectOneMenu disabled="#{evaluateGoods.disableStatus}"
+									styleClass="select Wid100" value="#{evaluateGoods.goodStatus}">
+									<p:ajax event="valueChange" update=":frm"
+										listener="#{evaluateGoods.changeStatus()}"></p:ajax>
+									<f:selectItems value="#{sessionBean.listStatus}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13"
+								rendered="#{evaluateGoods.renderReason}">
+								<p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203"
+								rendered="#{evaluateGoods.renderReason}">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{evaluateGoods.reasonId}">
+									<f:selectItems value="#{evaluateGoods.listReasons}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13"
+								rendered="#{!evaluateGoods.notRenderStock}">
+								<p:outputLabel value="#{msg['stockStatus']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203"
+								rendered="#{!evaluateGoods.notRenderStock}">
+								<p:selectOneMenu disabled="#{evaluateGoods.disableStock}"
+									styleClass="select Wid100"
+									value="#{evaluateGoods.stockStatusId}">
+									<p:ajax event="valueChange" update=":frm"
+										listener="#{evaluateGoods.changeStockStatus()}"></p:ajax>
+									<f:selectItems value="#{evaluateGoods.listStockStatus}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+
+							<p:column>
+								<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+							</p:column>
+							<p:column colspan="3">
+								<p:inputTextarea maxlength="200" rows="1" style="width: 100%"
+									value="#{evaluateGoods.reason}"></p:inputTextarea>
+							</p:column>
+							<p:column></p:column>
+						</p:row>
+					</p:panelGrid>
+
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<f:facet name="header">
+							<p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+						</f:facet>
+						<f:facet name="message">
+							<p:outputLabel value="#{msg['confirmMsg']}"></p:outputLabel>
+						</f:facet>
+						<p:commandButton value="#{msg['yes']}" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="#{msg['no']}" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel header="#{msg['search']}" id="info">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{evaluateGoods.goodsGroupId}">
+									<p:ajax event="valueChange" update=":frm:info"
+										listener="#{evaluateGoods.changeGoodsGroup()}"></p:ajax>
+									<f:selectItems value="#{sessionBean.lsgGroup}" var="c"
+										itemLabel="#{c.goodsGroupName}" itemValue="#{c.goodsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									dropdown="true" value="#{evaluateGoods.goods}"
+									completeMethod="#{evaluateGoods.completeGoods}">
+									<p:ajax event="itemSelect"
+										listener="#{evaluateGoods.goodsSelect}" update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['provider']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{evaluateGoods.providerId}" style="width: 190px">
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<f:selectItems value="#{sessionBean.lsProvider}" var="c"
+										itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['fromSerial']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="select Wid100" onkeypress="if (event.keyCode == 13) { return false; }"
+									value="#{evaluateGoods.fromSerial}"></p:inputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['toSerial']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="select Wid100" onkeypress="if (event.keyCode == 13) { return false; }"
+									value="#{evaluateGoods.toSerial}"></p:inputText>
+							</p:column>
+							<!--                             <p:column> -->
+							<!--                                 <p:outputLabel value="#{evaluateGoods.status}"></p:outputLabel> -->
+							<!--                             </p:column> -->
+							<!--                             <p:column> -->
+							<!--                                 <p:inputText disabled="true" styleClass="select Wid100 disableText" value="#{evaluateGoods.statusName}"></p:inputText> -->
+							<!--                             </p:column> -->
+							<p:column></p:column>
+							<p:column>
+								<p:commandButton icon="fa fa-search Fs14 white"
+									value="#{msg['search']}" style="float:right" update="frm"
+									actionListener="#{evaluateGoods.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+				<div class="EmptyBox5"></div>
+				<p:panel>
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{evaluateGoods.lsData}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtSearch" rowKey="#{c.id}"
+						selection="#{evaluateGoods.lsDataSelect}">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['stockGoodsInfo']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtSearch"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch" />
+						</f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected])" />
+						<p:ajax event="rowSelectCheckbox"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected])" />
+						<p:ajax event="rowUnselectCheckbox"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected])" />
+						<p:ajax event="toggleSelect"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected])" />
+						<p:column styleClass="index">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column sortBy="#{c.serial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['serial']}" />
+							</f:facet>
+							<h:outputText id="serial" value="#{c.serial}" />
+							<p:tooltip for="serial"
+									   value="#{c.serial}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods']}" />
+							</f:facet>
+							<h:outputText id="goods"
+								value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							<p:tooltip for="goods"
+									   value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['profileCode']}" />
+							</f:facet>
+							<h:outputText id="profileCode"
+								value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							<p:tooltip for="profileCode"
+									   value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['provider']}" />
+							</f:facet>
+							<h:outputText id="provider"
+								value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							<p:tooltip for="provider"
+									   value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+						</p:column>
+
+						<p:column sortBy="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['status']}" />
+							</f:facet>
+
+							<h:outputText id="status"
+								value="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}" />
+							<p:tooltip for="status"
+									   value="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getStockStatusName(c.stockStatus)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['stockStatus']}" />
+							</f:facet>
+
+							<h:outputText id="stockStatus"
+								value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+							<p:tooltip for="stockStatus"
+									   value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+						</p:column>
+						<p:column selectionMode="multiple" style="text-align: center">
+						</p:column>
+					</p:dataTable>
+
+					<div class="EmptyBox10" />
+					<p:panelGrid id="sumDataselected" styleClass="Wid100">
+						<p:column style="font-weight: bold;">#{msg['inven.sum']}: #{evaluateGoods.sumDataSelected}</p:column>
+					</p:panelGrid>
+					<p:separator></p:separator>
+
+					<p:panelGrid styleClass="Wid100">
+						<p:column style="width:10%"></p:column>
+						<p:column style="width:90%">
+							<div class="Fright">
+								<p:commandButton value="#{msg['add']}" update=":frm"
+									icon="fa fa-plus Fs14 white"
+									actionListener="#{evaluateGoods.add}"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+								<p:commandButton value="#{msg['addAll']}" update=":frm"
+									icon="fa fa-plus-square Fs14 white"
+									actionListener="#{evaluateGoods.addAll}"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel id="result">
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{evaluateGoods.lsDataRs}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtResult" lazy="false">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['changeInfo']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtResult"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<p:columnToggler datasource="dtResult" trigger="togglerdtResult" />
+						</f:facet>
+						<p:column styleClass="index">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column  sortBy="#{c.serial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['serial']}" />
+							</f:facet>
+							<h:outputText id="serial2" value="#{c.serial}" />
+							<p:tooltip for="serial2"
+									   value="#{c.serial}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods']}" />
+							</f:facet>
+							<h:outputText id="goods2"
+								value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+							<p:tooltip for="goods2"
+									   value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['profileCode']}" />
+							</f:facet>
+
+							<h:outputText id="profileCode2"
+								value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+							<p:tooltip for="profileCode2"
+									   value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['provider']}" />
+							</f:facet>
+							<h:outputText id="getProviderName"
+								value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							<p:tooltip for="getProviderName"
+									   value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['status']}" />
+							</f:facet>
+							<h:outputText id="getEquipsStatusName"
+								value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+							<p:tooltip for="getEquipsStatusName"
+									   value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getStockStatusName(c.stockStatus)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['stockStatus']}" />
+							</f:facet>
+
+							<h:outputText id="stockStatus1"
+								value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+							<p:tooltip for="stockStatus1"
+									   value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+						</p:column>
+						<p:column styleClass="deleteCol">
+							<f:facet name="header">
+								<h:outputText value="#{msg['delete']}" />
+							</f:facet>
+							<p:commandLink value="X" styleClass="delete" update=":frm"
+								actionListener="#{evaluateGoods.removeRs(c)}"></p:commandLink>
+						</p:column>
+					</p:dataTable>
+					<div class="EmptyBox10" />
+					<p:panelGrid styleClass="Wid100">
+						<p:column style="font-weight: bold;">#{msg['inven.sum']}: #{evaluateGoods.belowSumDataSelected}</p:column>
+					</p:panelGrid>
+					<p:separator></p:separator>
+
+				</p:panel>
+				<p:panelGrid styleClass="Wid100">
+					<p:column style="width:10%"></p:column>
+					<p:column style="width:90%">
+						<div class="Fright">
+							<p:commandButton value="#{msg['accept']}"
+								icon="fa fa-check Fs14 white"
+								disabled="#{evaluateGoods.setSize==0}" update="frm"
+								actionListener="#{evaluateGoods.save}"
+								styleClass="ui-priority-primary">
+								<p:confirm icon="ui-icon-alert" />
+							</p:commandButton>
+							<p:commandButton value="#{msg['cancel']}"
+								icon="fa fa-ban Fs14 white"
+								disabled="#{evaluateGoods.setSize==0}" update=":frm"
+								actionListener="#{evaluateGoods.refresh}"
+								styleClass="ui-priority-primary cancel">
+							</p:commandButton>
+							<p:commandButton value="#{msg['Exit']}"
+								icon="fa fa-times Fs14 white" action="index?faces-redirect=true"
+								styleClass="ui-priority-primary">
+							</p:commandButton>
+
+						</div>
+					</p:column>
+				</p:panelGrid>
+			</div>
+
+		</h:form>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,252 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:p="http://primefaces.org/ui"
+				template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['inven.detail.selled.report']}</title>
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['transSerialInfo']}"
+						 styleClass="Container100">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['shop']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{createDetailSelledReport.createShopId}">
+									<f:selectItems value="#{createDetailSelledReport.listShop}"
+												   var="c" itemLabel="#{c.shopName}" itemValue="#{c.shopId}" />
+									<!-- 									<p:ajax event="valueChange" -->
+									<!-- 										listener="#{createDetailSelledReport.searchStockGood}" -->
+									<!-- 										update="frm"></p:ajax> -->
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{createDetailSelledReport.groupId}">
+									<!-- 									<f:selectItem itemLabel="" itemValue="" -->
+									<!-- 										noSelectionOption="true" /> -->
+									<p:ajax event="valueChange" update="listGoods"
+											listener="#{createDetailSelledReport.changeGoodsGroup}"></p:ajax>
+									<f:selectItems value="#{sessionBean.lsgGroup}" var="c"
+												   itemLabel="#{c.goodsGroupName}" itemValue="#{c.goodsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100" id="listGoods"
+												 value="#{createDetailSelledReport.goodsId}">
+									<!-- 									<p:ajax event="valueChange" -->
+									<!-- 										listener="#{createDetailSelledReport.searchStockGood}" -->
+									<!-- 										update="@([id$=dtEtagSerial]), @([id$=dtStockGoods])"></p:ajax> -->
+									<f:selectItems value="#{createDetailSelledReport.lsGoods}"
+												   var="c" itemLabel="#{c.profileName}" itemValue="#{c.profileId}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100" disabled="true"
+												 value="#{createDetailSelledReport.stockGoodsStatus}">
+									<!-- 									<p:ajax event="valueChange" -->
+									<!-- 										listener="#{createDetailSelledReport.searchStockGood}" -->
+									<!-- 										update="frm"></p:ajax> -->
+									<!-- 									<f:selectItem itemLabel="" itemValue="" -->
+									<!-- 										noSelectionOption="true" /> -->
+									<f:selectItems value="#{createDetailSelledReport.listGoodStt}"
+												   var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['stockStatus']}"></p:outputLabel>
+							</p:column>
+							<!-- 						#{msg['stock.status']} -->
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="Wid100"
+												 value="#{createDetailSelledReport.stockStatus}">
+									<f:selectItems value="#{createDetailSelledReport.listStatus}"
+												   var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['provider']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="Wid100"
+												 value="#{createDetailSelledReport.providerId}">
+									<f:selectItem itemLabel="" itemValue=""
+												  noSelectionOption="true" />
+									<f:selectItems value="#{sessionBean.lsProvider}" var="c"
+												   itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="tungay" value="#{msg['inven.from.date']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar maxdate="#{createDetailSelledReport.newDate}" showOn="button"
+											id="tungay" locale="en" styleClass="Wid100"
+											value="#{createDetailSelledReport.fromDate}"
+											pattern="dd/MM/yyyy" navigator="true">
+								</p:calendar>
+							</p:column>
+							<p:column>
+								<p:outputLabel for="denngay" value="#{msg['inven.to.date']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="Wid100" showOn="button"
+											maxdate="#{createDetailSelledReport.newDate}" id="denngay"
+											locale="en" pattern="dd/MM/yyyy"
+											value="#{createDetailSelledReport.toDate}" navigator="true">
+								</p:calendar>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['fromSerial']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100" onkeypress="if (event.keyCode == 13) { return false; }"
+											 value="#{createDetailSelledReport.fromSerial}"></p:inputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['toSerial']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100" onkeypress="if (event.keyCode == 13) { return false; }"
+											 value="#{createDetailSelledReport.toSerial}"></p:inputText>
+							</p:column>
+							<p:column></p:column>
+							<p:column>
+								<p:commandButton icon="fa fa-search Fs14 white"
+												 style="float: right" value="#{msg['search']}" update="frm"
+												 actionListener="#{createDetailSelledReport.search}"
+												 id="search_">
+								</p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<div class="Pad5">
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+									 rowIndexVar="rowIndex" value="#{createDetailSelledReport.lsData}"
+									 paginator="true" rows="10" paginatorPosition="bottom"
+									 resizableColumns="true"
+									 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									 id="dtEtagSerial" lazy="true">
+							<f:facet name="header">
+								<p:commandButton styleClass="toggler" id="togglerdtEtagSerial"
+												 value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+								<p:columnToggler datasource="dtEtagSerial"
+												 trigger="togglerdtEtagSerial" />
+							</f:facet>
+							<p:column styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column sortBy="#{createDetailSelledReport.goodsGroupName}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goodsGroup']}" />
+								</f:facet>
+								<h:outputText id="goodsGroupName" value="#{createDetailSelledReport.goodsGroupName}" />
+								<p:tooltip  for="getStockStatusName"
+											value="#{createDetailSelledReport.goodsGroupName}" />
+							</p:column>
+							<p:column sortBy="#{c.profileName}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goods']}" />
+								</f:facet>
+								<h:outputText id="profileName" value="#{c.profileName}" />
+								<p:tooltip  for="profileName"
+											value="#{c.profileName}" />
+							</p:column>
+							<p:column sortBy="#{c.profileCode}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['profileCode']}" />
+								</f:facet>
+								<h:outputText id="profileCode" value="#{c.profileCode}" />
+								<p:tooltip  for="profileCode"
+											value="#{c.profileCode}" />
+							</p:column>
+							<p:column sortBy="#{c.serial}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['serial']}" />
+								</f:facet>
+								<h:outputText id="serial" value="#{c.serial}" />
+								<p:tooltip  for="serial"
+											value="#{c.serial}" />
+							</p:column>
+							<p:column visible="false" sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['provider']}" />
+								</f:facet>
+								<h:outputText id="getProviderName"
+											  value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+								<p:tooltip  for="getProviderName"
+											value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							</p:column>
+
+							<p:column visible="false" sortBy="#{sessionBean.getStockStatusName(c.stockStatus)}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['stockStatus']}" />
+								</f:facet>
+								<h:outputText id="getStockStatusName"
+											  value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+								<p:tooltip  for="getStockStatusName"
+											value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+							</p:column>
+							<p:column sortBy="#{c.strOutstockDatetime}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['inven.sell.date']}" />
+								</f:facet>
+								<h:outputText id="strOutstockDatetime" value="#{c.strOutstockDatetime}">
+								</h:outputText>
+								<p:tooltip  for="strOutstockDatetime"
+											value="#{c.strOutstockDatetime}"/>
+							</p:column>
+						</p:dataTable>
+						<p:panelGrid styleClass="Wid100">
+							<p:column styleClass="Wid203"></p:column>
+							<p:column style="width:79.6%">
+								<div class="Fright">
+									<p:commandButton icon="fa fa-file-excel-o Fs14 white"
+													 value="#{msg['inven.instock.report']}" ajax="true"
+													 onclick="PrimeFaces.monitorDownload(start, stop);"
+													 actionListener="#{createDetailSelledReport.exportInstockGoodsDetailReport()}"
+													 styleClass="ui-priority-primary">
+										<p:fileDownload value="#{createDetailSelledReport.fileExport}" />
+									</p:commandButton>
+									<p:commandButton icon="fa fa-times Fs14 white"
+													 value="#{msg['Exit']}" action="index?faces-redirect=true"
+													 styleClass="ui-priority-primary">
+									</p:commandButton>
+								</div>
+							</p:column>
+						</p:panelGrid>
+					</div>
+				</p:panel>
+			</div>
+			<div class="EmptyBox10"></div>
+		</h:form>
+	</ui:define>
+</ui:composition>

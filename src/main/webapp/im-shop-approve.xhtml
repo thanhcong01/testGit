@@ -1,0 +1,375 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml"
+	xmlns:cp="http://java.sun.com/jsf/composite/component">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['imPShopApprove']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['imPShopApprove']}"></p:outputLabel></h2>-->
+
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+
+			<div class="Pad10">
+
+				<p:growl id="messages" showDetail="true" />
+
+				<p:panel header="#{msg['search']}" id="info">
+					<p:panelGrid styleClass="Wid100">
+						<p:row style="visibility: hidden;">
+							<p:column styleClass="Wid13"></p:column>
+							<p:column styleClass="Wid203"></p:column>
+							<p:column styleClass="Wid13"></p:column>
+							<p:column styleClass="Wid203"></p:column>
+							<p:column styleClass="Wid13"></p:column>
+							<p:column styleClass="Wid203"></p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:autoComplete id="cmlOrder" styleClass="Wid100 textbox"
+									value="#{imPShopApprove.orderCode}" minQueryLength="3"
+									completeMethod="#{imPShopApprove.completeOrder}">
+									<p:ajax event="itemSelect"
+										listener="#{imPShopApprove.oderSelect}" update="frm" />
+								</p:autoComplete>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{imShopApprove.status}">
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<f:selectItems value="#{imShopApprove.listStatus}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['orderType']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{imPShopApprove.typeId}">
+									<p:ajax event="valueChange" update=":frm"
+										listener="#{imShopApprove.changeType}"></p:ajax>
+									<!--<f:selectItem itemLabel="" itemValue=""-->
+										<!--noSelectionOption="true" />-->
+									<f:selectItems value="#{imShopApprove.listTransType}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							
+						</p:row>
+
+						<p:row>
+							
+							<p:column>
+								<p:outputLabel value="#{msg['requireShop']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									scrollHeight="150" style="width:300px;" maxlength="50"
+									forceSelection="true" dropdown="true"
+									value="#{imShopApprove.subShop}"
+									emptyMessage="#{msg['common.table.emptymessage']}"
+									completeMethod="#{imShopApprove.CompleteSubShop}">
+									<p:ajax event="itemSelect"
+										listener="#{imShopApprove.SubShopSelect}" update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['createDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="datebox Wid100" id="button"
+									showOn="button" converterMessage="#{msg['errDateType']}"
+									value="#{imShopApprove.createDate}" pattern="dd/MM/yyyy">
+								</p:calendar>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['createStaff']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{imShopApprove.staffId}">
+									<!-- <p:ajax event="valueChange" update=":frm"
+										listener="#{imShopApprove.changeStaff}"></p:ajax> -->
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<f:selectItems value="#{imShopApprove.listStaff}" var="c"
+										itemLabel="#{c.staffName}" itemValue="#{c.staffId}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="4"></p:column>
+							<p:column colspan="2">
+
+								<p:commandButton icon="fa fa-eye Fs14 white"
+												 style="float: right; display: inline-block" value="#{msg['viewStock']}"
+												 update=":leftform:viewStock"
+												 actionListener="#{viewStock.viewStockFromButton}"></p:commandButton>
+								<p:commandButton icon="fa fa-search Fs14 white"
+												 value="#{msg['search']}" style="float: right; display: inline-block" update="frm"
+												 actionListener="#{imShopApprove.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel>
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{imShopApprove.lsData}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtta" lazy="true" selection="#{imShopApprove.ta}"
+						rowKey="#{c.transactionActionId}">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['transInfo']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtta"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+
+							<p:columnToggler datasource="dtta" trigger="togglerdtta">
+								<p:ajax event="toggle" listener="#{imShopApprove.onToggleActiveEtag}"
+										update="@([id$=dtta])"/>
+							</p:columnToggler>
+							<p:columnToggler datasource="dtta" trigger="togglerdtta" />
+						</f:facet>
+						<p:ajax event="rowSelectRadio" listener="#{imShopApprove.view}"
+							update=":frm" />
+
+						<p:column styleClass="index Wid5" style="text-align: center;" visible="#{imShopApprove.visibleTable[0]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column styleClass="Wid13" sortBy="#{c.transactionActionCode}" visible="#{imShopApprove.visibleTable[1]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['orderCode']}" />
+							</f:facet>
+							<h:outputText id="transactionActionCode" value="#{c.transactionActionCode}" />
+							<p:tooltip  for="transactionActionCode"
+										value="#{c.transactionActionCode}" />
+						</p:column>
+						<p:column styleClass="Wid13" sortBy="#{c.transactionType}" visible="#{imShopApprove.visibleTable[2]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['orderType']}" />
+							</f:facet>
+							<h:outputText id="typeName" value="#{c.typeName}" />
+							<p:tooltip  for="typeName"
+										value="#{c.typeName}" />
+						</p:column>
+						<!-- <p:column>
+							<f:facet name="header">
+								<h:outputText value="#{msg['reason']}" />
+							</f:facet>
+							<h:outputText value="#{c.reasonName}" />
+						</p:column> -->
+						<p:column styleClass="Wid13" sortBy="#{c.createShopId}" visible="#{imShopApprove.visibleTable[3]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['requireShop']}" />
+							</f:facet>
+							<h:outputText id="shopName" value="#{c.shopName}" />
+							<p:tooltip  for="shopName"
+										value="#{c.shopName}" />
+						</p:column>
+						<p:column styleClass="Wid9" sortBy="#{c.status}" visible="#{imShopApprove.visibleTable[4]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['status']}" />
+							</f:facet>
+							<h:outputText id="statusName" value="#{c.statusName}" />
+							<p:tooltip   for="statusName"
+										value="#{c.statusName}" />
+						</p:column>
+						
+						<p:column styleClass="Wid15" sortBy="#{c.createDatetime}" visible="#{imShopApprove.visibleTable[5]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['createDate']}" />
+							</f:facet>
+							<h:outputText id="createDateString" value="#{c.createDateString}">
+							</h:outputText>
+							<p:tooltip  for="createDateString"
+										 value="#{c.createDateString}" />
+						</p:column>
+						<p:column styleClass="Wid11" sortBy="#{c.createStaffId}" visible="#{imShopApprove.visibleTable[6]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['createStaff']}" />
+							</f:facet>
+							<h:outputText id="staffName" value="#{c.staffName}">
+							</h:outputText>
+							<p:tooltip  for="staffName"
+										value="#{c.staffName}" />
+						</p:column>
+						<p:column styleClass="Wid203" sortBy="#{c.description}" visible="#{imShopApprove.visibleTable[7]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['note']}" />
+							</f:facet>
+							<h:outputText id="lbdescription" value="#{c.description}" />
+							<p:tooltip for="lbdescription" value="#{c.description}" />
+						</p:column>
+						<p:column selectionMode="single" styleClass="Wid5" style="text-align: center;" visible="#{imShopApprove.visibleTable[8]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['choosed']}" />
+							</f:facet>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel>
+
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{imShopApprove.ta.lsDetail}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtstDetail" lazy="false">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['detailInfo']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtstDetail"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+
+							<p:columnToggler datasource="dtstDetail" trigger="togglerdtstDetail">
+								<p:ajax event="toggle" listener="#{imShopApprove.onToggleActiveEtag2}"
+										update="@([id$=dtstDetail])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:column styleClass="index"  visible="#{imShopApprove.visibleTable2[0]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" visible="#{imShopApprove.visibleTable2[1]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goodsGroup']}" />
+							</f:facet>
+							<h:outputText id="getGoodsGroupNameByGoods"
+								value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+							<p:tooltip  for="getGoodsGroupNameByGoods"
+										value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" visible="#{imShopApprove.visibleTable2[2]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['profileCode']}" />
+							</f:facet>
+							<h:outputText id="getEquipProfileCode"
+								value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							<p:tooltip  for="getEquipProfileCode"
+										value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" visible="#{imShopApprove.visibleTable2[3]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equipment.name']}" />
+							</f:facet>
+							<h:outputText id="getEquipProfileName"
+								value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							<p:tooltip  for="getEquipProfileName"
+										value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+						</p:column>
+						
+						<p:column sortBy="#{c.specification}" visible="#{imShopApprove.visibleTable2[4]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equipment.spec']}" />
+							</f:facet>
+							<h:outputText id="specification"
+								value="#{c.specification}" />
+							<p:tooltip for="specification" value="#{c.specification}" />
+						</p:column>
+						<p:column sortBy="#{c.quantity}" visible="#{imShopApprove.visibleTable2[5]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['quantity']}" />
+							</f:facet>
+							<h:outputText id="quantity" value="#{c.quantity}" />
+							<p:tooltip  for="quantity"
+										value="#{c.quantity}" />
+						</p:column>
+					</p:dataTable>
+					<div class="EmptyBox5"></div>
+					<p:panelGrid styleClass="Wid100">
+
+						<p:column>
+							<div class="Fright">
+								<p:commandButton icon="fa fa-check Fs14 white"
+									value="#{msg['approve']}"
+									disabled="#{imShopApprove.disableApp}" id="approve"
+									update=":frm" actionListener="#{imShopApprove.save}"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+								<p:commandButton icon="fa fa-ban Fs14 white"
+									value="#{msg['reject']}"
+									disabled="#{imShopApprove.disableDel}" id="delete"
+									update=":frm" actionListener="#{imShopApprove.cancel}"
+									styleClass="ui-priority-primary reject">
+								</p:commandButton>
+								<!-- <p:commandButton icon="fa fa-camera Fs14 white"
+									value="#{msg['print']}" styleClass="ui-priority-primary">
+								</p:commandButton> -->
+								<p:commandButton icon="fa fa-times Fs14 white"
+									value="#{msg['Exit']}" action="index?faces-redirect=true"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+								<p:dialog widgetVar="cfImPApp">
+									<f:facet name="header">
+										<p:outputLabel value="#{imShopApprove.confirm}"></p:outputLabel>
+									</f:facet>
+									<p:panelGrid styleClass="pngConfirm">
+										<p:row>
+											<p:column>
+												<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+											</p:column>
+											<p:column>
+												<p:inputText disabled="true" styleClass="disableText"
+													value="#{imShopApprove.ta.transactionActionCode}"></p:inputText>
+											</p:column>
+											<p:column>
+												<p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+											</p:column>
+											<p:column>
+												<p:inputText disabled="true" styleClass="disableText"
+													value="#{imShopApprove.ta.reasonName}"></p:inputText>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+											</p:column>
+											<p:column colspan="3">
+												<p:inputTextarea rows="3" maxlength="200"
+													value="#{imShopApprove.description}"></p:inputTextarea>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+									<div class="Fright">
+										<p:commandButton value="#{msg['yes']}" update="@all"
+											actionListener="#{imShopApprove.action}"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="#{msg['no']}"
+											onclick="PF('cfImPApp').hide();"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</div>
+								</p:dialog>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+			</div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

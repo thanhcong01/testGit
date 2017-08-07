@@ -1,0 +1,243 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:p="http://primefaces.org/ui"
+				template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchTrans']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['searchTrans']}"></p:outputLabel></h2>-->
+
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="EmptyBox10"></div>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true"/>
+				<p:panel header="#{msg['detailInfo']}" >
+					<p:panelGrid >
+						<p:row>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['orderCode.myc']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100" disabled="true"
+											 value="#{createDetailTransactionReport.transDetailSelected.transactionAction.transactionActionCode}" />
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['equipment.group.profile']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100" disabled="true"
+											 value="#{sessionBean.getGoodsGroupNameByGoods(createDetailTransactionReport.transDetailSelected.goodsId.toString())}" />
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['equipment.profile.code']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid12">
+								<p:inputText styleClass="Wid100 " disabled="true"
+											 value="#{sessionBean.getEquipProfileCode(createDetailTransactionReport.transDetailSelected.goodsId.toString())}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['equipment.profile.name']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100" disabled="true"
+											 value="#{sessionBean.getEquipProfileName(createDetailTransactionReport.transDetailSelected.goodsId.toString())}"></p:inputText>
+							</p:column>
+							<p:column  styleClass="Wid9">
+								<p:outputLabel value="#{msg['quantity.slyc']}"></p:outputLabel>
+							</p:column>
+							<p:column  style="width: 60px">
+								<p:inputText disabled="true" styleClass="Wid100"
+											 value="#{createDetailTransactionReport.transDetailSelected.quantity}"></p:inputText>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+
+				</p:panel>
+				<p:panel header="#{msg['transSerialInfo']}" >
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['serial']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid40">
+								<p:inputText styleClass="Wid100"
+											 value="#{createDetailTransactionReport.fromSerial}"
+											 onkeypress="if (event.keyCode == 13) { return false; }"
+											 validatorMessage="#{msg['fromSerialReq']}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu
+										styleClass="select Wid100" value="#{createDetailTransactionReport.goodsStatus}">
+									<f:selectItem itemValue="" itemLabel="" noSelectionOption="true"/>
+									<!--<p:ajax event="valueChange" update="@this"-->
+									<!--listener="#{searchEquipmentBean.changeStatus()}"></p:ajax>-->
+									<f:selectItems value="#{sessionBean.listStatus}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+									<p:ajax update=""></p:ajax>
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+
+								<p:commandButton style="float:right"
+												 icon="fa fa-search Fs14 white" value="#{msg['search']}"
+												 update="frm"
+												 actionListener="#{createDetailTransactionReport.searchSerial}"></p:commandButton>
+								<!-- <p:outputLabel style="display: none" value="#{imShopExGoods.searchSerial()}"></p:outputLabel> -->
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<p:panel>
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex"
+									 value="#{createDetailTransactionReport.lsData}"
+									 paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+									 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									 id="dtResult" lazy="false" >
+							<f:facet  name="header">
+								<span class="dtHead"  style="">#{msg['searchResult']}</span>
+								<!--<p:commandButton styleClass="toggler" id="togglerdtResult"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />-->
+								<!--<p:columnToggler datasource="dtResult" trigger="togglerdtResult" />-->
+							</f:facet>
+							<p:column styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column sortBy="#{c.serial}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['serial']}" />
+								</f:facet>
+								<h:outputText id="serial" value="#{c.serial}" />
+								<p:tooltip  for="serial"
+											value="#{c.serial}"/>
+							</p:column>
+
+
+							<p:column sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+								<f:facet name="header">
+									<h:outputText value="Trạng thái hàng" />
+								</f:facet>
+								<h:outputText id="getEquipsStatusName"
+											  value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+								<p:tooltip  for="getEquipsStatusName"
+											value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+							</p:column>
+							<p:column sortBy="#{imShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['equiment.status.waranty']}" />
+								</f:facet>
+								<h:outputText id="getWarranStatus"
+											  value="#{imShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+								<p:tooltip  for="getWarranStatus"
+											value="#{imShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+							</p:column>
+							<p:column sortBy="#{imShopExGoods.getWarranExpriDate2(c.equipmentProfileId, c.serial)}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['equiment.expire.waranty']}" />
+								</f:facet>
+								<h:outputText id="getWarranExpriDate"
+											  value="#{imShopExGoods.getWarranExpriDate(c.equipmentProfileId, c.serial)}" />
+								<p:tooltip  for="getWarranExpriDate"
+											value="#{imShopExGoods.getWarranExpriDate(c.equipmentProfileId, c.serial)}" />
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+					<p:panelGrid>
+						<p:column styleClass="Wid203"></p:column>
+						<p:column style="width:79.6%">
+							<div class="Fright">
+								<p:commandButton icon="fa fa-file-excel-o Fs14 white" disabled="#{createDetailTransactionReport.disableDetailExportButton}"
+												 value="#{msg['export.detail']}" ajax="true"
+												 onclick="PrimeFaces.monitorDownload(start, stop);"
+												 actionListener="#{createDetailTransactionReport.detailExportExcel()}"
+												 styleClass="ui-priority-primary">
+									<p:fileDownload
+											value="#{createDetailTransactionReport.fileExport}" />
+								</p:commandButton>
+								<p:commandButton value="#{msg['Exit']}" action="create-detail-transaction-rp"></p:commandButton>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+				<!-- <p:panel>
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{createDetailTransactionReport.lsData}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtOrdersSerial" lazy="true" >
+                        <f:facet  name="header">
+                            <span class="dtHead"  style="">#{msg['infoChoosedSerial']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtOrdersSerial"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="dtOrdersSerial" trigger="togglerdtOrdersSerial" />
+                        </f:facet>
+                        <p:column styleClass="index">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['serial']}" />
+                            </f:facet>
+                            <h:outputText value="#{c.serial}" />
+                        </p:column>
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goods']}" />
+                            </f:facet>
+                            <h:outputText value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+                        </p:column>
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['profileCode']}" />
+                            </f:facet>
+                            <h:outputText value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+                        </p:column>
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['provider']}" />
+                            </f:facet>
+                            <h:outputText value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                        </p:column>
+
+                        <p:column >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['status']}" />
+                            </f:facet>                       
+                            <h:outputText value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+                        </p:column>
+                    </p:dataTable>    
+                    <p:panelGrid>
+                        <p:column styleClass="Wid203"></p:column>
+                        <p:column style="width:79.6%">
+                            <div class="Fright">
+                            <p:commandButton icon="fa fa-file-excel-o Fs14 white" disabled="#{createDetailTransactionReport.disableDetailExportButton}"
+                                        value="#{msg['export.detail']}" ajax="true"
+                                        onclick="PrimeFaces.monitorDownload(start, stop);"
+                                        actionListener="#{createDetailTransactionReport.detailExportExcel()}"
+                                        styleClass="ui-priority-primary">
+                                        <p:fileDownload
+                                            value="#{createDetailTransactionReport.fileExport}" />
+                                    </p:commandButton>
+                                <p:commandButton value="#{msg['Exit']}" action="create-detail-transaction-rp"></p:commandButton>
+                            </div>
+                        </p:column>
+                    </p:panelGrid>
+                </p:panel> -->
+			</div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

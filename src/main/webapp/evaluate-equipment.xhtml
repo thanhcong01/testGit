@@ -1,0 +1,602 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['evaluateGoods']}</title>
+
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['audit.info.search.invoice']}">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13" >
+								<p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" >
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{evaluateGoods.reasonId}">
+									<f:selectItems value="#{evaluateGoods.listReasons}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column styleClass="Wid13" >
+								<p:outputLabel value="#{msg['audit.actionDate']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" >
+								<p:calendar styleClass="select Wid100" readonlyInput="true" disabled="true"
+											value="#{evaluateGoods.actionDate}" id="actionDate"
+											yearRange="c-70:c+70"
+											showOn="button" pattern="dd/MM/yyyy" navigator="true">
+								</p:calendar>
+							</p:column>
+
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['audit.actionUser']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu disabled="true"
+												 styleClass="select Wid100"
+												 value="#{evaluateGoods.actionUserId}">
+									<f:selectItems value="#{evaluateGoods.lstStaff}" var="c"
+												   itemLabel="#{c.staffCode} | #{c.staffName}" itemValue="#{c.staffId}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+							</p:column>
+							<p:column colspan="5">
+								<p:inputTextarea maxlength="200" rows="1" style="width: 100%"
+												 value="#{evaluateGoods.reason}"></p:inputTextarea>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+						<f:facet name="header">
+							<p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+						</f:facet>
+						<f:facet name="message">
+							<p:outputLabel value="#{msg['confirmMsg']}"></p:outputLabel>
+						</f:facet>
+						<p:commandButton value="#{msg['yes']}" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="#{msg['no']}" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel header="#{msg['audit.info.invoice']}" id="info">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup.type']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{evaluateGoods.groupTypeId}">
+									<p:ajax event="valueChange" listener="#{evaluateGoods.selectEquipType}"
+											update="@this, @([id$=profileCodeSearch]), @([id$=equipmentNameSearch]), @([id$=groupEquip])" ></p:ajax>
+									<f:selectItem  itemLabel="#{msg['audit.select.all']}" itemValue="" />
+									<f:selectItems value="#{sessionBean.lsgDomainGroup}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['audit.group.equiment']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{evaluateGoods.goodsGroupId}" id="groupEquip">
+									<!--<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>-->
+									<p:ajax event="valueChange" update="@this, @([id$=profileCodeSearch]), @([id$=equipmentNameSearch]) "
+											listener="#{evaluateGoods.changeGoodsGroup()}"></p:ajax>
+									<f:selectItem  itemLabel="#{msg['audit.select.all']}" itemValue="" />
+									<f:selectItems value="#{evaluateGoods.lsgGroup}" var="c"
+												   itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['audit.equipment.code']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete styleClass="ui-autocomplete-select" id="profileCodeSearch"
+												dropdown="true" value="#{evaluateGoods.goods}"
+												completeMethod="#{evaluateGoods.completeGoods}">
+									<p:ajax event="itemSelect"
+											listener="#{evaluateGoods.goodsSelect}" update="@this, @([id$=equipmentNameSearch])" />
+								</p:autoComplete>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['audit.equipment.name']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText id="equipmentNameSearch" maxlength="200" rows="1" style="width: 100%" disabled="true"
+												 value="#{evaluateGoods.equipmentName}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['audit.equipment.provider']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{evaluateGoods.providerId}" style="width: 190px">
+									<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>
+									<f:selectItems value="#{sessionBean.lsProviderStockSerial}" var="c"
+												   itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['audit.serial']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="select Wid100" onkeypress="if (event.keyCode == 13) { return false; }"
+											 value="#{evaluateGoods.serial}"></p:inputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['stockStatus']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100" disabled="true"
+												 value="#{evaluateGoods.stockStatusId}">
+									<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>
+									<p:ajax event="valueChange" update="@this"
+											listener="#{evaluateGoods.changeStockStatus()}"></p:ajax>
+									<f:selectItems value="#{evaluateGoods.listStockStatus}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}"/>
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13" >
+								<p:outputLabel value="#{msg['audit.status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" >
+								<p:selectOneMenu
+										styleClass="select Wid100" value="#{evaluateGoods.equipmentStatus}">
+									<p:ajax event="valueChange" update="@this"
+											listener="#{evaluateGoods.changeStatus()}"></p:ajax>
+									<f:selectItems value="#{sessionBean.listStatus}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+
+							<p:column colspan="6" style="text-align: center">
+								<p:commandButton icon="fa fa-search Fs14 white"
+												 value="#{msg['search']}" style="float:right" update="frm"
+												 actionListener="#{evaluateGoods.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+				<div class="EmptyBox5"></div>
+				<p:panel>
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{evaluateGoods.lsData}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+								 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+
+						id="dtSearch" rowKey="#{c.id}"
+						selection="#{evaluateGoods.lsDataSelect}">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['audit.search.result']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtSearch"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<!--<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch" />-->
+							<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch">
+								<p:ajax event="toggle" listener="#{evaluateGoods.onToggleActiveEtag}"
+										update="@([id$=dtSearch])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:ajax event="rowSelect"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected]), @this"/>
+						<p:ajax event="rowSelectCheckbox"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected]), @this" />
+						<p:ajax event="rowUnselectCheckbox"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected]), @this" />
+						<p:ajax event="toggleSelect"
+							listener="#{evaluateGoods.hanleLsDataSelect}"
+							update="@([id$=sumDataselected]), @this" />
+						<p:column visible="#{evaluateGoods.visibleTable[0]}"
+								  styleClass="index">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column visible="#{evaluateGoods.visibleTable[1]}"
+								  sortBy="#{c.serial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['serial']}" />
+							</f:facet>
+							<h:outputText id="serial" value="#{c.serial}" />
+							<p:tooltip for="serial"
+									   value="#{c.serial}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[2]}"
+								  sortBy="#{c.equipentGroupCode}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.group.equiment']}" />
+							</f:facet>
+							<h:outputText id="equipentGroupCode"
+									value="#{c.equipentGroupCode}" />
+							<p:tooltip for="equipentGroupCode"
+									   value="#{c.equipentGroupCode}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[3]}"
+								  sortBy="#{c.profileCode}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.code']}" />
+							</f:facet>
+							<h:outputText id="profileCode"
+								value="#{c.profileCode}" />
+							<p:tooltip for="profileCode"
+									   value="#{c.profileCode}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[4]}"
+								  sortBy="#{c.profileName}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.name']}" />
+							</f:facet>
+							<h:outputText id="profileName"
+								value="#{c.profileName}" />
+							<p:tooltip for="profileName"
+									   value="#{c.profileName}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[5]}"
+								  sortBy="#{c.countBlockSerial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.count']}" />
+							</f:facet>
+							<h:outputText id="countBlockSerial"
+									value="#{c.countBlockSerial}" />
+							<p:tooltip for="countBlockSerial"
+									   value="#{c.countBlockSerial}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[6]}"
+								  sortBy="#{equipmentsProfileBean.getUnitName(c.unit.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.unit']}" />
+							</f:facet>
+							<h:outputText id="unit2"
+									value="#{equipmentsProfileBean.getUnitName(c.unit.toString())}" />
+							<p:tooltip for="unit2"
+									   value="#{equipmentsProfileBean.getUnitName(c.unit.toString())}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[7]}"
+								  sortBy="#{c.providerName}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['provider']}" />
+							</f:facet>
+							<h:outputText id="providerName"
+								value="#{c.providerName}" />
+							<p:tooltip for="providerName"
+									   value="#{c.providerName}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable[8]}"
+								  sortBy="#{equipmentsProfileBean.getOriginName(c.origin)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.origin']}" />
+							</f:facet>
+							<!--<h:outputText-->
+									<!--value="#{c.origin}" />-->
+							<h:outputText id="getOriginName" value="#{equipmentsProfileBean.getOriginName(c.origin)}" />
+							<p:tooltip for="getOriginName"
+									   value="#{equipmentsProfileBean.getOriginName(c.origin)}" />
+						</p:column>
+
+						<p:column visible="#{evaluateGoods.visibleTable[9]}"
+								  sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.status']}" />
+							</f:facet>
+
+							<h:outputText id="equipmentProfileStatus"
+								value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+							<p:tooltip for="equipmentProfileStatus"
+									   value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+						</p:column>
+						<p:column  visible="#{evaluateGoods.visibleTable[10]}"
+								   selectionMode="multiple" style="text-align: center">
+						</p:column>
+					</p:dataTable>
+
+					<p:panelGrid styleClass="Wid100">
+						<p:column style="width:10%"></p:column>
+						<p:column style="width:90%">
+							<div class="Fright">
+								<p:commandButton value="#{msg['positon.field.choose']}" update=":frmDialog:dlSave, :frm"
+									icon="fa fa-plus Fs14 white"
+									actionListener="#{evaluateGoods.showDialog()}"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel id="result">
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{evaluateGoods.lsDataRs}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtResult" lazy="false">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['audit.list.selected']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtResult"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<!--<p:columnToggler datasource="dtResult" trigger="togglerdtResult" />-->
+							<p:columnToggler datasource="dtResult" trigger="togglerdtResult">
+								<p:ajax event="toggle" listener="#{evaluateGoods.onToggleActiveEtag2}"
+										update="@([id$=dtResult])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:column visible="#{evaluateGoods.visibleTable2[0]}"
+								  styleClass="index">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+
+						<p:column visible="#{evaluateGoods.visibleTable2[1]}"
+								  sortBy="#{c.serial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.serial']}" />
+							</f:facet>
+							<h:outputText id="serial2" value="#{c.serial}" />
+							<p:tooltip for="serial2"
+									   value="#{c.serial}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[2]}"
+								  sortBy="#{evaluateGoods.getGroupTypeName(c.groupType)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.type.equipment']}" />
+							</f:facet>
+							<h:outputText id="groupType" value="#{evaluateGoods.getGroupTypeName(c.groupType)}" />
+							<p:tooltip for="groupType"
+									   value="#{evaluateGoods.getGroupTypeName(c.groupType)}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[3]}"
+								  sortBy="#{c.profileCode}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.code']}" />
+							</f:facet>
+
+							<h:outputText id="profileCode2"
+									value="#{c.profileCode}" />
+							<p:tooltip for="profileCode2"
+									   value="#{c.profileCode}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[4]}"
+								  sortBy="#{c.profileName}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.name']}" />
+							</f:facet>
+							<h:outputText id="profileName2"
+								value="#{c.profileName}" />
+							<p:tooltip for="profileName2"
+									   value="#{c.profileName}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[5]}"
+								  sortBy="#{c.countBlockSerial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.count']}" />
+							</f:facet>
+							<h:outputText id="countBlockSerial2" value="#{c.countBlockSerial}" />
+							<p:tooltip for="countBlockSerial2"
+									   value="#{c.countBlockSerial}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[6]}"
+								  sortBy="#{equipmentsProfileBean.getUnitName(c.unit)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.unit']}" />
+							</f:facet>
+							<h:outputText id="getUnitName"
+									value="#{equipmentsProfileBean.getUnitName(c.unit)}" />
+							<p:tooltip for="getUnitName"
+									   value="#{equipmentsProfileBean.getUnitName(c.unit)}" />
+						</p:column>
+
+						<p:column visible="#{evaluateGoods.visibleTable2[7]}"
+								  sortBy="#{c.providerCode}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['provider']}" />
+							</f:facet>
+							<h:outputText id="providerCode"
+								value="#{c.providerCode}" />
+							<p:tooltip for="providerCode"
+									   value="#{c.providerCode}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[8]}"
+								  sortBy="#{equipmentsProfileBean.getOriginName(c.origin)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.equipment.origin']}" />
+							</f:facet>
+							<!--<h:outputText-->
+								<!--value="#{c.origin}" />-->
+							<h:outputText id="getOriginName2" value="#{equipmentsProfileBean.getOriginName(c.origin)}" />
+							<p:tooltip for="getOriginName2"
+									   value="#{equipmentsProfileBean.getOriginName(c.origin)}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[9]}"
+								  sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['audit.status']}" />
+							</f:facet>
+							<h:outputText id="getEquipsStatusName"
+								value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+							<p:tooltip for="getEquipsStatusName"
+									   value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+						</p:column>
+						<p:column visible="#{evaluateGoods.visibleTable2[10]}"
+								  styleClass="deleteCol">
+							<f:facet name="header">
+								<h:outputText value="#{msg['delete']}" />
+							</f:facet>
+							<p:commandLink value="X" styleClass="delete" update=":frm"
+								actionListener="#{evaluateGoods.removeRs(c)}"></p:commandLink>
+						</p:column>
+					</p:dataTable>
+					<div class="EmptyBox10" />
+					<p:panelGrid styleClass="Wid100">
+						<p:column style="font-weight: bold;">#{msg['audit.sum.select']} #{evaluateGoods.belowSumDataSelected}</p:column>
+					</p:panelGrid>
+					<p:separator></p:separator>
+
+				</p:panel>
+				<p:panelGrid styleClass="Wid100">
+					<p:column style="width:10%"></p:column>
+					<p:column style="width:90%">
+						<div class="Fright">
+							<!--actionListener="#{evaluateGoods.save}"-->
+							<p:commandButton value="#{msg['accept']}"
+								icon="fa fa-check Fs14 white"
+								disabled="#{evaluateGoods.setSize==0}" update=":frmDialog:dlSave, :frm"
+								action="#{evaluateGoods.save}"
+								styleClass="ui-priority-primary">
+								<p:resetInput target=":frmDialog:dlSave" />
+								<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+										   message="#{msg['save.confirm.dctb']}" />
+							</p:commandButton>
+							<p:commandButton value="#{msg['cancel']}"
+								icon="fa fa-ban Fs14 white"
+								disabled="#{evaluateGoods.setSize==0}" update=":frm"
+								actionListener="#{evaluateGoods.refresh}"
+								styleClass="ui-priority-primary cancel">
+							</p:commandButton>
+							<p:commandButton styleClass="ui-priority-primary" style="display: none"  value="In" icon="fa fa-fa fa-print Fs14 white"
+											 ajax="true" onclick="PrimeFaces.monitorDownload(start, stop);"
+											 disabled="#{evaluateGoods.setSize==0}"
+											 actionListener="#{evaluateGoods.export_excel()}">
+								<p:fileDownload value="#{evaluateGoods.fileExport}" />
+							</p:commandButton>
+							<!--<p:commandButton value="#{msg['print']}" icon="fa fa-fa fa-print Fs14 white"  update=":frm:dlgPDF"-->
+											 <!--actionListener="#{importGoods.print_}" styleClass="ui-priority-primary" />-->
+
+							<!--<p:dialog header="PDF" id="dlgPDF" widgetVar="dlgPDF" width="70%" height="500">-->
+								<!--<h3>PDF</h3><p:media value="#{importGoods.path}" player="pdf" width="100%" height="100%"/>-->
+							<!--</p:dialog>-->
+
+							<p:commandButton value="#{msg['Exit']}"
+								icon="fa fa-times Fs14 white" action="index?faces-redirect=true"
+								styleClass="ui-priority-primary">
+							</p:commandButton>
+
+						</div>
+					</p:column>
+				</p:panelGrid>
+			</div>
+
+		</h:form>
+		<h:form id="frmDialog">
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true"
+					  resizable="false" closable="true" minHeight="200" width="500"
+					  header="#{msg['audit.dialog.header']}">
+				<p:confirmDialog widgetVar="dlgDelete" global="true"
+								 showEffect="fade" hideEffect="fade">
+					<p:commandButton value="#{msg['common.confirmdialog.yes']}" type="button"
+									 styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="#{msg['common.confirmdialog.no']}" type="button"
+									 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+				<p:panelGrid id="panelPosition" columns="2">
+					<!--validator="#{positionBean.validate}"-->
+					<p:outputLabel style="font-size:12px;" value="#{msg['audit.count.stock.quantity.avaiable']}" />
+					<p:inputText style="width:300px;" id="quantity"
+								 value="#{evaluateGoods.stockGoodsUpdate.availableQuantity}"
+								  maxlength="50" disabled="true">
+						<f:attribute name="msglabel" value="#{msg['audit.count.stock.quantity']}" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="quantity" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['audit.equipment.unit']}" />
+					<!--<p:inputText style="width:300px;" id="unit"-->
+								 <!--value="#{evaluateGoods.stockGoodsUpdate.unit}" maxlength="150" disabled="true">-->
+						<!--<f:attribute name="msglabel" value="#{msg['audit.equipment.unit']}" />-->
+					<!--</p:inputText>-->
+					<p:selectOneMenu   id="unit" value="#{evaluateGoods.stockGoodsUpdate.unit}"
+									   style="width: 300px" disabled="true">
+						<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+						<f:selectItems value="#{equipmentsProfileBean.listUnit}" var="c"
+									   itemLabel="#{c.name}" itemValue="#{c.value}" />
+						<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.unit']}" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="unit" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['audit.count.reality']} (*)" />
+					<p:inputText style="width:300px;" id="aviableQuantity" validator="#{evaluateGoods.validate}"
+								 value="#{evaluateGoods.stockGoodsUpdate.quantityUpdate}" maxlength="9"
+									converterMessage="Hãy nhập số nguyên dương">
+						<f:attribute name="msglabel" value="#{msg['audit.count.reality']}" />
+						<f:validator validatorId="emtyValidator" />
+
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="aviableQuantity" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['audit.count.code.approval']} (*)" />
+					<p:inputText style="width:300px;" id="approCode"
+								 value="#{evaluateGoods.stockGoodsUpdate.approCode}" maxlength="30">
+						<f:attribute name="msglabel" value="#{msg['audit.count.code.approval']}" />
+						<f:validator validatorId="emtyValidator" />
+						<f:validator validatorId="codeValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="approCode" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['audit.link.document']} (*)" />
+					<p:inputText style="width:300px;" id="linkDocument" validator="#{evaluateGoods.validate}"
+								 value="#{evaluateGoods.stockGoodsUpdate.linkDocument}" maxlength="150"
+								 converterMessage="Không đúng định dạng URL">
+						<f:attribute name="msglabel" value="#{msg['audit.link.document']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="linkDocument" />
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="#{ui-icon-plus}" action="#{evaluateGoods.addRecordRs}"
+									 value="#{msg['common.dialog.save']}"
+									 update="@([id$=panelPosition]), @([id$=dtSearch]), @([id$=dtResult]), :frm">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+									 oncomplete="PF('dlSave').hide()">
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,319 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:form id="frmGP">
+		<p:outputPanel id="updateFormG">
+			<div class="Container100 Responsive100">
+				<div class="EmptyBox5" />
+				<div style="float: right;">
+					<p:commandLink oncomplete="PF('dlSaveGP').show();"
+						update="@([id$=dlSaveGP])">
+						<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+						<p:resetInput target=":tv:frmDialogGP:dlSaveGP" />
+						<f:setPropertyActionListener
+							target="#{goodsPriceBean.priceSelected}"
+							value="#{goodsPriceBean.reset()}" />
+						<f:setPropertyActionListener target="#{goodsPriceBean.type}"
+							value="#{goodsPriceBean.TYPE_ADD}" />
+					</p:commandLink>
+					<p:commandLink action="#{goodsPriceBean.beforeSave}"
+						update="@([id$=dlSaveGP])">
+						<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+						<p:resetInput target=":tv:frmDialogGP:dlSaveGP" />
+						<f:setPropertyActionListener target="#{goodsPriceBean.type}"
+							value="#{goodsPriceBean.TYPE_EDIT}" />
+					</p:commandLink>
+					<p:commandButton id="confirmButtonGP" style="display: none"
+						action="#{goodsPriceBean.delete}"
+						update="@([id$=tblGP]),@([id$=tree])">
+						<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+							message="#{msg['common.confirm.message']}" />
+					</p:commandButton>
+					<p:commandLink action="#{goodsPriceBean.beforeDelete}">
+						<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+					</p:commandLink>
+					<p:commandLink oncomplete="PF('dlSearchGP').show();"
+						update="@([id$=dlSearchGP])">
+						<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+						<f:setPropertyActionListener
+							target="#{goodsPriceBean.priceSelected}"
+							value="#{goodsPriceBean.reset()}" />
+						<f:setPropertyActionListener target="#{goodsPriceBean.type}"
+							value="#{goodsPriceBean.TYPE_SEARCH}" />
+					</p:commandLink>
+					<p:spacer width="10" />
+				</div>
+
+				<div class="EmptyBox10" />
+
+				<p:dataTable var="g" value="#{goodsPriceBean.listGoodsPrice}"
+					id="tblGP" paginator="true" paginatorPosition="bottom"
+					selection="#{goodsPriceBean.listPriceSelected}"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+					rowKey="#{g.priceId}" lazy="false" rows="20"
+					emptyMessage="#{msg['common.table.emptymessage']}">
+					<!-- <p:ajax event="rowSelect" listener="#{goodsPriceBean.onRowSelect}" /> -->
+
+					<p:ajax event="toggleSelect"
+						listener="#{goodsPriceBean.onRowSelected}" update="@this" />
+					<p:ajax event="rowSelectCheckbox"
+						listener="#{goodsPriceBean.onRowSelected}" update="@this" />
+					<p:ajax event="rowUnselectCheckbox"
+						listener="#{goodsPriceBean.onRowSelected}" update="@this" />
+
+					<p:column selectionMode="multiple" style="text-align: center" styleClass="Wid3" />
+
+					<p:column headerText="#{msg['goodsprice.table.column.name']}" sortBy="#{g.profileName}">
+						<h:outputText id="profileName" value="#{g.profileName}" />
+						<p:tooltip for="profileName"
+								   value="#{g.profileName}" />
+					</p:column>
+					<p:column headerText="#{msg['goodsprice.table.column.type']}" sortBy="#{goodsPriceBean.getPriceType(g.priceType)}">
+						<h:outputText id="getPriceType" value="#{goodsPriceBean.getPriceType(g.priceType)}" />
+						<p:tooltip for="getPriceType"
+								   value="#{g.getPriceType}" />
+					</p:column>
+					<p:column headerText="#{msg['goodsprice.table.column.price']}" sortBy="#{goodsPriceBean.commaSeparateNumber(g.price.toString())}">
+						<h:outputText id="commaSeparateNumber"
+							value="#{goodsPriceBean.commaSeparateNumber(g.price.toString())}" />
+						<p:tooltip for="commaSeparateNumber"
+								   value="#{goodsPriceBean.commaSeparateNumber(g.price.toString())}" />
+					</p:column>
+					<p:column  headerText="#{msg['goodsprice.table.column.startdate']}" sortBy="#{g.staDate}">
+						<h:outputText id="staDate" value="#{g.staDate}">
+							<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+						</h:outputText>
+						<p:tooltip for="staDate"
+								   value="#{g.staDate}">
+							<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+						</p:tooltip>
+
+					</p:column>
+					<p:column headerText="#{msg['goodsprice.table.column.enddate']}" sortBy="#{g.endDate}">
+						<h:outputText id="endDate" value="#{g.endDate}">
+							<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+						</h:outputText>
+						<p:tooltip for="endDate"
+								   value="#{g.endDate}">
+							<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+						</p:tooltip>
+					</p:column>
+					<p:column headerText="#{msg['goodsprice.table.column.username']}" sortBy="#{g.username}">
+						<h:outputText id="username" value="#{g.username}" />
+						<p:tooltip for="username"
+								   value="#{g.username}" />
+					</p:column>
+					<p:column headerText="#{msg['common.status']}" style="width:6%;" sortBy="#{g.status}">
+						<h:outputText id="statusG" value="#{g.status==1?msg['common.status.1']:msg['common.status.0']}" />
+						<p:tooltip for="statusG"
+								   value="#{g.status==1?msg['common.status.1']:msg['common.status.0']}" />
+					</p:column>
+					<p:column headerText="VAT" sortBy="#{g.vat}">
+						<h:outputText id="vatG" value="#{g.vat}" />
+						<p:tooltip for="vatG"
+								   value="#{g.vat}" />
+					</p:column>
+				</p:dataTable>
+			</div>
+		</p:outputPanel>
+
+	</h:form>
+
+	<h:form id="frmDialogGP">
+		<p:confirmDialog widgetVar="dlgDeleteGP" global="true"
+			showEffect="fade" hideEffect="fade">
+			<p:commandButton value="#{msg['common.confirmdialog.yes']}" 
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="#{msg['common.confirmdialog.no']}" 
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+
+		<p:dialog widgetVar="dlSaveGP" id="dlSaveGP" modal="true"
+			resizable="false" closable="true" height="300"
+			header="#{msg['goodsprice.header']}">
+			<p:panelGrid id="panelGP" columns="2">
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.name']}" />
+                                <p:inputText style="width:300px;" id="nameGP" disabled="true" styleClass="disableText"
+					value="#{goodsPriceBean.goods.profileName}">
+					<f:attribute name="msglabel" value="#{msg['goodsprice.table.column.name']}" />
+					<f:validator validatorId="emtyValidator" />
+				</p:inputText>
+				<p:outputLabel />
+				<p:message for="nameGP" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.type']}" />
+				<p:selectOneMenu id="ptype"
+					value="#{goodsPriceBean.priceSelected.priceType}"
+					style="width:300px;">
+					<f:selectItems value="#{goodsPriceBean.listDomains}" var="ptype"
+						itemLabel="#{ptype.name}" itemValue="#{ptype.code}" />
+				</p:selectOneMenu>
+				<p:outputLabel />
+				<p:message for="ptype" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.price']}" />
+				<p:inputText style="width:300px;" id="price"
+					converterMessage="#{msg['goodsprice.validator.price']}"
+					value="#{goodsPriceBean.priceSelected.price}" maxlength="12">
+					<f:convertNumber />
+					<f:attribute name="msglabel" value="#{msg['goodsprice.table.column.price']}" />
+					<f:validator validatorId="emtyValidator" />
+					<f:validator validatorId="numberValidator" />
+				</p:inputText>
+				<p:outputLabel />
+				<p:message for="price" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.startdate']}" />
+				<p:calendar id="sd" value="#{goodsPriceBean.priceSelected.staDate}"
+					showOn="button" maxdate="#{goodsPriceBean.priceSelected.endDate}"
+					onblur="close()" style="width:300px;"
+					converterMessage="#{msg['common.dialog.datemessage']}" timeZone="GMT+7"
+					pattern="dd/MM/yyyy" navigator="true">
+					<f:attribute name="msglabel" value="#{msg['goodsprice.table.column.startdate']}" />
+					<f:validator validatorId="emtyValidator" />
+					<p:ajax event="dateSelect" update="@([id$=ed])" />
+				</p:calendar>
+				<p:outputLabel />
+				<p:message for="sd" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.enddate']}" />
+				<p:calendar id="ed" value="#{goodsPriceBean.priceSelected.endDate}"
+					showOn="button" converterMessage="#{msg['common.dialog.datemessage']}"
+					onblur="close()" mindate="#{goodsPriceBean.priceSelected.staDate}"
+					style="width:300px;" timeZone="GMT+7" pattern="dd/MM/yyyy"
+					navigator="true">
+					<p:ajax event="dateSelect" update="@([id$=sd])" />
+				</p:calendar>
+				<p:outputLabel />
+				<p:message for="ed" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['common.status']}" />
+				<p:inputText value="#{msg['common.status.1']}" readonly="true" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.username']}" />
+				<p:autoComplete id="use" style="width:300px;"
+					value="#{goodsPriceBean.priceSelected.username}"
+					completeMethod="#{goodsPriceBean.autoCompleteUsername}"
+					dropdown="true" scrollHeight="150" forceSelection="true"
+					emptyMessage="#{msg['common.autocomplete.empty']}">
+					<f:attribute name="msglabel" value="#{msg['goodsprice.table.column.username']}" />
+					<f:validator validatorId="emtyValidator" />
+				</p:autoComplete>
+				<p:outputLabel />
+				<p:message for="use" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.vat']}" />
+				<p:inputText style="width:300px;" id="vat"
+					converterMessage="#{mag['validator.message.number.content2']}"
+					value="#{goodsPriceBean.priceSelected.vat}" maxlength="10">
+					<f:attribute name="msglabel" value="#{msg['goodsprice.table.column.vat']}" />
+					<f:validator validatorId="emtyValidator" />
+					<f:validator validatorId="numberValidator" />
+				</p:inputText>
+				<p:outputLabel />
+				<p:message for="vat" />
+
+			</p:panelGrid>
+
+			<f:facet name="footer">
+				<p:commandButton icon="ui-icon-plus" action="#{goodsPriceBean.save}"
+					value="#{msg['common.dialog.save']}" update="@([id$=tblGP]),@([id$=panelGP])">
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+					 oncomplete="PF('dlSaveGP').hide()">
+					<p:resetInput target=":tv:frmDialogGP:dlSaveGP" />
+				</p:commandButton>
+			</f:facet>
+		</p:dialog>
+
+	</h:form>
+
+	<h:form id="frmSearchGP">
+		<p:dialog widgetVar="dlSearchGP" id="dlSearchGP" modal="true"
+			resizable="false" closable="true" height="300"
+			header="#{msg['goodsprice.header']}">
+			<p:panelGrid id="panelGPSearch" columns="2">
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.name']}" />
+                                <p:inputText style="width:300px;" disabled="true" styleClass="disableText"
+					value="#{goodsPriceBean.goods.profileName}">
+				</p:inputText>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.type']}" />
+				<p:selectOneMenu value="#{goodsPriceBean.priceSelected.priceType}"
+					style="width:300px;">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems value="#{goodsPriceBean.listDomains}" var="ptype"
+						itemLabel="#{ptype.name}" itemValue="#{ptype.code}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.price']}" />
+				<p:inputText style="width:300px;" id="priceS"
+					converterMessage="#{msg['goodsprice.validator.price']}"
+					value="#{goodsPriceBean.priceSelected.price}" maxlength="12">
+					<f:convertNumber />
+					<f:attribute name="msglabel" value="#{msg['goodsprice.table.column.price']}" />
+					<f:validator validatorId="numberValidator" />
+				</p:inputText>
+				<p:outputLabel />
+				<p:message for="priceS" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.startdate']}" />
+				<p:calendar id="ssd" value="#{goodsPriceBean.priceSelected.staDate}"
+					showOn="button" maxdate="#{goodsPriceBean.priceSelected.endDate}"
+					onblur="close()" style="width:300px;"
+					converterMessage="#{msg['common.dialog.datemessage']}" timeZone="GMT+7"
+					pattern="dd/MM/yyyy" navigator="true">
+					<p:ajax event="dateSelect" update="@([id$=esd])" />
+				</p:calendar>
+				<p:outputLabel />
+				<p:message for="ssd" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.enddate']}" />
+				<p:calendar id="esd" value="#{goodsPriceBean.priceSelected.endDate}"
+					showOn="button" converterMessage="#{msg['common.dialog.datemessage']}"
+					onblur="close()" mindate="#{goodsPriceBean.priceSelected.staDate}"
+					style="width:300px;" timeZone="GMT+7" pattern="dd/MM/yyyy"
+					navigator="true">
+					<p:ajax event="dateSelect" update="@([id$=ssd])" />
+				</p:calendar>
+				<p:outputLabel />
+				<p:message for="esd" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['common.status']}" />
+				<p:selectOneMenu id="type" style="width:300px;"
+					value="#{goodsPriceBean.priceSelected.status}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+					<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+				</p:selectOneMenu>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.username']}" />
+				<p:autoComplete style="width:300px;"
+					value="#{goodsPriceBean.priceSelected.username}"
+					completeMethod="#{goodsPriceBean.autoCompleteUsername}"
+					dropdown="true" scrollHeight="150" forceSelection="true"
+					emptyMessage="#{msg['common.autocomplete.empty']}">
+				</p:autoComplete>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goodsprice.table.column.vat']}" />
+				<p:inputText style="width:300px;"
+					value="#{goodsPriceBean.priceSelected.vat}" maxlength="10">
+				</p:inputText>
+
+			</p:panelGrid>
+			<f:facet name="footer">
+				<p:commandButton icon="ui-icon-plus"
+					action="#{goodsPriceBean.filterSearch}" value="#{msg['common.dialog.search']}"
+					update="@([id$=tblGP]),@([id$=panelGPSearch])">
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+					 oncomplete="PF('dlSearchGP').hide()">
+					<p:resetInput target="tv:frmSearchGP:dlSearchGP" />
+				</p:commandButton>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+</ui:composition>

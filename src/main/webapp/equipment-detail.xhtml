@@ -1,0 +1,619 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frmHandleType">
+			<p:outputLabel style="display: none"
+				value="#{equipmentsDetailBean.changeEquipmentsGroup()}"></p:outputLabel>
+		</h:form>
+		<h:form id="frm">
+			<title>#{msg['equipmentsDetail.search']}</title>
+			<!--                <h2 ><p:outputLabel value="#{msg['equipmentsDetail']}"></p:outputLabel></h2>-->
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['searchInfo']}" styleClass="Container100">
+					<div class="EmptyBox5" />
+					<p:panelGrid styleClass="Wid100" id="info">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel
+									value="#{msg['equipmentsDetail.group.euqipment']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{equipmentsDetailBean.equipmentsDetail.equipmentsGroupId}">
+									<p:ajax event="valueChange" update=":frm:info, :frm:equipments"
+										listener="#{equipmentsDetailBean.changeEquipmentsGroup()}"></p:ajax>
+									<f:selectItem itemValue=""
+										itemLabel="#{msg['audit.select.all']}"></f:selectItem>
+									<f:selectItems value="#{sessionBean.getLsgGroupOrder()}" var="c"
+										itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}"
+										itemValue="#{c.equipmentsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods.tableProfile.column.code']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete id="equipments"
+									styleClass="ui-autocomplete-select" style="width: 300px"
+									dropdown="true"
+									value="#{equipmentsDetailBean.equipmentsDetail.equipments}"
+									completeMethod="#{equipmentsDetailBean.completeEquipments}">
+									<p:ajax event="itemSelect"
+										listener="#{equipmentsDetailBean.equipmentsSelect}"
+										update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:outputLabel value="#{msg['equipmentsDetail.serial']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:inputText style="width: 250px"
+									value="#{equipmentsDetailBean.equipmentsDetail.serial}"
+									onkeypress="if (event.keyCode == 13) { return false; }"></p:inputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['equipmentsDetail.Shop.Kho']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									disabled="true" forceSelection="true" dropdown="true"
+									scrollHeight="150" style="width:300px;" maxlength="50"
+									value="#{equipmentsDetailBean.createShop}"
+									emptyMessage="#{msg['common.table.emptymessage']}"
+									completeMethod="#{equipmentsDetailBean.completeCreateShop}">
+									<p:ajax event="itemSelect"
+										listener="#{equipmentsDetailBean.createShopSelect}"
+										update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['equipmentsDetail.PXK']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									forceSelection="true" dropdown="true" scrollHeight="150"
+									style="width:300px;" maxlength="50"
+									value="#{equipmentsDetailBean.equipmentsDetail.transactionActionCode}"
+									emptyMessage="#{msg['common.table.emptymessage']}"
+									completeMethod="#{equipmentsDetailBean.completeTransactionCode}">
+									<p:ajax event="itemSelect"
+										listener="#{equipmentsDetailBean.createTransactionSelect}"
+										update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:outputLabel value="#{msg['equipmentsDetail.NXK']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<!--<p:selectOneMenu styleClass="select Wid100"-->
+								<!--value="#{equipmentsDetailBean.stockStatusId}">-->
+								<!--<f:selectItem itemLabel="" itemValue=""-->
+								<!--noSelectionOption="true" />-->
+								<!--<f:selectItems value="#{equipmentsDetailBean.listStockStatus}" var="c"-->
+								<!--itemLabel="#{c.name}" itemValue="#{c.value}" />-->
+								<!--</p:selectOneMenu>-->
+								<p:calendar style="width:250px;" readonlyInput="false"
+									value="#{equipmentsDetailBean.equipmentsDetail.dateInventory}"
+									id="dateInventory"
+									converterMessage="Ngày xuất kho không đúng định dạng"
+									yearRange="c-70:c+70" showOn="button" pattern="dd/MM/yyyy"
+									navigator="true">
+									<f:attribute name="msglabel" value="Ngày xuất kho" />
+								</p:calendar>
+							</p:column>
+
+						</p:row>
+						<p:row>
+							<p:column styleClass="Wid15">
+								<p:outputLabel value="#{msg['stock.status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{equipmentsDetailBean.equipmentsDetail.stockStatusId}">
+									<f:selectItem itemLabel="" itemValue="-1"
+										noSelectionOption="true" />
+									<f:selectItems
+										value="#{equipmentsDetailBean.getLstStockUpdateDetail()}"
+										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+
+							</p:column>
+							<p:column styleClass="Wid15" colspan="4">
+								<p:commandButton icon="fa fa-search Fs14 white"
+									value="#{msg['search']}" style="float:right" update=":frm"
+									actionListener="#{equipmentsDetailBean.search}">
+								</p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<div class="EmptyBox5" />
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<div style="clear: both;overflow:hidden;margin: 0px;width: 100%">
+					<p:outputPanel   styleClass="Wid100 tableSize fullHeight">
+						<!--<h:outputScript name="min-fullheight.js" library="js" />-->
+						<!--<h:outputScript name="width3.js" library="js" />-->
+						<!---->
+						<p:panel header="#{msg['search.result']}" styleClass="Container100">
+							<div style="clear: both;overflow-y:auto;margin: 0px; max-height: 320px">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" styleClass="invoice_table"
+											 rowIndexVar="rowIndex" value="#{equipmentsDetailBean.lsData}"
+											 paginator="true" rows="5" paginatorPosition="bottom"
+											 resizableColumns="true"
+											 selection="#{equipmentsDetailBean.equipmentsDetailSelected}"
+											 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											 rowsPerPageTemplate="5,10,20,50,100" id="dtSearchEtagSerial"
+											 lazy="true" rowKey="#{c.id}" >
+									<f:facet name="header">
+										<p:commandButton styleClass="toggler"
+														 id="togglerdtSearchEtagSerial" value="#{msg['chooseColumns']}"
+														 icon="ui-icon-calculator" />
+										<p:columnToggler datasource="dtSearchEtagSerial" trigger="togglerdtSearchEtagSerial">
+											<p:ajax event="toggle" listener="#{equipmentsDetailBean.onToggleActiveEtag}"
+													update="@([id$=dtSearchEtagSerial])"/>
+										</p:columnToggler>
+									</f:facet>
+									<p:ajax event="toggleSelect" update="@this" />
+									<p:ajax event="rowSelect"
+											update="@([id$=dtSearchEtagSerial]),@([id$=tblEquipmentHistory]), :frm:messages, @([id$=disableBeforeAdd])"
+											listener="#{equipmentsDetailBean.view}" />
+									<p:ajax event="rowSelectRadio"
+											update="@([id$=dtSearchEtagSerial]),@([id$=tblEquipmentHistory]), :frm:messages, @([id$=disableBeforeAdd])"
+											listener="#{equipmentsDetailBean.view}" />
+
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[0]}"
+											   resizable="true"  styleClass="Wid40p">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable[1]}"
+											  resizable="true" styleClass="Wid100p" sortBy="#{c.transactionActionCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipmentsDetail.PXK']}" />
+										</f:facet>
+										<h:outputText id="gtransactionActionCode"
+													  value="#{c.transactionActionCode}" />
+										<p:tooltip for="gtransactionActionCode"
+												   value="#{c.transactionActionCode}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[2]}"
+											   resizable="true" styleClass="Wid60p" sortBy="#{c.groupCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipmentsDetail.group.euqipment']}" />
+										</f:facet>
+										<h:outputText id="ggroupCode" value="#{c.groupCode}" />
+										<p:tooltip for="ggroupCode" value="#{c.groupCode}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[3]}"
+											   resizable="true" styleClass="Wid60p" sortBy="#{c.equipmentsProfileCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['goods.tableProfile.column.code']}" />
+										</f:facet>
+										<h:outputText id="gequipmentsProfileCode"
+													  value="#{c.equipmentsProfileCode}" />
+										<p:tooltip for="gequipmentsProfileCode"
+												   value="#{c.equipmentsProfileCode}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[4]}"
+											   resizable="true" styleClass="Wid60p" sortBy="#{c.profileName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['goods.tableProfile.column.name']}" />
+										</f:facet>
+										<h:outputText id="gprofileName" value="#{c.profileName}" />
+										<p:tooltip for="gprofileName" value="#{c.profileName}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable[5]}"
+											  resizable="true" styleClass="Wid60p" sortBy="#{c.serial}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['serial']}" />
+										</f:facet>
+										<h:outputText id="serial22" value="#{c.serial}" />
+										<p:tooltip for="serial22" value="#{c.serial}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable[6]}"
+											  resizable="true" styleClass="Wid60p" sortBy="#{c.quantitySerial}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['inven.numberic']}" />
+										</f:facet>
+										<h:outputText id="quantitySerial" value="#{c.quantitySerial}" />
+										<p:tooltip   for="quantitySerial"
+													 value="#{c.quantitySerial}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[7]}"
+											   resizable="true" styleClass="Wid60p" sortBy="#{c.status}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.equipment.status']}" />
+										</f:facet>
+										<h:outputText id="getEquipStatusName" value="#{sessionBean.getEquipStatusName(c.status)}" />
+										<p:tooltip   for="getEquipStatusName"
+													 value="#{sessionBean.getEquipStatusName(c.status)}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[8]}"
+											   resizable="true" styleClass="Wid60p" sortBy="#{c.stockStatusId}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['stock.status']}" />
+										</f:facet>
+										<h:outputText id="getStockStatusName"
+												value="#{equipmentsDetailBean.getStockStatusName(c.stockStatusId)}" />
+										<p:tooltip   for="getStockStatusName"
+													 value="#{equipmentsDetailBean.getStockStatusName(c.stockStatusId)}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[9]}"
+											   resizable="true" styleClass="Wid100p" sortBy="#{c.maintancePeriod}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipmentsDetail.maintaincePerio']}" />
+										</f:facet>
+										<h:outputText id="maintancePeriod" value="#{c.maintancePeriod}" />
+										<p:tooltip   for="maintancePeriod"
+													 value="#{c.maintancePeriod}" />
+									</p:column>
+									<p:column  visible="#{equipmentsDetailBean.visibleTable[10]}"
+											   resizable="true" styleClass="Wid80p" sortBy="#{c.lifeCycle}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipmentsDetail.lifeCycle']}" />
+										</f:facet>
+										<h:outputText id="lifeCycle" value="#{c.lifeCycle}" />
+										<p:tooltip   for="lifeCycle"
+													 value="#{c.lifeCycle}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable[11]}"
+											  headerText="Chọn" selectionMode="single"  resizable="true" styleClass="Wid30p"
+											  style="text-align: center;" />
+
+								</p:dataTable>
+							</div>
+						</p:panel>
+
+
+					</p:outputPanel>
+
+				</div>
+				<div class="EmptyBox10"></div>
+				<div style="display: block; clear: both">
+					<p:panel styleClass="Container100"
+						header="#{msg['equipment.update.info']}">
+						<div class="Container100 Pad5 Responsive100">
+							<div class="Pad5">
+								<div style="float: right;">
+									<p:commandLink id="beforeAdd" oncomplete="PF('dlSave').show();"
+										style="display: none" update="@([id$=dlSave])">
+										<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+										<p:resetInput target=":frmDialog:dlSave" />
+										<f:setPropertyActionListener
+											target="#{equipmentsDetailBean.equipHistorySelected}"
+											value="#{equipmentsDetailBean.reset()}" />
+										<!--<f:setPropertyActionListener target="#{equipmentsDetailBean.type}"-->
+										<!--value="#{equipmentsDetailBean.TYPE_ADD}" />-->
+									</p:commandLink>
+									<p:commandButton icon="fa fa-check Fs14 white"
+										id="disableBeforeAdd" value="#{msg['add.infor']}"
+										update="@([id$=dlSave])"
+										disabled="#{equipmentsDetailBean.disableBeforeAdd}"
+										actionListener="#{equipmentsDetailBean.beforeAdd}"
+										styleClass="ui-priority-primary">
+									</p:commandButton>
+									<p:spacer width="10" />
+								</div>
+
+								<div class="EmptyBox5" />
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}"
+									var="history" id="tblEquipmentHistory" rowIndexVar="rowCount"
+									value="#{equipmentsDetailBean.equipmentsDetailShow.equipmentHistories}"
+									selection="#{equipmentsDetailBean.equipHistorySelected}"
+									scrollHeight="150" paginator="true" rows="5"
+									paginatorPosition="bottom" resizableColumns="true"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+									rowsPerPageTemplate="5,10,20,50,100" lazy="false"
+									rowKey="#{history.rowKey}">
+									<p:ajax event="rowSelect" update="@([id$=tblEquipmentHistory])" />
+									<p:ajax event="toggleSelect" update="@this" />
+									<p:ajax event="rowSelectCheckbox" update="@this" />
+									<p:ajax event="rowUnselectCheckbox" update="@this" />
+
+									<p:ajax event="rowUnselect" update="@this" />
+									<f:facet name="header">
+										<p:commandButton styleClass="toggler"
+											id="togglertblEquipmentHistory" type="button"
+											value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+										<p:columnToggler datasource="tblEquipmentHistory" trigger="togglertblEquipmentHistory">
+											<p:ajax event="toggle" listener="#{equipmentsDetailBean.onToggleActiveEtag2}"
+													update="@([id$=tblEquipmentHistory])"/>
+										</p:columnToggler>
+									</f:facet>
+
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[0]}"
+											  style="max-width: 70px;"
+										headerText="#{msg['commont.grid.indext']}">
+										<h:outputText id="stt" value="#{rowCount + 1}"
+											lable="#{rowCount + 1}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[1]}"
+											  headerText="#{msg['history.actionDate']}" sortBy="#{history.actionDateStr}">
+										<h:outputText id="mnv" value="#{history.actionDateStr}">
+										</h:outputText>
+										<p:tooltip for="mnv" value="#{history.actionDateStr}">
+										</p:tooltip>
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[2]}"
+											  headerText="#{msg['history.actionType']}" sortBy="#{equipmentsDetailBean.getActionTypeName(history.actionType)}">
+										<h:outputText id="tnv"
+											value="#{equipmentsDetailBean.getActionTypeName(history.actionType)}" />
+										<p:tooltip for="tnv"
+											value="#{equipmentsDetailBean.getActionTypeName(history.actionType)}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[3]}"
+											  sortBy="#{sessionBean.getEquipStatusName(history.equipmentStatus)}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.equipment.status']}" />
+										</f:facet>
+										<h:outputText
+											value="#{sessionBean.getEquipStatusName(history.equipmentStatus)}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[4]}"
+											  headerText="#{msg['history.shop']}" sortBy="#{equipmentsDetailBean.getShopName(history.shopIdHis)}">
+										<h:outputText id="chc"
+											value="#{equipmentsDetailBean.getShopName(history.shopIdHis)}" />
+										<p:tooltip for="chc"
+											value="#{equipmentsDetailBean.getShopName(history.shopIdHis)}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[5]}"
+											  headerText="#{msg['history.lane']}" sortBy="#{history.lanCode}">
+										<h:outputText id="lc" value="#{history.lanCode}" />
+										<p:tooltip for="lc" value="#{history.lanCode}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[6]}"
+											  headerText="#{msg['history.position']}" sortBy="#{history.positionCode}">
+										<h:outputText value="#{history.positionCode}">
+										</h:outputText>
+										<p:tooltip for="nc" value="#{history.positionCode}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[7]}"
+											  style="width:100px" sortBy="#{history.maintancePerio}">
+										<f:facet name="header">
+											<h:outputText
+												value="#{msg['equipmentsDetail.maintaincePerio']}" />
+										</f:facet>
+										<h:outputText value="#{history.maintancePerio}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[8]}"
+											  style="width:80px" sortBy="#{history.lifeCycle}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipmentsDetail.lifeCycle']}" />
+										</f:facet>
+										<h:outputText value="#{history.lifeCycle}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[9]}"
+											  headerText="#{msg['history.note']}" sortBy="#{history.note}">
+										<h:outputText id="nc" value="#{history.note}" />
+										<p:tooltip for="nc" value="#{history.note}" />
+									</p:column>
+									<p:column visible="#{equipmentsDetailBean.visibleTable2[10]}"
+											  styleClass="deleteCol" style="max-width: 70px;">
+										<f:facet name="header">
+											<h:outputText value="#{msg['delete']}" />
+										</f:facet>
+										<p:commandLink value="X" styleClass="delete"
+											update=":frm:tblEquipmentHistory, :frm:dtSearchEtagSerial, @([id$=disableBeforeAdd])"
+											actionListener="#{equipmentsDetailBean.delete(history)}"></p:commandLink>
+									</p:column>
+								</p:dataTable>
+								<p:commandButton id="confirmButton" style="display: none"
+									action="#{equipmentsDetailBean.action()}"
+									update="@([id$=tblEquipmentHistory])">
+									<p:confirm header="#{msg['common.confirm.header']}"
+										icon="ui-icon-alert" message="#{msg['save.confirm']}" />
+								</p:commandButton>
+								<div style="clear: both; text-align: center">
+									<p:commandButton icon="fa fa-check Fs14 white"
+										value="#{msg['common.dialog.message.confirmDialog-accept']}"
+										update="@([id$=dlSave])"
+										actionListener="#{equipmentsDetailBean.beforeSaveHistory}"
+										styleClass="ui-priority-primary">
+									</p:commandButton>
+									<p:commandButton icon="fa fa-undo Fs14 white"
+										value="#{msg['common.dialog.message.confirmDialog-cancel']}"
+										update=":frm"
+										actionListener="#{equipmentsDetailBean.resetCancel()}"
+										styleClass="ui-priority-primary">
+									</p:commandButton>
+								</div>
+							</div>
+						</div>
+					</p:panel>
+				</div>
+			</div>
+		</h:form>
+
+		<h:form id="frmDialog">
+			<p:confirmDialog widgetVar="dlgDelete" global="true"
+				showEffect="fade" hideEffect="fade">
+				<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+					type="button" styleClass="ui-confirmdialog-yes"
+					icon="ui-icon-check" />
+				<p:commandButton value="#{msg['common.confirmdialog.no']}"
+					type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true"
+				resizable="false" closable="true" height="450px" width="500"
+				header="#{msg['history.dialog.header']}">
+
+				<p:panelGrid id="panelEquipmentHistory" columns="2">
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.actionDate']}" />
+					<p:calendar style="width:300px;" readonlyInput="false"
+						disabled="true"
+						value="#{equipmentsDetailBean.equipHistorySelected.actionDate}"
+						id="actionDateDlg" validator="#{equipmentsDetailBean.validate}"
+						converterMessage="#{msg['history.actionDate']}"
+						yearRange="c-70:c+70" showOn="button" pattern="dd/MM/yyyy"
+						navigator="true">
+						<f:attribute name="msglabel" value="#{msg['history.actionDate']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:calendar>
+					<p:outputLabel />
+					<p:message for="actionDateDlg" />
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.actionType']}" />
+					<p:selectOneMenu style="width:300px;" id="actionTypeDlg"
+						disabled="#{equipmentsDetailBean.disableActionType}"
+						value="#{equipmentsDetailBean.equipHistorySelected.actionType}">
+						<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+						<f:selectItems value="#{equipmentsDetailBean.listActionType}"
+							var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+						<f:attribute name="msglabel" value="#{msg['history.actionType']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="actionTypeDlg" />
+
+					<!--<p:outputLabel style="font-size:12px;" value="#{msg['history.equipError']}" />-->
+					<!--<p:selectBooleanCheckbox  id="equipError"  value="#{equipmentsDetailBean.equipHistorySelected.equipError}">-->
+					<!--</p:selectBooleanCheckbox>-->
+					<!--<p:outputLabel />-->
+					<!--<p:message for="equipError" />-->
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.shop']}" />
+					<p:selectOneMenu style="width:300px;" id="shopIdDlg"
+						disabled="#{equipmentsDetailBean.disableShop}"
+						value="#{equipmentsDetailBean.equipHistorySelected.shopIdHis}">
+						<f:selectItem itemLabel="Chọn" itemValue=""
+							noSelectionOption="true" />
+						<!--<f:selectItems value="#{equipmentsDetailBean.lstShopHis}" var="c"-->
+						<!--itemLabel="#{c.shopCode} | #{c.shopName}" itemValue="#{c.shopId}" />-->
+						<f:selectItem
+							itemLabel="#{sessionBean.getShop().shopCode} | #{sessionBean.getShop().shopName}"
+							itemValue="#{sessionBean.getShop().shopId}" />
+						<f:attribute name="msglabel" value="#{msg['history.shop']}" />
+						<p:ajax event="valueChange" update="@([id$=positionIdDlg])"
+							listener="#{equipmentsDetailBean.changShopDlg()}"></p:ajax>
+						<f:validator validatorId="emtyValidator" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="shopIdDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.position']}" />
+					<p:selectOneMenu id="positionIdDlg" style="width:300px;"
+						disabled="#{equipmentsDetailBean.disableShop}"
+						value="#{equipmentsDetailBean.equipHistorySelected.positionId}">
+						<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+							noSelectionOption="true" />
+						<f:selectItems value="#{equipmentsDetailBean.lstPostion}"
+							var="position" itemLabel="#{position.positionName}"
+							itemValue="#{position.positionId}" />
+						<f:attribute name="msglabel" value="#{msg['history.position']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="positionIdDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.equipment.status']}" />
+					<p:selectOneMenu style="width:300px;" id="equipmentStatusDlg"
+						disabled="#{equipmentsDetailBean.disableGooodStatus}"
+						value="#{equipmentsDetailBean.equipHistorySelected.equipmentStatus}">
+						<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+						<p:ajax event="valueChange"
+							update=":frmDialog:positionIdDlg, :frmDialog:shopIdDlg, :frm:messages"
+							listener="#{equipmentsDetailBean.setDisableShopByStatus()}"></p:ajax>
+						<f:selectItems value="#{equipmentsDetailBean.getListGoodStatus()}"
+							var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+						<f:attribute name="msglabel"
+							value="#{msg['history.equipment.status']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="equipmentStatusDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.referenceCode']}" />
+					<p:inputText style="width:300px;" id="referenceIdDlg"
+						maxlength="30" converterMessage="Mã tham chiếu phải là số"
+						value="#{equipmentsDetailBean.equipHistorySelected.referenceId}"
+						validator="#{equipmentsDetailBean.validate}">
+						<f:attribute name="msglabel" value="#{msg['history.referenceCode']}" />
+						<!--<f:validator validatorId="codeValidator" />-->
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgreferenceIdDlg" for="referenceIdDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['equipment.specifile']}" />
+
+					<p:inputTextarea autoResize="false"
+						style="width:300px; height: 150px!important" id="specificationDlg"
+						value="#{equipmentsDetailBean.equipHistorySelected.specification}"
+						validator="#{equipmentsDetailBean.validate}" maxlength="2000">
+					</p:inputTextarea>
+					<p:outputLabel />
+					<p:message for="specificationDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.maitancyPri']}" />
+					<p:inputText style="width:300px;" id="maintancePerioDlg"
+						maxlength="9"
+						value="#{equipmentsDetailBean.equipHistorySelected.maintancePerio}"
+						converterMessage="Ckỳ bảo trì phải là số "
+						validator="#{equipmentsDetailBean.validate}">
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgmaintancePerioDlg" for="maintancePerioDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.lifeCycle']}" />
+					<p:inputText style="width:300px;" id="lifeCycleDlg" maxlength="9"
+						value="#{equipmentsDetailBean.equipHistorySelected.lifeCycle}"
+						converterMessage="Vòng đời phải là số "
+						validator="#{equipmentsDetailBean.validate}">
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="lifeCycleDlg" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['history.note']}" />
+					<p:inputTextarea style="width:300px;height: 150!important;"
+						id="documentDlg" maxlength="400"
+						value="#{equipmentsDetailBean.equipHistorySelected.note}">
+						<f:attribute name="msglabel" value="#{msg['history.note']}" />
+					</p:inputTextarea>
+					<p:outputLabel />
+					<p:message for="documentDlg" />
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="#{ui-icon-plus}"
+						action="#{equipmentsDetailBean.save}"
+						value="#{msg['common.dialog.save']}"
+						update="@([id$=tblEquipmentHistory]),@([id$=panelEquipmentHistory]), @([id$=disableBeforeAdd])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						oncomplete="PF('dlSave').hide()">
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

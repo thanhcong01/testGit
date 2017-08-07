@@ -1,0 +1,374 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frm2">
+            <p:outputLabel style="display: none" value="#{exportWaranty.initShop()}"></p:outputLabel>
+        </h:form>
+        <h:form id="frm">
+            <title>#{msg['exportWaranty']}</title>
+            <!--            <h2 ><p:outputLabel value="#{msg['exportWaranty']}"></p:outputLabel></h2>-->
+            <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <p:panel class="Pad10" rendered="#{sessionBean.shop.statusCancel}">
+                <p:growl id="messages" showDetail="true" life="30000" />
+                <p:panel header="#{msg['transInfo']}" id="info">
+                    <p:panelGrid styleClass="Wid100">
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['equipmentsDetail.PXK']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText  disabled="true" value="#{exportWaranty.orderCode}" styleClass="select Wid100 disableText"></p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['exportType']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu styleClass="select Wid100" value="#{exportWaranty.typeId}"  >
+                                    <p:ajax event="valueChange" update=":frm:info" listener="#{exportWaranty.changeType}"></p:ajax>
+                                    <f:selectItems value="#{exportWaranty.listTransType}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+							<p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['today.export.waranty']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:calendar id="button" showOn="button" disabled="true"
+                                            converterMessage="#{msg['errDateType']}"
+                                            yearRange="c-70:c+70" navigator="true"
+                                            value="#{exportWaranty.today}" pattern="dd/MM/yyyy" >
+                                </p:calendar>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['createStaff.export.waranty']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText disabled="true" value="#{sessionBean.staff.staffName}" styleClass="select Wid100 disableText"></p:inputText>
+                            </p:column>
+                            
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['user.export.to']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText  value="#{exportWaranty.staffName}" styleClass="Wid100"></p:inputText>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:panel>
+                <div class="EmptyBox10"></div>
+                <p:panel header="#{msg['search']}">
+                    <p:panelGrid styleClass="Wid100">
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['goodsGroup']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu styleClass="select Wid100" value="#{exportWaranty.goodsGroupId}"  >
+                                    <p:ajax event="valueChange" update=":frm" listener="#{exportWaranty.changeGoodsGroup()}"></p:ajax>
+                                    <f:selectItem  itemLabel="#{msg['audit.select.all']}" itemValue="" />
+                                    <f:selectItems value="#{sessionBean.lsgGroupActive}" var="c"
+                                                   itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['goods']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:autoComplete styleClass="ui-autocomplete-select" dropdown="true" value="#{exportWaranty.goods}"
+                                                completeMethod="#{exportWaranty.completeGoods}" >
+                                    <p:ajax event="itemSelect"  listener="#{exportWaranty.goodsSelect}" update="@this, :frm" />
+                                </p:autoComplete>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['goods.tableProfile.column.name']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText styleClass="select Wid100" disabled="true"
+                                             value="#{exportWaranty.profileName}"
+                                             onkeypress="if (event.keyCode == 13) { return false; }"  ></p:inputText>
+                            </p:column>
+
+                        </p:row>
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel   value="#{msg['status']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu  disabled="true" styleClass="select Wid100 disableText" value="#{exportWaranty.goodStatus}">
+                                    <f:selectItems value="#{sessionBean.listStatus}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel  value="#{msg['serial']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="select Wid100" value="#{exportWaranty.fromSerial}" onkeypress="if (event.keyCode == 13) { return false; }"  ></p:inputText>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:commandButton icon="fa fa-search Fs14 white" value="#{msg['search']}" style="float:right" update="frm" actionListener="#{exportWaranty.search}" ></p:commandButton>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <table>
+                        <tr>
+                            <td style="vertical-align: top; width: 100%">
+                                <p:panel>
+                                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{exportWaranty.lsData}" paginator="true"
+                                                 rows="5" paginatorPosition="bottom"
+                                                 resizableColumns="false"
+                                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 rowsPerPageTemplate="5,10,20,50,100"
+                                                 id="dtSearch" rowKey="#{c.rowKey}"
+                                                 selection="#{exportWaranty.lsDataSelected}">
+                                        <f:facet  name="header">
+                                            <span class="dtHead"  style="">#{msg['searchResult']}</span>
+                                            <p:commandButton styleClass="toggler" id="togglerdtSearch"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                                            <!--<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch" />-->
+                                            <p:columnToggler datasource="dtSearch" trigger="togglerdtSearch">
+                                                <p:ajax event="toggle" listener="#{exportWaranty.onToggleActiveEtag}"
+                                                        update="@([id$=dtSearch])"/>
+                                            </p:columnToggler>
+                                        </f:facet>
+                                        <p:ajax event="rowSelectRadio" listener="#{exportWaranty.viewClick}" update="@([id$=dtResult]), @this, @([id$=selectData])"/>
+                                        <p:ajax event="rowSelect" listener="#{exportWaranty.viewClick}" update="@([id$=dtResult]), @this, @([id$=selectData])"/>
+                                        <p:ajax event="rowSelectCheckbox" listener="#{exportWaranty.viewClick}" update="@([id$=dtResult]), @this, @([id$=selectData])"/>
+                                        <p:ajax event="rowUnselectCheckbox" listener="#{exportWaranty.viewClick}" update="@([id$=dtResult]), @this, @([id$=selectData])"/>
+
+                                        <p:ajax event="toggleSelect" partialSubmit="true"  listener="#{exportWaranty.viewClick}" update="@([id$=dtResult]), @this"/>
+                                        <!--<p:ajax event="rowSelect" listener="#{exportWaranty.viewClick}" update=":frm"  />-->
+                                        <p:column visible="#{exportWaranty.visibleTable[0]}"
+                                                  styleClass="index">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['index']}" />
+                                            </f:facet>
+                                            <h:outputText value="#{rowIndex+1}" />
+                                        </p:column>
+                                        <p:column visible="#{exportWaranty.visibleTable[1]}"
+                                                  sortBy="#{c.serial}" >
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['serial']}" />
+                                            </f:facet>
+                                            <h:outputText id="serial" value="#{c.serial}" />
+                                            <p:tooltip for="serial"
+                                                       value="#{c.serial}" />
+                                        </p:column>
+
+                                        <p:column visible="#{exportWaranty.visibleTable[2]}"
+                                                  sortBy="#{c.instockDatetimeStr}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['instock.date.ncc']}" />
+                                            </f:facet>
+                                            <h:outputText id="instockDatetimeStr" value="#{c.instockDatetimeStr}" />
+                                            <p:tooltip for="instockDatetimeStr"
+                                                       value="#{c.instockDatetimeStr}" />
+                                        </p:column>
+                                        <p:column visible="#{exportWaranty.visibleTable[3]}"
+                                                  sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus)}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['audit.status']}" />
+                                            </f:facet>
+                                            <h:outputText id="getEquipsStatusName" value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus)}" />
+                                            <p:tooltip for="getEquipsStatusName"
+                                                       value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus)}" />
+                                        </p:column>
+                                        <p:column visible="#{exportWaranty.visibleTable[4]}"
+                                                  sortBy="#{sessionBean.getStockStatusName(c.stockStatus)}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['stockStatus']}" />
+                                            </f:facet>
+
+                                            <h:outputText id="getStockStatusName" value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+                                            <p:tooltip for="getStockStatusName"
+                                                       value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+                                        </p:column>
+                                        <p:column visible="#{exportWaranty.visibleTable[5]}"
+                                                  headerText="#{msg['waran.status']}" sortBy="#{searchEquipmentBean.getWarantyStatusName(c.warrantyStatus)}">
+                                            <h:outputText id="getWarantyStatusName"
+                                                    value="#{searchEquipmentBean.getWarantyStatusName(c.warrantyStatus)}" />
+                                            <p:tooltip for="getWarantyStatusName"
+                                                       value="#{searchEquipmentBean.getWarantyStatusName(c.warrantyStatus)}" />
+                                        </p:column>
+                                        <p:column visible="#{exportWaranty.visibleTable[6]}"
+                                                  sortBy="#{c.warantyExpiredDateStr}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['search.equiment.warrDate']}" />
+                                            </f:facet>
+                                            <h:outputText id="warantyExpiredDateStr" value="#{c.warantyExpiredDateStr}" />
+                                            <p:tooltip for="warantyExpiredDateStr"
+                                                       value="#{c.warantyExpiredDateStr}" />
+                                        </p:column>
+
+                                        <p:column visible="#{exportWaranty.visibleTable[7]}"
+                                                  headerText="#{msg['positon.field.choose']}"
+                                                  selectionMode="single" style="text-align: center" styleClass="Wid5" />
+
+                                    </p:dataTable>
+                                    <div class="EmptyBox10" />
+                                </p:panel>
+                            </td>
+                        </tr>
+                    </table>
+                </p:panel>
+                <div class="EmptyBox10"></div>
+                <div style="clear: both;width: 100%; text-align: right">
+                    <p:commandButton id = "selectData" value="#{msg['positon.field.choose']}" icon="fa fa-check Fs14 white"
+                                     update=":frm"
+                                     disabled="#{exportWaranty.disableSelected}"
+                                     actionListener="#{exportWaranty.addSelected()}" styleClass="ui-priority-primary" >
+                    </p:commandButton>
+                </div>
+                <div class="EmptyBox10"></div>
+                <p:panel id="result">
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex"
+                                 value="#{exportWaranty.lsDataRsSelected}" paginator="true" rows="10"
+                                 paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtResult" lazy="false" rowKey="#{c.rowKey}" >
+                        <f:facet  name="header">
+                            <span class="dtHead"  style="">#{msg['equipmentProfile.top.title']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtResult"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <!--<p:columnToggler datasource="dtResult" trigger="togglerdtResult" />-->
+                            <p:columnToggler datasource="dtResult" trigger="togglerdtResult">
+                                <p:ajax event="toggle" listener="#{exportWaranty.onToggleActiveEtag2}"
+                                        update="@([id$=dtResult])"/>
+                            </p:columnToggler>
+                        </f:facet>
+                        <p:column visible="#{exportWaranty.visibleTable2[0]}"
+                                  styleClass="index" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column visible="#{exportWaranty.visibleTable2[1]}"
+                                  sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.equipmentProfileId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goodsGroup']}" />
+                            </f:facet>
+                            <h:outputText id="getGoodsGroupNameByGoods" value="#{sessionBean.getGoodsGroupNameByGoods(c.equipmentProfileId.toString())}" />
+                            <p:tooltip for="getGoodsGroupNameByGoods"
+                                       value="#{sessionBean.getGoodsGroupNameByGoods(c.equipmentProfileId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exportWaranty.visibleTable2[2]}"
+                                  sortBy="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['audit.equipment.code']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileCode" value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+                            <p:tooltip for="getEquipProfileCode"
+                                       value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exportWaranty.visibleTable2[3]}"
+                                  sortBy="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['audit.equipment.name']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+                            <p:tooltip for="getEquipProfileName"
+                                       value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exportWaranty.visibleTable2[4]}"
+                                  sortBy="#{c.specification}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.specifile']}" />
+                            </f:facet>
+                            <h:outputText id="grspecification" value="#{c.specification}" />
+                            <p:tooltip for="grspecification" value="#{c.specification}" />
+                        </p:column>
+
+                        <p:column visible="#{exportWaranty.visibleTable2[5]}"
+                                  sortBy="#{c.reasonsWarranty}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['title.reson.waran']}" />
+                            </f:facet>
+                            <h:outputText id="reasonsWarranty" value="#{c.reasonsWarranty}" />
+                            <p:tooltip for="reasonsWarranty"
+                                       value="#{c.reasonsWarranty}" />
+                        </p:column>
+
+                        <p:column visible="#{exportWaranty.visibleTable2[6]}"
+                                  headerText="#{msg['delete']}" styleClass="deleteCol" style="max-width: 70px;">
+                            <p:commandLink value="X" styleClass="delete" update=":frm:dtResult, :frm:dtSearch, :frm:printEx"
+                                           actionListener="#{exportWaranty.removeSeleted(c)}"></p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+                <p:panel id="detail">
+                    <p:panelGrid styleClass="Wid100">
+                        <p:column style="width:10%"></p:column>
+                        <p:column style="width:89.9%">
+                            <div class="Fright">
+                                <p:commandButton value="#{msg['accept']}" icon="fa fa-check Fs14 white" update="frm" disabled="#{exportWaranty.disableAdd}"  actionListener="#{exportWaranty.save}" styleClass="ui-priority-primary" >
+                                </p:commandButton>
+                                <p:commandButton value="#{msg['cancel']}" icon="fa fa-undo Fs14 white"  disabled="#{exportWaranty.disableAdd}" update=":frm"  actionListener="#{exportWaranty.refresh}" styleClass="ui-priority-primary cancel" >
+                                </p:commandButton>
+                                <p:commandButton  icon="fa fa-file-excel-o Fs14 white" id="printEx"
+                                                 value="#{msg['print']}" ajax="true" disabled="#{exportWaranty.disablePrint}"
+                                                 onclick="PrimeFaces.monitorDownload(start, stop);"
+                                                 actionListener="#{exportWaranty.export()}"
+                                                 styleClass="ui-priority-primary">
+                                    <p:fileDownload
+                                            value="#{exportWaranty.fileExport}" />
+                                </p:commandButton>
+                                <p:dialog widgetVar="cfExport" >
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid columns="4" styleClass="pngConfirm">
+                                        <p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+                                        <p:inputText disabled="true" styleClass="disableText" value="#{exportWaranty.orderCode}"></p:inputText>
+                                        <!-- <p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+                                        <p:inputText disabled="true" styleClass="disableText" value="#{exportWaranty.reasonName}"></p:inputText> -->
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update="frm"  actionListener="#{exportWaranty.action}" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"  onclick="PF('cfExport').hide();" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+                                <p:dialog widgetVar="dlSelectedData" style="width: 500px!important;" >
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg['detail.reson.waran.equip']}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid columns="4" styleClass="pngConfirm">
+                                        <p:outputLabel value="#{msg['title.reson.waran']}"></p:outputLabel>
+                                        <p:inputText value="#{exportWaranty.resonWaranty}"
+                                                     onkeypress="if (event.keyCode == 13) { return false; }">
+
+                                        </p:inputText>
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update=":frm"  actionListener="#{exportWaranty.saveSelected()}" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"  onclick="PF('dlSelectedData').hide();" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+                            </div>
+                        </p:column>
+                    </p:panelGrid>
+                </p:panel>
+            </p:panel>
+            
+            <p:panel class="Pad10" rendered="#{!sessionBean.shop.statusCancel}">
+            
+            <p:outputLabel  style="font-size:20px; margin:20px" value="Kho không có quyền xuất bảo hành, sửa chữa!"></p:outputLabel>
+            
+            </p:panel>
+        </h:form>
+        <script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+        </script>
+    </ui:define>
+</ui:composition>

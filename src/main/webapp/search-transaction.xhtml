@@ -1,0 +1,384 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchTrans']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['searchTrans']}"></p:outputLabel></h2>-->
+
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['search']}" styleClass="Container100">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete id="cmlOrder" styleClass="select Wid100"
+									value="#{searchTransaction.orderCode}" minQueryLength="3"
+									completeMethod="#{searchTransaction.completeOrder}">
+									<p:ajax event="itemSelect"
+										listener="#{searchTransaction.oderSelect}" update="frm" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderType']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{searchTransaction.typeId}">
+									<p:ajax event="valueChange" update=":frm"
+										listener="#{searchTransaction.changeType}"></p:ajax>
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<f:selectItems value="#{searchTransaction.listTransType}"
+										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<!-- <p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{searchTransaction.reasonId}">
+									<p:ajax event="valueChange" update=":frm"
+										listener="#{searchTransaction.changeReason}"></p:ajax>
+									<f:selectItem itemLabel="Tất cả" itemValue="-1"
+										noSelectionOption="true" />
+									<f:selectItems value="#{searchTransaction.listReason}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column> -->
+							<p:column>
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{searchTransaction.status}">
+									<f:selectItem itemLabel="" itemValue=""
+										noSelectionOption="true" />
+									<f:selectItems value="#{searchTransaction.listTransStatus}"
+										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['requireShop']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									scrollHeight="150" style="width:300px;" maxlength="50"
+									forceSelection="true"
+									emptyMessage="#{msg['common.table.emptymessage']}"
+									dropdown="true" value="#{searchTransaction.createShop}"
+									completeMethod="#{searchTransaction.CompleteCreateShop}">
+									<p:ajax event="itemSelect"
+										listener="#{searchTransaction.CreateShopSelect}"
+										update="@this" />
+
+								</p:autoComplete>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['fromCreateDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="Wid100" id="buttonf" showOn="button"
+									converterMessage="#{msg['errDateType']}"
+									value="#{searchTransaction.fromCreateDate}"
+									pattern="dd/MM/yyyy"></p:calendar>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['toCreateDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="Wid100" id="button" showOn="button"
+									converterMessage="#{msg['errDateType']}"
+									value="#{searchTransaction.toCreateDate}" pattern="dd/MM/yyyy"></p:calendar>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="5"></p:column>
+							<p:column>
+								<p:commandButton value="#{msg['search']}" style="float:right"
+									icon="fa fa-search Fs14 white" update="frm"
+									actionListener="#{searchTransaction.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<div class="Pad5">
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+							rowIndexVar="rowIndex" value="#{searchTransaction.listTrans}"
+							paginator="true" rows="5" paginatorPosition="bottom"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+							id="dtta" lazy="true" selection="#{searchTransaction.trans}"
+							rowKey="#{c.transactionActionId}">
+							<f:facet name="header">
+								<span class="dtHead" style="">#{msg['transList']}</span>
+								<p:commandButton styleClass="toggler" id="togglerdtta"
+									value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+								<!--<p:columnToggler datasource="dtta" trigger="togglerdtta" />-->
+								<p:columnToggler datasource="dtta" trigger="togglerdtta">
+									<p:ajax event="toggle" listener="#{searchTransaction.onToggleActiveEtag}"
+											update="@([id$=dtta])"/>
+								</p:columnToggler>
+							</f:facet>
+							<p:ajax event="rowSelectRadio"
+								listener="#{searchTransaction.viewDetail}" update=":frm" />
+							<p:column selectionMode="single"
+								style="text-align: center; width:5%">
+								<f:facet name="header">
+									<h:outputText value="#{msg['choosed']}" />
+								</f:facet>
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[0]}"
+									  styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[1]}"
+									  sortBy="#{c.transactionActionCode}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['orderCode']}" />
+								</f:facet>
+								<h:outputText id="transactionActionCode" value="#{c.transactionActionCode}" />
+								<p:tooltip for="transactionActionCode" value="#{c.transactionActionCode}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[2]}"
+									  sortBy="#{c.transactionType}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['orderType']}" />
+								</f:facet>
+								<h:outputText id="typeName" value="#{c.typeName}" />
+								<p:tooltip for="typeName" value="#{c.typeName}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[3]}"
+									  sortBy="#{c.status}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['status']}" />
+								</f:facet>
+								<h:outputText id="statusName" value="#{c.statusName}" />
+								<p:tooltip for="statusName" value="#{c.statusName}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[4]}"
+									  sortBy="#{c.createDatetime}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['createDate']}" />
+								</f:facet>
+								<h:outputText id="createDateString" value="#{c.createDateString}">
+								</h:outputText>
+								<p:tooltip for="createDateString" value="#{c.createDateString}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[5]}"
+									  sortBy="#{c.createStaffId}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['createStaff']}" />
+								</f:facet>
+								<h:outputText id="staffName" value="#{c.staffName}">
+								</h:outputText>
+								<p:tooltip for="staffName" value="#{c.staffName}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[6]}"
+									  sortBy="#{c.assessmentDatetime}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['assDate']}" />
+								</f:facet>
+								<h:outputText id="assDateString" value="#{c.assDateString}">
+								</h:outputText>
+								<p:tooltip for="assDateString" value="#{c.assDateString}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[7]}"
+									  sortBy="#{c.assessmentStaffId}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['assStaffName']}" />
+								</f:facet>
+								<h:outputText id="assStaffName" value="#{c.assStaffName}">
+								</h:outputText>
+								<p:tooltip for="assStaffName" value="#{c.assStaffName}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable[8]}"
+									  style="width:15%" sortBy="#{c.createShopId}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['requireShop']}" />
+								</f:facet>
+								<h:outputText id="shopName" value="#{c.shopName}">
+								</h:outputText>
+								<p:tooltip for="shopName" value="#{c.shopName}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel header="#{msg['transDetailInfo']}"
+					styleClass="Container100">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.transactionActionCode}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderType']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.typeName}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.statusName}"></p:inputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['exportDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.exportDate}"></p:inputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['exportStaff']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.exportStaff}"></p:inputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['importDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.importDate}"></p:inputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['importStaff']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.trans.importStaff}"></p:inputText>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+							</p:column>
+							<p:column colspan="3">
+								<p:inputTextarea rows="3" styleClass="Wid100 disableText"
+									disabled="true" value="#{searchTransaction.trans.description}"></p:inputTextarea>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<div class="Pad5">
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+							rowIndexVar="rowIndex"
+							value="#{searchTransaction.listTransDetail}" paginator="true"
+							rows="5" paginatorPosition="bottom" resizableColumns="true"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+							id="dtOrdersDetail" lazy="false" selectionMode="single"
+							rowKey="#{c.transactionActionDetailId}">
+							<f:facet name="header">
+								<p:commandButton styleClass="toggler" id="togglerdtOrdersDetail"
+									value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+								<p:columnToggler datasource="dtOrdersDetail" trigger="togglerdtOrdersDetail">
+									<p:ajax event="toggle" listener="#{searchTransaction.onToggleActiveEtag2}"
+											update="@([id$=dtOrdersDetail])"/>
+								</p:columnToggler>
+							</f:facet>
+							<p:ajax event="rowSelect"
+								listener="#{searchTransaction.viewSerial}" update=":frm" />
+							<p:column visible="#{searchTransaction.visibleTable2[0]}"
+									  styleClass="index" style="text-align: center;">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable2[1]}"
+									  styleClass="Wid13" sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goodsGroup']}" />
+								</f:facet>
+								<h:outputText id="getGoodsGroupNameByGoods"
+									value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+								<p:tooltip for="getGoodsGroupNameByGoods" value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable2[2]}"
+									  styleClass="Wid13" sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['equipment.profile.code']}" />
+								</f:facet>
+								<h:outputText id="getEquipProfileCode"
+									value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+								<p:tooltip for="getEquipProfileCode" value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable2[3]}"
+									  styleClass="Wid15" sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['equipment.profile.name']}" />
+								</f:facet>
+								<h:outputText id="getEquipProfileName"
+									value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+								<p:tooltip for="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable2[4]}"
+									  sortBy="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['equipment.spec']}" />
+								</f:facet>
+								<h:outputText id="specification"
+									value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+								<p:tooltip for="specification"
+									value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+							</p:column>
+							<p:column visible="#{searchTransaction.visibleTable2[5]}"
+									  styleClass="Wid9" sortBy="#{c.quantity}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['quantity']}" />
+								</f:facet>
+								<h:outputText id="quantity" value="#{c.quantity}" />
+								<p:tooltip for="quantity" value="#{c.quantity}" />
+							</p:column>
+							<!--<p:column visible="#{searchTransaction.visibleTable2[6]}"-->
+									  <!--styleClass="Wid203" sortBy="#{c.description}">-->
+								<!--<f:facet name="header">-->
+									<!--<h:outputText value="#{msg['reason']}" />-->
+								<!--</f:facet>-->
+								<!--<h:outputText id="description" value="#{c.description}" />-->
+								<!--<p:tooltip for="description" value="#{c.description}" />-->
+							<!--</p:column>-->
+							<p:column visible="#{searchTransaction.visibleTable2[7]}"
+									  styleClass="Wid11" rendered="#{sessionBean.getGoods(c.getGoodsId().toString()).serial}"
+								style="text-align: center;color:blue">
+								<h:outputText value="#{msg['view.info']}" />
+							</p:column>
+						</p:dataTable>
+					</div>
+				</p:panel>
+			</div>
+			<div class="EmptyBox10"></div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<f:facet name="first">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+	</f:facet>
+	<title>VETC-Hệ thống thu phí không dừng</title>
+	<h:outputScript name="js/layout.js" library="sentinel-layout" />
+	<h:outputStylesheet name="css/font-icon-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="css/sentinel-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="css/core-layout.css"
+		library="sentinel-layout" />
+	<h:outputStylesheet name="theme.css" library="primefaces-sentinel" />
+	<h:outputStylesheet name="inventory.css" library="inventory-css" />
+	<ui:insert name="head" />
+</h:head>
+
+<h:body>
+    <f:view locale="#{languageBean.locale}"></f:view>
+	<header class="Wraptopbar">
+		<ui:include src="topbar-layout.xhtml" />
+	</header>
+	<section class="Wraplayout">
+		<aside class="Wrapmenu">
+			<ui:include src="leftmenu-layout.xhtml" />
+		</aside>
+		<section class="WrapMain">
+			<div class="Wrapcontent">
+				<div id="layout-portlets-cover" class="fontRegular">
+					<ui:insert name="content"></ui:insert>
+				</div>
+			</div>
+		</section>
+	</section>
+
+	<p:ajaxStatus
+		style="width:32px; height:32px; position:fixed; right:12px; bottom:10px">
+		<f:facet name="start">
+			<p:graphicImage name="images/preloader.gif" library="sentinel-layout" />
+		</f:facet>
+		<f:facet name="complete">
+			<h:outputText value="" />
+		</f:facet>
+	</p:ajaxStatus>
+</h:body>
+</html>

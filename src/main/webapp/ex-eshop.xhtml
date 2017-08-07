@@ -1,0 +1,339 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['exEShop']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['exEShop']}"></p:outputLabel></h2>-->
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="EmptyBox10"></div>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['transInfo']}" id="info">
+					<p:panelGrid id="pgs">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['equipmentsDetail.PXK']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:inputText styleClass="Wid100 disableText"
+									value="#{exEShop.orderCode}" disabled="true"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['today.export.waranty']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:inputText styleClass="Wid100 disableText" disabled="true" value="#{exEShop.exportDate}">
+								  <f:convertDateTime type="date" pattern="dd/MM/yyyy"/>
+								</p:inputText>
+								
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['createStaff.export.waranty']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{sessionBean.staff.staffCode} | #{sessionBean.staff.staffName}"></p:inputText>
+							</p:column>
+						</p:row>
+						<p:row>
+						<p:column>
+								<p:outputLabel value="#{msg['requireStaff']}(*)"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<!-- 								                                <p:selectOneMenu styleClass="select Wid100" value="#{imShopExGoods.subStaffId}"  > -->
+								<!-- 								                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" /> -->
+								<!-- 								                                    <f:selectItems value="#{imShopExGoods.childShop}" var="c" itemLabel="#{c.shopName}" itemValue="#{c.shopId}" /> -->
+								<!-- 								                                </p:selectOneMenu> -->
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									scrollHeight="150" style="" maxlength="50"
+									forceSelection="true" dropdown="true"
+									value="#{exEShop.subShop}"
+									emptyMessage="#{msg['common.table.emptymessage']}"
+									completeMethod="#{exEShop.CompleteSubShop}">
+									<p:ajax event="itemSelect" listener="#{exEShop.SubShopSelect}"
+										update="@this, :frm:printEx" />
+								</p:autoComplete>
+							</p:column>
+
+							<!--<p:column styleClass="Wid13">-->
+								<!--<p:outputLabel value="#{msg['orderType']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid203">-->
+								<!--<p:selectOneMenu  styleClass="select Wid100"-->
+									<!--value="#{exEShop.typeId}">-->
+									<!--<p:ajax event="valueChange" update=":frm"-->
+										<!--listener="#{exEShop.changeType}"></p:ajax>-->
+									<!--<f:selectItems value="#{exEShop.listTransType}" var="c"-->
+										<!--itemLabel="#{c.name}" itemValue="#{c.value}" />-->
+								<!--</p:selectOneMenu>-->
+							<!--</p:column>-->
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['history.referenceCode']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" colspan="3">
+								<p:inputText value="#{exEShop.referenceCode}" styleClass="Wid100 "></p:inputText>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+							</p:column>
+							<p:column  colspan="5">
+								<p:inputTextarea styleClass="Wid100 " value="#{exEShop.note}"></p:inputTextarea>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+
+				</p:panel>
+				<p:panel header="#{msg['transInfo.tttb']}">
+					<p:panelGrid>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup.type']} (*)"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{exEShop.domainGroupId}">
+									<p:ajax event="valueChange" listener="#{exEShop.selectEquipType}"
+											update=":frm:goodsGroupId, :frm:goodsSelectId, :frm:goodsNameSearcb" ></p:ajax>
+									<f:selectItems value="#{sessionBean.lsgDomainGroup}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup']} (*)"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100" id="goodsGroupId"
+									value="#{exEShop.goodsGroupId}">
+									<p:ajax event="valueChange" update=":frm:goodsGroupId, :frm:goodsSelectId, :frm:goodsNameSearcb"
+										listener="#{exEShop.changeGoodsGroup()}"></p:ajax>
+									<f:selectItems value="#{exEShop.lsgGroup}" var="c"
+										itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods']}(*)"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete styleClass="ui-autocomplete-select" id="goodsSelectId"
+									dropdown="true" value="#{exEShop.goods}"
+									completeMethod="#{exEShop.completeGoods}">
+									<p:ajax event="itemSelect" listener="#{exEShop.goodsSelect}"
+										update=":frm:goodsNameSearcb" />
+								</p:autoComplete>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods.tablegoods.column.name']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" >
+								<p:inputText id="goodsNameSearcb" disabled="true" styleClass="select disableText"
+									value="#{exEShop.goodsName}">
+									
+								</p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['quantity']} (*)"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" >
+								<p:inputText styleClass="select"
+									value="#{exEShop.quantity}">
+								</p:inputText>
+							</p:column>
+							<!-- <p:column styleClass="Wid203">
+								<p:commandButton value="#{msg['Exit']}"
+									action="index?faces-redirect=true"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+							</p:column> -->
+						</p:row>
+					</p:panelGrid>
+					<p:panelGrid styleClass="Wid100">
+						<p:column styleClass="Wid203"></p:column>
+						<p:column style="width:79.6%">
+							<div class="Fright">
+								<p:commandButton value="#{msg['add']}"
+												 actionListener="#{exEShop.add}" update=":frm"></p:commandButton>
+								<p:commandButton value="#{msg['viewStock']}"
+												 update=":leftform:viewStock"
+												 actionListener="#{viewStock.viewStockFromButton}"></p:commandButton>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel>
+
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{exEShop.st.lsDetail}"
+								 selection="#{exEShop.stockTransactionDetailSelected}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtDetail" lazy="false" selectionMode="single"
+						rowKey="#{c.rowkey}">
+						<f:facet name="header">
+							<p:commandButton styleClass="toggler" id="togglerdtDetail"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<!--<p:columnToggler datasource="dtDetail" trigger="togglerdtDetail" />-->
+							<p:columnToggler datasource="dtDetail" trigger="togglerdtDetail">
+								<p:ajax event="toggle" listener="#{exEShop.onToggleActiveEtag}"
+										update="@([id$=dtDetail])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:ajax event="toggleSelect"
+								listener="#{imShopExGoods.hanleLsDataSelect}"
+								update=":frm:disableViewDetail" />
+						<p:ajax event="rowSelect" listener="#{exEShop.viewClick}" update=":frm:disableViewDetail, @this" />
+						<p:column visible="#{exEShop.visibleTable[0]}"
+								  styleClass="index">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column visible="#{exEShop.visibleTable[1]}"
+								  sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goodsGroup']}" />
+							</f:facet>
+							<h:outputText id="goodsGroup"
+								value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+							<p:tooltip for="goodsGroup"
+									   value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+						</p:column>
+						<p:column visible="#{exEShop.visibleTable[2]}"
+								  sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['profileCode']}" />
+							</f:facet>
+							<h:outputText id="profileCode"
+									value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							<p:tooltip for="profileCode"
+									   value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+						</p:column>
+
+						<p:column visible="#{exEShop.visibleTable[3]}"
+								  sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods.tableProfile.column.name']}" />
+							</f:facet>
+							<h:outputText
+								value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							<p:tooltip for="profileCode"
+									   value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+						</p:column>
+
+						<p:column visible="#{exEShop.visibleTable[4]}"
+								  sortBy="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equipment.spec']}" />
+							</f:facet>
+							<h:outputText id="specification"
+										  value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+							<p:tooltip for="specification"
+									   value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+							<!--<h:outputText-->
+								<!--value="#{sessionBean.service.get(c.goodsStatus.toString())}" />-->
+						</p:column>
+						<p:column visible="#{exEShop.visibleTable[5]}"
+								  sortBy="#{c.quantity}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['quantity']}" />
+							</f:facet>
+							<h:outputText value="#{c.quantity}" />
+						</p:column>
+						<p:column visible="#{exEShop.visibleTable[6]}"
+								  style="text-align: center;" styleClass="deleteCol">
+							<f:facet name="header">
+								<h:outputText value="#{msg['delete']}" />
+							</f:facet>
+							<p:commandLink value="X" styleClass="delete" update=":frm"
+								actionListener="#{exEShop.removeDtRs(c)}"></p:commandLink>
+						</p:column>
+					</p:dataTable>
+					<p:panelGrid styleClass="Wid100">
+						<p:column styleClass="Wid203"></p:column>
+						<p:column style="width:79.6%">
+							<div class="Fright">
+								<p:commandButton id="disableViewDetail" value="#{msg['equiment.detail.ct']}" disabled="#{exEShop.disableViewDetail}"
+												 actionListener="#{exEShop.detailInfo}" update=":frm"></p:commandButton>
+								<p:commandButton value="#{msg['ex.appro.stock']}" update=":frm, :frm:messages"
+									disabled="#{exEShop.disableApp}"
+									actionListener="#{exEShop.save}"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+								<p:commandButton value="#{msg['cancel']}" update=":frm"
+									actionListener="#{exEShop.refresh}"
+									styleClass="ui-priority-primary cancel">
+								</p:commandButton>
+								<p:commandButton value="#{msg['print']}" id="printEx"
+									disabled="#{exEShop.disableApp}"
+									onclick="PrimeFaces.monitorDownload(start, stop);"
+									actionListener="#{exEShop.export()}"
+									styleClass="ui-priority-primary">
+									<p:fileDownload
+											value="#{exEShop.fileExport}" />
+								</p:commandButton>
+								<p:dialog widgetVar="cfExSReq">
+									<f:facet name="header">
+										<p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+									</f:facet>
+									<p:panelGrid styleClass="pngConfirm">
+										<p:row>
+											<p:column>
+												<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+											</p:column>
+											<p:column>
+												<p:inputText styleClass="disableText" disabled="true"
+													value="#{exEShop.ta.transactionActionCode}"></p:inputText>
+											</p:column>
+											<!--<p:column>-->
+												<!--<p:outputLabel value="#{msg['reason']}"></p:outputLabel>-->
+											<!--</p:column>-->
+											<!--<p:column>-->
+												<!--<p:inputText styleClass="disableText" disabled="true"-->
+													<!--value="#{exEShop.ta.reasonName}"></p:inputText>-->
+											<!--</p:column>-->
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+											</p:column>
+											<p:column>
+												<p:inputTextarea maxlength="200" rows="3" disabled="true"
+													value="#{exEShop.note}"></p:inputTextarea>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+									<div class="Fright">
+										<p:commandButton value="#{msg['yes']}" update="frm"
+											actionListener="#{exEShop.action}"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="#{msg['no']}"
+											onclick="PF('cfExSReq').hide();"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</div>
+								</p:dialog>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+			</div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

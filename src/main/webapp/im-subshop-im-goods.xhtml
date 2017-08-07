@@ -1,0 +1,413 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['imSubShopImGoods']}</title>
+			<!--<h2 ><p:outputLabel value="#{msg['imSubShopImGoods']}"></p:outputLabel></h2>-->
+
+			<div class="Empty`Box10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="EmptyBox10"></div>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['search']}" id="info">
+					<p:panelGrid>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderCode.myc']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete id="cmlOrder" styleClass="Wid100"
+												value="#{imSubShopImGoods.orderCode}" minQueryLength="3"
+												completeMethod="#{imSubShopImGoods.completeOrder}">
+									<p:ajax event="itemSelect"
+											listener="#{imSubShopImGoods.oderSelect}" update="frm" />
+								</p:autoComplete>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{imSubShopImGoods.status}">
+									<f:selectItem itemLabel="" itemValue=""
+												  noSelectionOption="true" />
+									<f:selectItems value="#{imSubShopImGoods.listStatus}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderType.lyc']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{imSubShopImGoods.typeId}">
+									<p:ajax event="valueChange" update=":frm"
+											listener="#{imSubShopImGoods.changeType}"></p:ajax>
+									<!--<f:selectItem itemLabel="" itemValue=""-->
+												  <!--noSelectionOption="true" />-->
+									<f:selectItems value="#{imSubShopImGoods.listTransType}"
+												   var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['requireShop']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<!-- 								                                <p:selectOneMenu styleClass="select Wid100" value="#{imShopExGoods.subStaffId}"  > -->
+								<!-- 								                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" /> -->
+								<!-- 								                                    <f:selectItems value="#{imShopExGoods.childShop}" var="c" itemLabel="#{c.shopName}" itemValue="#{c.shopId}" /> -->
+								<!-- 								                                </p:selectOneMenu> -->
+								<p:autoComplete styleClass="ui-autocomplete-select"
+												scrollHeight="150" style="width:300px;" maxlength="50"
+												forceSelection="true" dropdown="true"
+												value="#{imSubShopImGoods.subShop}"
+												emptyMessage="#{msg['common.table.emptymessage']}"
+												completeMethod="#{imSubShopImGoods.CompleteSubShop}">
+									<p:ajax event="itemSelect"
+											listener="#{imSubShopImGoods.SubShopSelect}" update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<!---->
+							<!--<p:column>-->
+							<!--<p:outputLabel value="#{msg['shop']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column>-->
+							<!--<p:inputText styleClass="Wid100 disableText" disabled="true"-->
+							<!--value="#{imSubShopImGoods.shop.shopName}"></p:inputText>-->
+							<!--</p:column>-->
+							<p:column>
+								<p:outputLabel value="#{msg['createDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="Wid100" id="button"
+											converterMessage="#{msg['errDateType']}"
+											value="#{imSubShopImGoods.createDate}" pattern="dd/MM/yyyy">
+								</p:calendar>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['equipment.transactionAction.createUser']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:autoComplete id="usernameFrm"
+												value="#{imSubShopImGoods.usernameFrm}"
+												completeMethod="#{imSubShopImGoods.autoCompleteUsername}" dropdown="true"
+												scrollHeight="150"
+												styleClass="Wid100"
+												forceSelection="true" maxlength="100">
+									<p:ajax event="itemSelect"
+											listener="#{imSubShopImGoods.usernameSelect}" update="@this" />
+								</p:autoComplete>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column colspan="5"></p:column>
+							<p:column>
+
+								<p:commandButton icon="fa fa-search Fs14 white"
+									value="#{msg['search']}" style="float: right" update="frm"
+									actionListener="#{imSubShopImGoods.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+				<p:panel>
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+								 rowIndexVar="rowIndex" value="#{imSubShopImGoods.lsData}"
+								 paginator="true" rows="5" paginatorPosition="bottom"
+								 resizableColumns="true"
+								 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+								 id="dtta" lazy="true" selection="#{imSubShopImGoods.ta}"
+								 rowKey="#{c.transactionActionId}">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['transList.dsyc']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtta"
+											 value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<!--<p:columnToggler datasource="dtta" trigger="togglerdtta" />-->
+							<p:columnToggler datasource="dtta" trigger="togglerdtta">
+								<p:ajax event="toggle" listener="#{imSubShopImGoods.onToggleActiveEtag}"
+										update="@([id$=dtta])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:ajax event="rowSelectRadio" listener="#{imSubShopImGoods.view}"
+								update=":frm, :frm:viewDetail" />
+						<p:ajax event="toggleSelect"
+								update="@this" />
+						<p:ajax event="rowSelect" update=":frm, :frm:viewDetail"
+								listener="#{imSubShopImGoods.view}" />
+
+						<p:column styleClass="index" visible="#{imSubShopImGoods.visibleTable[0]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column sortBy="#{c.transactionActionCode}" visible="#{imSubShopImGoods.visibleTable[1]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['orderCode.myc']}" />
+							</f:facet>
+							<h:outputText id="transactionActionCode" value="#{c.transactionActionCode}" />
+							<p:tooltip for="transactionActionCode" value="#{c.transactionActionCode}" />
+						</p:column>
+						<p:column sortBy="#{c.createShopId}" visible="#{imSubShopImGoods.visibleTable[2]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['requireShop']}" />
+							</f:facet>
+							<h:outputText id="shopName" value="#{c.shopName}" />
+							<p:tooltip for="shopName" value="#{c.shopName}" />
+						</p:column>
+						<p:column sortBy="#{c.createDatetime}" visible="#{imSubShopImGoods.visibleTable[3]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['createDate']}" />
+							</f:facet>
+							<h:outputText id="createDateString" value="#{c.createDateString}">
+							</h:outputText>
+							<p:tooltip for="createDateString" value="#{c.createDateString}" />
+						</p:column>
+						<p:column sortBy="#{c.createStaffId}" visible="#{imSubShopImGoods.visibleTable[4]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['createStaff']}" />
+							</f:facet>
+							<h:outputText id="staffName" value="#{c.staffName}" />
+							<p:tooltip for="staffName" value="#{c.staffName}" />
+						</p:column>
+						<p:column  sortBy="#{c.assessmentDatetime}" visible="#{imSubShopImGoods.visibleTable[5]}" >
+							<f:facet name="header">
+								<h:outputText value="#{msg['assDate']}" />
+							</f:facet>
+							<h:outputText id="assDateString" value="#{c.assDateString}">
+							</h:outputText>
+							<p:tooltip for="assDateString" value="#{c.assDateString}" />
+						</p:column>
+						<p:column sortBy="#{c.assessmentStaffId}" visible="#{imSubShopImGoods.visibleTable[6]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['assStaffName']}" />
+							</f:facet>
+							<h:outputText id="assStaffName" value="#{c.assStaffName}" />
+							<p:tooltip for="assStaffName" value="#{c.assStaffName}" />
+						</p:column>
+						<p:column sortBy="#{c.status}" visible="#{imSubShopImGoods.visibleTable[7]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['status']}" />
+							</f:facet>
+							<h:outputText id="statusName" value="#{c.statusName}" />
+							<p:tooltip for="statusName" value="#{c.statusName}" />
+						</p:column>
+						<p:column selectionMode="single" style="width: 5%; text-align: center;"
+								  visible="#{imSubShopImGoods.visibleTable[8]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['choosed']}" />
+							</f:facet>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+
+				<p:panel header="#{msg['transInfo.tttb']}">
+					<!--<p:panelGrid>-->
+						<!--<p:row>-->
+							<!--<p:column styleClass="Wid13">-->
+								<!--<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid203">-->
+								<!--<p:inputText styleClass="Wid100 disableText" disabled="true"-->
+									<!--value="#{imSubShopImGoods.ta.transactionActionCode}"></p:inputText>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid13">-->
+								<!--<p:outputLabel value="#{msg['orderType']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid203">-->
+								<!--<p:inputText styleClass="Wid100 disableText" disabled="true"-->
+									<!--value="#{imSubShopImGoods.ta.typeName}"></p:inputText>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid13">-->
+								<!--<p:outputLabel value="#{msg['status']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid203">-->
+								<!--<p:inputText styleClass="Wid100 disableText" disabled="true"-->
+									<!--value="#{imSubShopImGoods.ta.statusName}"></p:inputText>-->
+							<!--</p:column>-->
+						<!--</p:row>-->
+					<!--</p:panelGrid>-->
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+								 rowIndexVar="rowIndex" value="#{imSubShopImGoods.st.lsDetail}"
+								 selection="#{imSubShopImGoods.stockTransactionDetailSelected}"
+								 paginator="true" imSubShopImGoods="5" paginatorPosition="bottom"
+								 resizableColumns="true"
+								 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+								 id="dtstDetail" lazy="false"
+								 rowKey="#{c.rowkey}">
+						<f:facet name="header">
+							<p:commandButton styleClass="toggler" id="togglerdtstDetail"
+											 value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<!--<p:columnToggler datasource="dtstDetail"-->
+											 <!--trigger="togglerdtstDetail" />-->
+							<p:columnToggler datasource="dtstDetail" trigger="togglerdtstDetail">
+								<p:ajax event="toggle" listener="#{imSubShopImGoods.onToggleActiveEtag2}"
+										update="@([id$=dtstDetail])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:ajax event="toggleSelect"
+								update="@this" />
+						<p:ajax event="rowSelect" update=":frm, :frm:viewDetail"
+								listener="#{imSubShopImGoods.viewSerial}" />
+						<p:ajax event="rowSelectRadio" update=":frm, :frm:viewDetail"
+								listener="#{imSubShopImGoods.viewSerial}" />
+
+						<p:column styleClass="index" visible="#{imSubShopImGoods.visibleTable2[0]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}"
+								  visible="#{imSubShopImGoods.visibleTable2[1]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goodsGroup']}" />
+							</f:facet>
+							<h:outputText id="getGoodsGroupNameByGoods"
+									value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+							<p:tooltip for="getGoodsGroupNameByGoods" value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}"
+								  visible="#{imSubShopImGoods.visibleTable2[2]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods.tableProfile.column.code']}" />
+							</f:facet>
+							<h:outputText id="getEquipProfileCode"
+									value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							<p:tooltip for="getEquipProfileCode" value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}"
+								  visible="#{imSubShopImGoods.visibleTable2[3]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods.tableProfile.column.name']}" />
+							</f:facet>
+							<h:outputText id="getEquipProfileName"
+									value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							<p:tooltip for="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{c.quantity}" visible="#{imSubShopImGoods.visibleTable2[4]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['quantity']}" />
+							</f:facet>
+							<h:outputText id="quantity" value="#{c.quantity}" />
+							<p:tooltip for="quantity" value="#{c.quantity}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}"
+								  visible="#{imSubShopImGoods.visibleTable2[5]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equipment.specifile']}" />
+							</f:facet>
+							<h:outputText id="specification"
+									value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+							<p:tooltip for="specification"
+									   value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+						</p:column>
+						<p:column visible="#{imSubShopImGoods.visibleTable2[6]}"
+								  styleClass="Wid5" selectionMode="single" style="text-align: center">
+							<f:facet name="header">
+								<h:outputText value="#{msg['choosed']}" />
+							</f:facet>
+						</p:column>
+					</p:dataTable>
+					<p:panelGrid styleClass="Wid100">
+						<p:column styleClass="Wid203"></p:column>
+						<p:column style="width:79.6%">
+							<div class="Fright">
+								<p:commandButton icon="fa fa-eye Fs14 white"
+												 style="float: right" value="#{msg['viewStock']}"
+												 update=":leftform:viewStock"
+												 actionListener="#{viewStock.viewStockFromButton}"></p:commandButton>
+								<p:commandButton icon="fa fa-check Fs14 white"
+												 value="#{msg['equiment.detail.ct']}"
+												 disabled="#{imSubShopImGoods.disableViewDetail}" id="viewDetail"
+												 update=":frm" actionListener="#{imSubShopImGoods.viewDetailSerial()}"
+												 styleClass="ui-priority-primary">
+
+								</p:commandButton>
+								<p:commandButton icon="fa fa-check Fs14 white"
+									value="#{msg['importStock']}"
+									disabled="#{imSubShopImGoods.disableApp}" id="approve"
+									update=":frm" actionListener="#{imSubShopImGoods.save}"
+									styleClass="ui-priority-primary">
+
+								</p:commandButton>
+								<!--<p:commandButton icon="fa fa-undo Fs14 white"-->
+									<!--value="#{msg['cancel']}" update=":frm"-->
+									<!--actionListener="#{imSubShopImGoods.refresh}"-->
+									<!--styleClass="ui-priority-primary cancel">-->
+								<!--</p:commandButton>-->
+								<p:commandButton icon="fa fa-file-excel-o Fs14 white"
+										value="#{msg['print']}" ajax="true" disabled="#{imSubShopImGoods.disableFileDownloadButton}"
+										onclick="PrimeFaces.monitorDownload(start, stop);"
+										actionListener="#{imSubShopImGoods.export()}"
+										styleClass="ui-priority-primary">
+										<p:fileDownload
+											value="#{imSubShopImGoods.fileExport}" />
+									</p:commandButton>
+								<p:commandButton icon="fa fa-times Fs14 white"
+									value="#{msg['Exit']}" action="index?faces-redirect=true"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+								<p:dialog widgetVar="cfImSIM">
+									<f:facet name="header">
+										<p:outputLabel value="#{msg['confirmIm']}"></p:outputLabel>
+									</f:facet>
+									<p:panelGrid styleClass="pngConfirm">
+										<p:row>
+											<p:column>
+												<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+											</p:column>
+											<p:column>
+												<p:inputText styleClass="disableText" disabled="true"
+													value="#{imSubShopImGoods.ta.transactionActionCode}"></p:inputText>
+											</p:column>
+											<p:column>
+												<p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+											</p:column>
+											<p:column>
+												<p:inputText styleClass="disableText" disabled="true"
+													value="#{imSubShopImGoods.ta.reasonName}"></p:inputText>
+											</p:column>
+										</p:row>
+										<p:row>
+											<p:column>
+												<p:outputLabel value="#{msg['note']}"></p:outputLabel>
+											</p:column>
+											<p:column colspan="3">
+												<p:inputTextarea styleClass="disableText" rows="3"
+													disabled="true" value="#{imSubShopImGoods.ta.description}"></p:inputTextarea>
+											</p:column>
+										</p:row>
+									</p:panelGrid>
+									<div class="Fright">
+										<p:commandButton value="#{msg['yes']}" update="@all"
+											actionListener="#{imSubShopImGoods.action}"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="#{msg['no']}"
+											onclick="PF('cfImSIM').hide();"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</div>
+								</p:dialog>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+			</div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,439 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="EQUIPMENT.DEPOT" />
+		<h:form id="frm">
+			<!--<p:outputLabel style="display: none" value="#{shopBean.initTreeShop()}"></p:outputLabel>-->
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad5">
+
+				<p:outputPanel styleClass="Container100 Responsive100">
+
+					<!-- Table Content -->
+					<div class="Container100 Responsive100" style="max-height: 500px">
+
+						<!-- Tree layout-->
+						<div class="Container20 Pad5 Responsive50">
+							<p:panel styleClass="DispBlock Fleft Wid100"
+								style="min-height:480px"
+								header="#{msg['positon.left.shop.title2']}">
+								<div
+									style="clear: both; display: block; width: 100%; height: 35px">
+									<p:outputPanel>
+										<p:inputText styleClass="Fleft Wid100" id="txtKeyFilter"
+											label="Lọc dữ liệu" placeholder="Tìm kiếm kho"
+											onkeypress="if (event.keyCode == 13) { return false; }"
+											value="#{shopBean.strKeyFilter}">
+											<p:ajax event="keyup" listener="#{shopBean.treesSelect}"
+												update="@([id$=shopTree])" />
+										</p:inputText>
+									</p:outputPanel>
+								</div>
+								<div class="treeShop" style="clear: both">
+								<p:outputPanel id="tree">
+									<p:tree value="#{shopBean.root}" var="node" id="shopTree"
+										selectionMode="single" selection="#{shopBean.selectedNode}">
+										<p:treeNode>
+											<h:outputText value="#{node.shopCode} - #{node.shopName}" />
+										</p:treeNode>
+										<p:ajax event="select" update="@([id$=updateForm])"
+											listener="#{shopBean.onNodeSelect}">
+										</p:ajax>
+									</p:tree>
+								</p:outputPanel>
+								</div>
+							</p:panel>
+						</div>
+
+						<!-- Form layout-->
+						<p:outputPanel id="updateForm">
+							<div class="Container80 Pad5 Responsive50">
+								<p:panel styleClass="Container100"
+									header="#{msg['shop.paneltoolbar.header2']}">
+									<div class="Pad5">
+										<div style="float: right;">
+											<!--PRIVILEGE="INSERT"-->
+											<p:commandLink oncomplete="PF('dlSave').show();"
+														   PRIVILEGE="INSERT"
+														   update="@([id$=dlSave])">
+												<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+												<p:resetInput target=":frmDialog:dlSave" />
+												<f:setPropertyActionListener
+													target="#{shopBean.shopSelected}"
+													value="#{shopBean.reset()}" />
+												<f:setPropertyActionListener target="#{shopBean.type}"
+													value="#{shopBean.TYPE_ADD}" />
+											</p:commandLink>
+											<!--PRIVILEGE="UPDATE"-->
+											<p:commandLink action="#{shopBean.beforeSave}"
+														   PRIVILEGE="UPDATE"
+														   update="@([id$=dlSave])">
+												<i class="yellow icon-edit"
+													style="width: 20px; height: 40px;"></i>
+												<p:resetInput target=":frmDialog:dlSave" />
+												<f:setPropertyActionListener target="#{shopBean.type}"
+													value="#{shopBean.TYPE_EDIT}" />
+											</p:commandLink>
+											<p:commandButton id="confirmButton" style="display: none"
+												action="#{shopBean.delete}"
+												update="@([id$=tblShop]),@([id$=shopTree]), :frm">
+												<p:confirm header="#{msg['common.confirm.header']}"
+													icon="ui-icon-alert"
+													message="#{msg['common.confirm.message']}" />
+											</p:commandButton>
+											<!--PRIVILEGE="DELETE" -->
+											<p:commandLink action="#{shopBean.beforeDelete}" PRIVILEGE="DELETE">
+
+												<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+											</p:commandLink>
+											<p:commandLink oncomplete="PF('dlSearch').show();"
+												update="@([id$=dlSearch])">
+												<i class="gray icon-search"
+													style="width: 20px; height: 40px;"></i>
+												<f:setPropertyActionListener
+													target="#{shopBean.shopSelected}"
+													value="#{shopBean.reset()}" />
+												<f:setPropertyActionListener target="#{shopBean.type}"
+													value="#{shopBean.TYPE_SEARCH}" />
+											</p:commandLink>
+											<p:spacer width="10" />
+										</div>
+
+										<div class="EmptyBox5" />
+										<p:dataTable var="shop" value="#{shopBean.lazyShop}"
+											id="tblShop" paginator="true" paginatorPosition="bottom"
+											selection="#{shopBean.shopSelected}" rowIndexVar="rowCount"
+											scrollWidth="100%"
+											paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+											currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+											lazy="true" rows="10"
+											emptyMessage="#{msg['common.table.emptymessage']}">
+											<p:ajax event="toggleSelect"
+												listener="#{shopBean.onRowSelected}" update="@this" />
+											<p:ajax event="rowSelectCheckbox"
+												listener="#{shopBean.onRowSelected}" update="@this" />
+											<p:ajax event="rowUnselectCheckbox"
+												listener="#{shopBean.onRowSelected}" update="@this" />
+											<f:facet name="header">
+
+												<p:commandButton styleClass="toggler" id="togglertblshop"
+													type="button" value="#{msg['chooseColumns']}"
+													icon="ui-icon-calculator" update="@([id$=tblShop]), :frm" />
+												<p:columnToggler datasource="tblShop" trigger="togglertblshop">
+													<p:ajax event="toggle" listener="#{shopBean.onToggleActiveEtag}"
+															update="@([id$=tblShop])"/>
+												</p:columnToggler>
+											</f:facet>
+											<p:column selectionMode="single" style="text-align: center"
+												styleClass="Wid3" visible="#{shopBean.visibleTable[0]}" />
+											<p:column styleClass="Wid5" style="text-align:center;"
+													  visible="#{shopBean.visibleTable[1]}"
+												headerText="#{msg['commont.grid.indext']}" >
+												<h:outputText id="stt" value="#{rowCount + 1}"
+													lable="#{rowCount + 1}" />
+											</p:column>
+											<!--sortBy="#{shop.shopCode}"-->
+											<p:column headerText="#{msg['shop.tableshop.column.code']}" sortBy="#{shop.shopCode}"
+													  visible="#{shopBean.visibleTable[2]}">
+												<h:outputText id="mnv" value="#{shop.shopCode}" />
+												<p:tooltip for="mnv" value="#{shop.shopCode}" />
+											</p:column>
+											<!--sortBy="#{shop.shopName}"-->
+											<p:column headerText="#{msg['shop.tableshop.column.name']}" visible="#{shopBean.visibleTable[3]}"
+													  sortBy="#{shop.shopName}">
+												<h:outputText id="tnv" value="#{shop.shopName}" />
+												<p:tooltip for="tnv" value="#{shop.shopName}" />
+											</p:column>
+											<!--<p:column headerText="#{msg['shop.tableshop.column.type']}">-->
+											<!--<h:outputText id="ttv" value="#{shop.shopType}" />-->
+											<!--<p:tooltip for="ttv" value="#{shop.shopType}" />-->
+											<!--</p:column>-->
+											<!--sortBy="#{shop.address}"-->
+											<p:column sortBy="#{shop.address}" visible="#{shopBean.visibleTable[4]}"
+												headerText="#{msg['shop.tableshop.column.address']}">
+												<h:outputText id="chc" value="#{shop.address}" />
+												<p:tooltip for="chc" value="#{shop.address}" />
+											</p:column>
+											<!--sortBy="#{shop.contactName}"-->
+											<p:column sortBy="#{shop.contactName}" visible="#{shopBean.visibleTable[5]}"
+												headerText="#{msg['shop.tableshop.column.contact']}">
+												<h:outputText id="contactName" value="#{shop.contactName}">
+												</h:outputText>
+												<p:tooltip for="contactName" value="#{shop.contactName}" />
+											</p:column>
+											<!--sortBy="#{shop.telNumber}"-->
+											<p:column sortBy="#{shop.telNumber}" visible="#{shopBean.visibleTable[6]}"
+													headerText="#{msg['shop.tableshop.column.tel']}">
+												<h:outputText id="nc" value="#{shop.telNumber}" />
+												<p:tooltip for="nc" value="#{shop.telNumber}" />
+											</p:column>
+											<!--sortBy="#{shop.latitude}"-->
+											<p:column sortBy="#{shop.latitude}" visible="#{shopBean.visibleTable[7]}"
+													  headerText="#{msg['shop.tableshop.column.lat']}">
+												<h:outputText id="llat" value="#{shop.latitude}" />
+												<p:tooltip for="llat" value="#{shop.latitude}" />
+											</p:column>
+											<!--sortBy="#{shop.longitude}"-->
+											<p:column sortBy="#{shop.longitude}" visible="#{shopBean.visibleTable[8]}"
+													headerText="#{msg['shop.tableshop.column.lon']}">
+												<h:outputText id="llon" value="#{shop.longitude}" />
+												<p:tooltip for="llon" value="#{shop.longitude}" />
+											</p:column>
+											<!--sortBy="#{shop.statusCancel}"-->
+											<p:column sortBy="#{shop.statusCancel}" visible="#{shopBean.visibleTable[9]}"
+													  headerText="#{msg['shop.tableshop.title.status']}"
+												style="text-align: center">
+												<!--<h:outputText id="status" value="#{shop.longitude}" />-->
+												<p:selectBooleanCheckbox value="#{shop.statusCancel}"
+													disabled="true" />
+											</p:column>
+											<!--sortBy="#{shop.shopStatus}"-->
+											<p:column sortBy="#{shop.shopStatus}" visible="#{shopBean.visibleTable[10]}"
+													headerText="#{msg['common.status']}">
+												<h:outputText id="shopStatus" value="#{shop.shopStatus==1?msg['common.status.1']:msg['common.status.0']}" />
+												<p:tooltip for="shopStatus" value="#{shop.shopStatus==1?msg['common.status.1']:msg['common.status.0']}" />
+											</p:column>
+										</p:dataTable>
+									</div>
+								</p:panel>
+							</div>
+						</p:outputPanel>
+					</div>
+				</p:outputPanel>
+				<div class="EmptyBox10"></div>
+			</div>
+		</h:form>
+
+
+		<h:form id="frmDialog">
+			<p:confirmDialog widgetVar="dlgDelete" global="true"
+				showEffect="fade" hideEffect="fade">
+				<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+					type="button" styleClass="ui-confirmdialog-yes"
+					icon="ui-icon-check" />
+				<p:commandButton value="#{msg['common.confirmdialog.no']}"
+					type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true"
+				resizable="false" closable="true" height="300" width="500"
+				header="#{msg['shop.dialog.header']}">
+
+				<p:panelGrid id="panelShop" columns="2">
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.code']} (*)" />
+					<p:inputText style="width:300px;" id="code"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.shopCode}"
+						validator="#{shopBean.validate}" maxlength="30">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.code']}" />
+						<f:validator validatorId="emtyValidator" />
+						<f:validator validatorId="codeValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgCode" for="code" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.name']} (*)" />
+					<p:inputText style="width:300px;" id="name"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.shopName}" maxlength="50">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.name']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgName" for="name" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.address']} (*)" />
+					<p:inputText style="width:300px;" id="address"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.address}" maxlength="50">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.address']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="address" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.contact']} (*)" />
+					<p:inputText style="width:300px;" id="idNo"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.contactName}" maxlength="40">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.contact']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="idNo" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.tel']} (*)" />
+					<p:inputText style="width:300px;" id="iplace" maxlength="15"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.telNumber}"
+						validator="#{shopBean.validate}">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.tel']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgIPlace" for="iplace" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.lat']} (*)" />
+					<p:inputText style="width:300px;" id="lat" maxlength="5"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.latitude}"
+						converterMessage="Vĩ độ không đúng định dạng">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.lat']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="lat" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.lon']} (*)" />
+					<p:inputText style="width:300px;" id="lon" maxlength="5"
+								 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.longitude}"
+						converterMessage="Kinh độ không đúng định dạng">
+						<f:attribute name="msglabel"
+							value="#{msg['shop.tableshop.column.lon']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="lon" />
+
+					<!--<p:outputLabel style="font-size:12px;" value="#{msg['shop.tableshop.column.type']}" />-->
+					<!--<p:selectOneMenu id="type" style="width:300px;"-->
+					<!--value="#{shopBean.shopSelected.shopType}">-->
+					<!--<f:selectItem itemValue="" itemLabel="" />-->
+					<!--&lt;!&ndash; <f:selectItems value="#{shopBean.listDomainsShopType}"-->
+					<!--var="domain" itemLabel="#{domain.name}"-->
+					<!--itemValue="#{domain.value}" /> &ndash;&gt;-->
+					<!--</p:selectOneMenu>-->
+					<!--<p:outputLabel />-->
+					<!--<p:message for="type" />-->
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.status.cancel']}" />
+					<p:selectBooleanCheckbox id="sts"
+											 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{shopBean.shopSelected.statusCancel}" />
+					<p:outputLabel />
+					<p:message for="sts" />
+
+					<p:outputLabel style="font-size:12px;" value="Trạng thái" />
+					<p:selectOneMenu disabled="true"
+									 value="#{shopBean.shopSelected.shopStatus}" style="width:300px">
+						<f:selectItem itemLabel="Hiệu lực" itemValue="1" />
+						<f:selectItem itemLabel="Hết hiệu lực" itemValue="0" />
+					</p:selectOneMenu>
+					<!--<p:inputText style="width:300px;" id="ssts" value="#{msg['common.status.1']}" styleClass="disableText"-->
+						<!--maxlength="50" disabled="true">-->
+					<!--</p:inputText>-->
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="#{ui-icon-plus}" action="#{shopBean.save}"
+									 disabled="#{shopBean.shopSelected.shopStatus==0?true:false}"
+						value="#{msg['common.dialog.save']}"
+						update="@([id$=tblShop]),@([id$=panelShop]), leftform:sm_leftmenu, :frm">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						oncomplete="PF('dlSave').hide()">
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+		</h:form>
+
+		<h:form id="frmSearch">
+			<p:dialog widgetVar="dlSearch" id="dlSearch" modal="true"
+				resizable="false" closable="true" height="300" width="500"
+				header="#{msg['shop.dialog.header']}">
+				<p:panelGrid id="panelShopSearch" columns="2">
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.code']}" />
+					<p:inputText style="width:300px;"
+						value="#{shopBean.shopSelected.shopCode}" maxlength="50">
+					</p:inputText>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.name']}" />
+					<p:inputText style="width:300px;"
+						value="#{shopBean.shopSelected.shopName}" maxlength="50">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.address']}" />
+					<p:inputText style="width:300px;"
+						value="#{shopBean.shopSelected.address}" maxlength="50">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.contact']}" />
+					<p:inputText style="width:300px;"
+						value="#{shopBean.shopSelected.contactName}" maxlength="50">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.column.tel']}" />
+					<p:inputText style="width:300px;" maxlength="250"
+						value="#{shopBean.shopSelected.telNumber}">
+					</p:inputText>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['shop.tableshop.status.cancel']}" />
+					<!--<p:selectBooleanCheckbox-->
+						<!--value="#{shopBean.shopSelected.statusCancel}" />-->
+					<p:selectOneMenu
+									 value="#{shopBean.shopSelected.statusCancelCbb}" style="width:300px">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="#{msg['shop.tableshop.status.yes']}" itemValue="1" />
+						<f:selectItem itemLabel="#{msg['shop.tableshop.status.no']}" itemValue="0" />
+					</p:selectOneMenu>
+
+					<p:outputLabel style="font-size:12px;" value="Trạng thái" />
+					<p:selectOneMenu id="status"
+						value="#{shopBean.shopSelected.shopStatus}" style="width:300px">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="Hiệu lực" itemValue="1" />
+						<f:selectItem itemLabel="Hết hiệu lực" itemValue="0" />
+					</p:selectOneMenu>
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-search"
+						action="#{shopBean.filterSearch}"
+						value="#{msg['common.dialog.search']}"
+						update="@([id$=tblShop]),@([id$=panelShopSearch]),@([id$=shopTree])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						oncomplete="PF('dlSearch').hide()">
+						<p:resetInput target=":frmSearch:dlSearch" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+		<script>
+			$(document.body).mousedown(function(event) {
+			var target = $(event.target);
+			if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+			$('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+			}
+			});
+		</script>
+
+	</ui:define>
+</ui:composition>

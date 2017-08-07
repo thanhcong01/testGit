@@ -1,0 +1,341 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchTrans']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['searchTrans']}"></p:outputLabel></h2>-->
+
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['search']}" styleClass="Container100">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete id="cmlOrder" styleClass="select Wid100"
+									value="#{createGeneralTransactionReport.orderCode}"
+									minQueryLength="3"
+									completeMethod="#{createGeneralTransactionReport.completeOrder}">
+									<p:ajax event="itemSelect"
+										listener="#{createGeneralTransactionReport.oderSelect}"
+										update="frm" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['orderType']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectCheckboxMenu styleClass="select Wid100" id="menu"
+									value="#{createGeneralTransactionReport.listTypeId}"
+									label="#{msg['inven.choose']}" filter="true"
+									filterMatchMode="startsWith">
+									<f:selectItems
+										value="#{createGeneralTransactionReport.listTransType}"
+										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectCheckboxMenu>
+							</p:column>
+							<!-- 							<p:column> -->
+							<!-- 								<p:outputLabel value="#{msg['status']}"></p:outputLabel> -->
+							<!-- 							</p:column> -->
+							<!-- 							<p:column> -->
+							<!-- 								<p:selectOneMenu styleClass="select Wid100" -->
+							<!-- 									value="#{createGeneralTransactionReport.status}"> -->
+							<!-- 									<f:selectItem itemLabel="" itemValue="" -->
+							<!-- 										noSelectionOption="true" /> -->
+							<!-- 									<f:selectItems -->
+							<!-- 										value="#{createGeneralTransactionReport.listTransStatus}" -->
+							<!-- 										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" /> -->
+							<!-- 								</p:selectOneMenu> -->
+							<!-- 							</p:column> -->
+							<p:column>
+								<p:outputLabel value="#{msg['inven.shop']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:autoComplete styleClass="ui-autocomplete-select"
+									dropdown="true" forceSelection="true"
+									value="#{createGeneralTransactionReport.fromShop}"
+									emptyMessage="#{msg['common.table.emptymessage']}"
+									completeMethod="#{createGeneralTransactionReport.autoCompleteUsername}">
+									<p:ajax event="itemSelect"
+										listener="#{createGeneralTransactionReport.fromShopSelect}"
+										update="@this" />
+
+								</p:autoComplete>
+							</p:column>
+						</p:row>
+						<p:row>
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['fromCreateDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="Wid100" id="buttonf" showOn="button"
+									converterMessage="#{msg['errDateType']}"
+									value="#{createGeneralTransactionReport.fromCreateDate}"
+									pattern="dd/MM/yyyy"></p:calendar>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['toCreateDate']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:calendar styleClass="Wid100" id="button" showOn="button"
+									converterMessage="#{msg['errDateType']}"
+									value="#{createGeneralTransactionReport.toCreateDate}"
+									pattern="dd/MM/yyyy"></p:calendar>
+							</p:column>
+							<p:column></p:column>
+							<p:column>
+								<p:commandButton icon="fa fa-search Fs14 white"
+									value="#{msg['search']}" style="float:right" update="frm"
+									actionListener="#{createGeneralTransactionReport.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+					<div class="Pad5">
+						
+                    <div class="EmptyBox10" />
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+							rowIndexVar="rowIndex"
+							value="#{createGeneralTransactionReport.listTransDetailEX}"
+							paginator="true" rows="5" paginatorPosition="bottom"
+							resizableColumns="true"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+							id="dtOrdersDetailEX" lazy="true">
+							<f:facet name="header">
+<!-- 							<p:outputLabel value="#{msg['inven.export.transaction']}" ></p:outputLabel> -->
+							<span class="dtHead"  style="">#{msg['inven.export.transaction']}</span>
+								<p:commandButton styleClass="toggler" id="togglerdtOrdersDetail"
+									value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+								<p:columnToggler datasource="dtOrdersDetailEX"
+									trigger="togglerdtOrdersDetail" />
+							</f:facet>
+							<p:column styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column sortBy="#{c.transactionAction.transactionActionCode}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['orderCode']}" />
+								</f:facet>
+								<h:outputText id="transactionActionCode"
+									value="#{c.transactionAction.transactionActionCode}" />
+								<p:tooltip  for="transactionActionCode"
+											value="#{c.transactionAction.transactionActionCode}" />
+							</p:column>
+							<p:column sortBy="#{c.transactionAction.typeName}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['orderType']}" />
+								</f:facet>
+								<h:outputText id="typeName" value="#{c.transactionAction.typeName}" />
+								<p:tooltip  for="typeName"
+											value="#{c.transactionAction.typeName}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goodsGroup']}" />
+								</f:facet>
+								<h:outputText id="goodsGroup"
+									value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+								<p:tooltip  for="goodsGroup"
+											value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goods']}" />
+								</f:facet>
+								<h:outputText id="goods"
+									value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+								<p:tooltip  for="goods"
+											value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['profileCode']}" />
+								</f:facet>
+								<h:outputText id="profileCode"
+									value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+								<p:tooltip  for="profileCode"
+											value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['provider']}" />
+								</f:facet>
+								<h:outputText id="provider"
+									value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+								<p:tooltip  for="provider"
+											value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{c.quantity}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['quantity']}" />
+								</f:facet>
+								<h:outputText id="quantity" style="float:right" value="#{c.quantity}" />
+								<p:tooltip  for="quantity"
+											value="#{c.quantity}" />
+							</p:column>
+							<!-- 							<p:column style="text-align: center;"> -->
+							<!-- 								<f:facet name="header"> -->
+							<!-- 									<h:outputText value="#{msg['view']}" /> -->
+							<!-- 								</f:facet> -->
+
+							<!-- 								<h:outputText -->
+							<!-- 									style="text-align: center;color: blue;text-decoration: underline" -->
+							<!-- 									value="#{msg['view']}" /> -->
+							<!-- 							</p:column> -->
+							<p:column style="text-align: center;" sortBy="#{c.strCreateDatetime}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['inve.action.date']}" />
+								</f:facet>
+								<h:outputText id="strCreateDatetime" value="#{c.strCreateDatetime}">
+								</h:outputText>
+								<p:tooltip  for="strCreateDatetime"
+											value="#{c.strCreateDatetime}" />
+							</p:column>
+						</p:dataTable>
+						<p:panelGrid id="sumEX"  styleClass="Wid100">
+                        <p:column style="font-weight: bold;">#{msg['inven.sum']}: #{createGeneralTransactionReport.sumEX}</p:column>
+                        </p:panelGrid>
+                    <p:separator></p:separator>
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+							rowIndexVar="rowIndex"
+							value="#{createGeneralTransactionReport.listTransDetail}"
+							paginator="true" rows="5" paginatorPosition="bottom"
+							resizableColumns="true"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+							id="dtOrdersDetail" lazy="true">
+							<f:facet name="header">
+							<span class="dtHead"  style="">#{msg['inven.import.transaction']}</span>
+								<p:commandButton styleClass="toggler" id="togglerdtOrdersDetail"
+									value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+								<p:columnToggler datasource="dtOrdersDetail"
+									trigger="togglerdtOrdersDetail" />
+							</f:facet>
+							<p:column styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column sortBy="#{c.transactionAction.transactionActionCode}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['orderCode']}" />
+								</f:facet>
+								<h:outputText id="transactionActionCode2"
+									value="#{c.transactionAction.transactionActionCode}" />
+								<p:tooltip  for="transactionActionCode2"
+											value="#{c.transactionAction.transactionActionCode}" />
+							</p:column>
+							<p:column sortBy="#{c.transactionAction.typeName}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['orderType']}" />
+								</f:facet>
+								<h:outputText id="typeName2" value="#{c.transactionAction.typeName}" />
+								<p:tooltip  for="typeName2"
+											value="#{c.transactionAction.typeName}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goodsGroup']}" />
+								</f:facet>
+								<h:outputText id="goodsGroup2"
+									value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+								<p:tooltip  for="goodsGroup2"
+											value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['goods']}" />
+								</f:facet>
+								<h:outputText id="goods2"
+									value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+								<p:tooltip  for="goods2"
+											value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['profileCode']}" />
+								</f:facet>
+								<h:outputText id="profileCode2"
+									value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+								<p:tooltip  for="profileCode2"
+											value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['provider']}" />
+								</f:facet>
+								<h:outputText  id="provider2"
+									value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+								<p:tooltip  for="provider2"
+											value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							</p:column>
+							<p:column sortBy="#{c.quantity}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['quantity']}" />
+								</f:facet>
+								<h:outputText id="quantity2" style="float:right" value="#{c.quantity}" />
+								<p:tooltip  for="quantity2"
+											value="#{c.quantity}" />
+							</p:column>
+							<!-- 							<p:column style="text-align: center;"> -->
+							<!-- 								<f:facet name="header"> -->
+							<!-- 									<h:outputText value="#{msg['view']}" /> -->
+							<!-- 								</f:facet> -->
+
+							<!-- 								<h:outputText -->
+							<!-- 									style="text-align: center;color: blue;text-decoration: underline" -->
+							<!-- 									value="#{msg['view']}" /> -->
+							<!-- 							</p:column> -->
+							<p:column style="text-align: center;" sortBy="#{c.strCreateDatetime}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['inve.action.date']}" />
+								</f:facet>
+								<h:outputText id="strCreateDatetime2" value="#{c.strCreateDatetime}">
+								</h:outputText>
+								<p:tooltip  for="strCreateDatetime2"
+											value="#{c.strCreateDatetime}" />
+							</p:column>
+						</p:dataTable>
+						<p:panelGrid id="sumIM"  styleClass="Wid100">
+                        <p:column style="font-weight: bold;">#{msg['inven.sum']}: #{createGeneralTransactionReport.sumIM}</p:column>
+                        </p:panelGrid>
+                    <p:separator></p:separator> 
+					</div>
+					<p:panelGrid styleClass="Wid100">
+						<p:column styleClass="Wid203"></p:column>
+						<p:column style="width:79.6%">
+							<div class="Fright">
+							<p:commandButton icon="fa fa-file-excel-o Fs14 white" disabled="#{createGeneralTransactionReport.disableExportButton}"
+										value="#{msg['inven.instock.report']}" ajax="true"
+										onclick="PrimeFaces.monitorDownload(start, stop);"
+										actionListener="#{createGeneralTransactionReport.exportExcel()}"
+										styleClass="ui-priority-primary">
+										<p:fileDownload
+											value="#{createGeneralTransactionReport.fileExport}" />
+									</p:commandButton>
+								<p:commandButton icon="fa fa-times Fs14 white"
+									value="#{msg['Exit']}" action="index?faces-redirect=true"
+									styleClass="ui-priority-primary">
+								</p:commandButton>
+							</div>
+						</p:column>
+					</p:panelGrid>
+				</p:panel>
+			</div>
+			<div class="EmptyBox10"></div>
+		</h:form>
+	</ui:define>
+</ui:composition>

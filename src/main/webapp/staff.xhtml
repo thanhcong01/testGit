@@ -1,0 +1,550 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<!--#{staffBean.resourceLog}-->
+		<f:attribute name="RESOURCE" value="EQUIPMENT.EMP" />
+		<h:form id="frm">
+			<div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <div class="Pad5">
+			<p:outputPanel styleClass="Container100 Responsive100">
+
+				<!-- Table Content -->
+				<div class="Container100 Responsive100">
+					<!-- Tree layout-->
+					<div class="Container20 Pad5 Responsive50">
+						<p:panel styleClass="DispBlock Fleft Wid100"
+							style="min-height:480px" header="#{msg['shop.title.list']}">
+							<div style="clear: both;display: block; width: 100%; height: 35px">
+								<p:outputPanel>
+									<p:inputText styleClass="Fleft Wid100" id="txtKeyFilter"
+												 label="Lọc dữ liệu"
+												 placeholder="Tìm kiếm kho"
+												 onkeypress="if (event.keyCode == 13) { return false; }"
+												 value="#{shopBean.strKeyFilter}">
+										<p:ajax event="keyup" listener="#{shopBean.treesSelect}" update="@([id$=shopTree])" />
+									</p:inputText>
+								</p:outputPanel>
+							</div>
+							<div class="treeShop" style="clear: both">
+							<p:outputPanel id="tree">
+								<p:tree value="#{shopBean.root}" var="node" id="shopTree"
+									selectionMode="single" selection="#{staffBean.selectedNode}">
+									<p:treeNode>
+										<h:outputText value="#{node.shopCode} - #{node.shopName}" />
+									</p:treeNode>
+									<p:ajax event="select" update="@([id$=updateForm])"
+										listener="#{staffBean.onNodeSelect}">
+									</p:ajax>
+								</p:tree>
+
+							</p:outputPanel>
+							</div>
+						</p:panel>
+					</div>
+
+					<!-- Form layout-->
+					<p:outputPanel id="updateForm">
+						<div class="Container80 Pad5 Responsive50">
+							<p:panel styleClass="Container100" header="#{msg['staff.paneltoolbar.staff.list']}">
+								<div class="Pad5">
+								<div style="float: right;">
+									<p:commandLink oncomplete="PF('dlSave').show();"
+												   PRIVILEGE="INSERT" RESOURCE="EQUIPMENT.EMP"
+										update="@([id$=dlSave])">
+										<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+										<p:resetInput target=":frmDialog:dlSave" />
+										<f:setPropertyActionListener
+											target="#{staffBean.staffSelected}"
+											value="#{staffBean.reset()}" />
+										<f:setPropertyActionListener target="#{staffBean.type}"
+											value="#{staffBean.TYPE_ADD}" />
+									</p:commandLink>
+									<p:commandLink action="#{staffBean.beforeSave}"
+												   PRIVILEGE="UPDATE" RESOURCE="EQUIPMENT.EMP"
+										update="@([id$=dlSave])">
+										<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+										<p:resetInput target=":frmDialog:dlSave" />
+										<f:setPropertyActionListener target="#{staffBean.type}"
+											value="#{staffBean.TYPE_EDIT}" />
+									</p:commandLink>
+									<p:commandButton id="confirmButton" style="display: none"
+										action="#{staffBean.delete}" update="@([id$=tblStaff])">
+										<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+											message="#{msg['common.confirm.message']}" />
+									</p:commandButton>
+									<p:commandLink action="#{staffBean.beforeDelete}" PRIVILEGE="DELETE">
+										<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+									</p:commandLink>
+									<p:commandLink oncomplete="PF('dlSearch').show();"
+										update="@([id$=dlSearch])">
+										<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+										<f:setPropertyActionListener
+											target="#{staffBean.staffSelected}"
+											value="#{staffBean.reset()}" />
+										<f:setPropertyActionListener target="#{staffBean.type}"
+											value="#{staffBean.TYPE_SEARCH}" />
+									</p:commandLink>
+									<p:spacer width="10" />
+								</div>
+
+								<div class="EmptyBox5" />
+
+								<p:dataTable var="staff" value="#{staffBean.lazyStaff}"
+									id="tblStaff" paginator="true" paginatorPosition="bottom"
+									selection="#{staffBean.listStaffSelecteds}"  rowIndexVar="rowCount"
+											 scrollWidth="100%"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+									lazy="true" rows="10" emptyMessage="#{msg['common.table.emptymessage']}">
+									 <!--<p:ajax event="rowSelect" listener="#{staffBean.onRowSelect}"  />-->
+									<p:ajax event="toggleSelect"
+										listener="#{staffBean.onRowSelected}" update="@this" />
+									<p:ajax event="rowSelectCheckbox"
+										listener="#{staffBean.onRowSelected}" update="@this" />
+									<p:ajax event="rowUnselectCheckbox"
+										listener="#{staffBean.onRowSelected}" update="@this" />
+									<f:facet name="header">
+										<p:commandButton styleClass="toggler" id="togglertblStaff"
+											type="button" value="#{msg['chooseColumns']}"
+											icon="ui-icon-calculator" />
+										<p:columnToggler datasource="tblStaff" trigger="togglertblStaff">
+											<p:ajax event="toggle" listener="#{staffBean.onToggleActiveEtag}"
+													update="@([id$=tblStaff])"/>
+										</p:columnToggler>
+									</f:facet>
+									<p:column selectionMode="multiple" style="text-align: center"
+											  visible="#{staffBean.visibleTable[0]}"  styleClass="Wid35p" />
+									<p:column headerText="#{msg['commont.grid.indext']}"
+											  visible="#{staffBean.visibleTable[1]}" >
+										<h:outputText id="stt" value="#{rowCount + 1}" lable="#{rowCount + 1}"/>
+									</p:column>
+									<p:column  headerText="#{msg['equipmentsDetail.Shop']}"
+											   visible="#{staffBean.visibleTable[2]}" sortBy="#{staff.shopId}">
+										<h:outputText id="Shop" value="#{sessionBean.getShopNameById(staff.shopId)}" />
+										<p:tooltip for="Shop" value="#{sessionBean.getShopNameById(staff.shopId)}" />
+									</p:column>
+									<p:column  headerText="#{msg['staff.tablestaff.column.code']}"
+											   visible="#{staffBean.visibleTable[3]}" sortBy="#{staff.staffCode}">
+										<h:outputText id="mnv" value="#{staff.staffCode}" />
+										<p:tooltip for="mnv" value="#{staff.staffCode}" />
+									</p:column>
+									<p:column   headerText="#{msg['staff.tablestaff.column.name']}"
+												visible="#{staffBean.visibleTable[4]}" sortBy="#{staff.staffName}">
+										<h:outputText id="tnv" value="#{staff.staffName}" />
+										<p:tooltip for="tnv" value="#{staff.staffName}" />
+									</p:column>
+									<p:column  headerText="#{msg['staff.tablestaff.column.idno']}"
+											   visible="#{staffBean.visibleTable[5]}" sortBy="#{staff.idNo}">
+										<h:outputText id="chc" value="#{staff.idNo}" />
+										<p:tooltip for="chc" value="#{staff.idNo}" />
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.issuedate']}"
+											  visible="#{staffBean.visibleTable[6]}" sortBy="#{staff.issueDate}">
+										<h:outputText id="issueDate" value="#{staff.issueDate}">
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</h:outputText>
+										<p:tooltip for="issueDate" value="#{staff.issueDate}" >
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</p:tooltip>
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.issueplace']}"
+											  visible="#{staffBean.visibleTable[7]}" sortBy="#{staff.issuePlace}">
+										<h:outputText id="nc" value="#{staff.issuePlace}" />
+										<p:tooltip for="nc" value="#{staff.issuePlace}" />
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.mobinumber']}"
+											  visible="#{staffBean.visibleTable[8]}" sortBy="#{staff.mobiNumber}">
+										<h:outputText id="sdt" value="#{staff.mobiNumber}" />
+										<p:tooltip for="sdt" value="#{staff.mobiNumber}" />
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.email']}"
+											  visible="#{staffBean.visibleTable[9]}" sortBy="#{staff.email}">
+										<h:outputText id="em" value="#{staff.email}" />
+										<p:tooltip for="em" value="#{staff.email}" />
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.dob']}"
+											  visible="#{staffBean.visibleTable[10]}" sortBy="#{staff.dob}">
+										<h:outputText id="dobG" value="#{staff.dob}">
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</h:outputText>
+										<p:tooltip for="dobG" value="#{staff.dob}">
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</p:tooltip>
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.gender']}"
+											  visible="#{staffBean.visibleTable[11]}" sortBy="#{staff.gender}">
+										<h:outputText id="genderG" value="#{staff.gender}" />
+										<p:tooltip for="genderG" value="#{staff.gender}" />
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.stafftype']}"
+											  visible="#{staffBean.visibleTable[12]}" sortBy="#{staff.staffType}">
+										<h:outputText id="lnv" value="#{staffBean.getPriceType(staff.staffType)}" />
+										<p:tooltip for="lnv" value="#{staffBean.getPriceType(staff.staffType)}" />
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.startdate']}"
+											  visible="#{staffBean.visibleTable[13]}" sortBy="#{staff.startDate}">
+										<h:outputText id="startDateG" value="#{staff.startDate}">
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</h:outputText>
+										<p:tooltip for="startDateG" value="#{staff.startDate}" >
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</p:tooltip>
+									</p:column>
+									<p:column headerText="#{msg['staff.tablestaff.column.enddate']}" visible="#{staffBean.visibleTable[14]}"
+											  sortBy="#{staff.endDate}">
+										<h:outputText id="endDateG" value="#{staff.endDate}">
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</h:outputText>
+										<p:tooltip for="endDateG" value="#{staff.endDate}" >
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7" />
+										</p:tooltip>
+									</p:column>
+									<p:column headerText="#{msg['common.status']}"
+											  visible="#{staffBean.visibleTable[15]}" sortBy="#{staff.staffStatus}">
+										<h:outputText id="staffStatus"
+											value="#{staff.staffStatus== 1?msg['common.status.1']:msg['common.status.0']}" />
+										<p:tooltip for="staffStatus" value="#{staff.staffStatus== 1?msg['common.status.1']:msg['common.status.0']}" />
+									</p:column>
+									<p:column sortBy="#{staff.userName}" visible="#{staffBean.visibleTable[16]}"
+											  headerText="#{msg['staff.tablestaff.column.username']}">
+										<h:outputText id="un" value="#{staff.userName}" />
+										<p:tooltip for="un" value="#{staff.userName}" />
+									</p:column>
+								</p:dataTable>
+							  </div>	
+							</p:panel>
+						</div>
+					</p:outputPanel>
+				</div>
+			</p:outputPanel>
+			 <div class="EmptyBox10"></div>
+         </div>
+		</h:form>
+
+		<h:form id="frmDialog">
+			<p:confirmDialog widgetVar="dlgDelete" global="true"
+				showEffect="fade" hideEffect="fade">
+				<p:commandButton value="#{msg['common.confirmdialog.yes']}" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="#{msg['common.confirmdialog.no']}" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true"
+				 closable="true" height="400" width="500"
+				header="#{msg['staff.dialog.header']}">
+				<p:panelGrid id="panelStaff" columns="2">
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.code']} (*)" />
+					<p:inputText style="width:300px;" id="code"
+								 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{staffBean.staffSelected.staffCode}"
+						validator="#{staffBean.validate}" maxlength="10">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.code']}" />
+						<f:validator validatorId="emtyValidator" />
+						<f:validator validatorId="codeValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgCode" for="code" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.name']} (*)" />
+					<p:inputText style="width:300px;" id="name"
+								 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{staffBean.staffSelected.staffName}" maxlength="40">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.name']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgName" for="name" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.gender']} (*)" />
+					<p:selectOneMenu id="gender" style="width:300px;"
+									 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+									 value="#{staffBean.staffSelected.gender}">
+						<f:selectItems value="#{staffBean.listGender}" var="domain"
+									   itemLabel="#{domain.name}" itemValue="#{domain.name}" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="gender" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.dob']} (*)" />
+					<p:calendar style="width:300px;" readonlyInput="true"
+								disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+								value="#{staffBean.staffSelected.dob}" id="dob"
+								converterMessage="#{msg['staff.dialog.datemessage']}"
+								validator="#{staffBean.validate}" yearRange="c-70:c+70"
+								showOn="button" pattern="dd/MM/yyyy" navigator="true">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.dob']}" />
+						<f:validator validatorId="emtyValidator" />
+						<!--<p:ajax event="dateSelect" update="@([id$=idate])" />-->
+					</p:calendar>
+					<p:outputLabel />
+					<p:message id="msgDob" for="dob" />
+
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.idno']} (*)" />
+					<p:inputText style="width:300px;" id="idNo" validator="#{staffBean.validate}"
+								 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+								 value="#{staffBean.staffSelected.idNo}" maxlength="15">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.idno']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgID" for="idNo" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.issuedate']} (*)" />
+					<p:calendar style="width:300px;"
+								disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+								value="#{staffBean.staffSelected.issueDate}" id="idate" showOn="button"
+								yearRange="c-70:c+70" readonlyInput="true"
+								validator="#{staffBean.validate}" pattern="dd/MM/yyyy"
+								navigator="true">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.issuedate']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:calendar>
+					<p:outputLabel />
+					<p:message id="msgIDate" for="idate" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.issueplace']} (*)" />
+					<p:inputText style="width:300px;" id="iplace" maxlength="15"
+								 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+								 value="#{staffBean.staffSelected.issuePlace}">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.issueplace']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgIPlace" for="iplace" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.mobinumber']} (*)" />
+					<p:inputText style="width:300px;" id="no" maxlength="15"
+								 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+								 value="#{staffBean.staffSelected.mobiNumber}">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.mobinumber']}" />
+						<f:validator validatorId="emtyValidator" />
+						<f:validator validatorId="numberValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgNo" for="no" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.email']} (*)" />
+					<p:inputText style="width:300px;" id="email"
+								 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+								 value="#{staffBean.staffSelected.email}" maxlength="50">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.email']}" />
+						<f:validator validatorId="emtyValidator" />
+						<f:validator validatorId="emailValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgIm" for="email" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.stafftype']} (*)" />
+					<p:selectOneMenu id="staffType" style="width:300px;"
+									 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{staffBean.staffSelected.staffType}">
+						<f:selectItems value="#{staffBean.listDomainsStaffType}"
+							var="domain" itemLabel="#{domain.name}"
+							itemValue="#{domain.code}" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="staffType" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.startdate']} (*)" />
+					<p:calendar style="width:300px;"
+								disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{staffBean.staffSelected.startDate}" id="sdate"
+						showOn="button" yearRange="c-70:c+70"
+						maxdate="#{staffBean.staffSelected.endDate}" readonlyInput="true"
+						pattern="dd/MM/yyyy" navigator="true">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.startdate']}" />
+						<f:validator validatorId="emtyValidator" />
+						<p:ajax event="dateSelect" update="@([id$=edate])" />
+					</p:calendar>
+					<p:outputLabel />
+					<p:message id="msgSDate" for="sdate" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.enddate']}" />
+					<p:calendar style="width:300px;"
+								converterMessage="#{msg['staff.tablestaff.column.enddate.fomat']}"
+								disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{staffBean.staffSelected.endDate}" id="edate"
+						showOn="button" yearRange="c-70:c+70"
+						mindate="#{staffBean.staffSelected.startDate}"
+						readonlyInput="false" pattern="dd/MM/yyyy" navigator="true">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.enddate']}" />
+						<p:ajax event="dateSelect" update="@([id$=sdate])" />
+						<p:ajax event="change" update="@([id$=edate]), @([id$=sdate])" listener="#{staffBean.staffSelected.getStartDate()}"   />
+					</p:calendar>
+					<p:outputLabel />
+					<p:message id="msgEDate" for="edate" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['common.status']} (*)" />
+					<p:selectOneMenu id="frmStatus" style="width:300px;"
+									 value="#{staffBean.staffSelected.staffStatus}" disabled="true">
+						<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+						<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="frmStatus" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.username']} (*)" />
+					<p:autoComplete id="use"
+									disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{staffBean.staffSelected.userName}"
+						completeMethod="#{staffBean.autoCompleteUsernameActive}" dropdown="true"
+						validator="#{staffBean.validate}" scrollHeight="150"
+						style="width:300px;" forceSelection="true" maxlength="50"
+						emptyMessage="#{msg['common.table.emptymessage']}">
+						<f:attribute name="msglabel" value="#{msg['staff.tablestaff.column.username']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:autoComplete>
+					<p:outputLabel />
+					<p:message for="use" />
+
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="#{ui-icon-plus}" action="#{staffBean.save}"
+									 disabled="#{staffBean.staffSelected.staffStatus==0?true:false}"
+						value="#{msg['common.dialog.save']}"
+						update="@([id$=tblStaff]),@([id$=panelStaff])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+						 oncomplete="PF('dlSave').hide()">
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+		</h:form>
+
+		<h:form id="frmSearch">
+			<p:dialog widgetVar="dlSearch" id="dlSearch" modal="true"
+				 closable="true" height="300" width="500"
+				header="#{msg['staff.dialog.header']}">
+				<p:panelGrid id="panelStaffSearch" columns="2">
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.code']}" />
+					<p:inputText style="width:300px;"
+						value="#{staffBean.staffSelected.staffCode}" maxlength="50">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.name']}" />
+					<p:inputText style="width:300px;"
+						value="#{staffBean.staffSelected.staffName}" maxlength="50">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.idno']}" />
+					<p:inputText style="width:300px;"
+								 value="#{staffBean.staffSelected.idNo}" maxlength="50">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.issuedate']}" />
+					<p:calendar style="width:300px;" id="mnc"
+								converterMessage="#{msg['common.dialog.datemessage']}"
+								value="#{staffBean.staffSelected.issueDate}" showOn="button"
+								pattern="dd/MM/yyyy" navigator="true">
+					</p:calendar>
+					<p:outputLabel/><p:message for="mnc" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.issueplace']}" />
+					<p:inputText style="width:300px;" maxlength="250"
+								 value="#{staffBean.staffSelected.issuePlace}">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.mobinumber']}" />
+					<p:inputText style="width:300px;" maxlength="20"
+								 value="#{staffBean.staffSelected.mobiNumber}">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.email']}" />
+					<p:inputText style="width:300px;"
+								 value="#{staffBean.staffSelected.email}" maxlength="100">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.dob']}" />
+					<p:calendar style="width:300px;" id="mns"
+								converterMessage="#{msg['common.dialog.datemessage']}"
+								value="#{staffBean.staffSelected.dob}" yearRange="c-70:c+10"
+								showOn="button" pattern="dd/MM/yyyy" navigator="true">
+					</p:calendar>
+					<p:outputLabel/><p:message for="mns" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.gender']}" />
+					<p:selectOneMenu style="width:300px;"
+						value="#{staffBean.staffSelected.gender}">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItems value="#{staffBean.listGender}" var="domain"
+							itemLabel="#{domain.name}" itemValue="#{domain.name}" />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.stafftype']}" />
+					<p:selectOneMenu style="width:300px;"
+						value="#{staffBean.staffSelected.staffType}">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItems value="#{staffBean.listDomainsStaffType}"
+							var="domain" itemLabel="#{domain.name}"
+							itemValue="#{domain.code}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.startdate']}" />
+					<p:calendar style="width:300px;"
+						value="#{staffBean.staffSelected.startDate}" showOn="button"
+						maxdate="#{staffBean.staffSelected.endDate}" id="ssdate"
+						converterMessage="#{msg['common.dialog.datemessage']}"
+						yearRange="c-70:c+70" pattern="dd/MM/yyyy" navigator="true">
+						<p:ajax event="dateSelect" update="@([id$=esdate])" />
+					</p:calendar>
+					<p:outputLabel/><p:message for="ssdate" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.enddate']}" />
+					<p:calendar style="width:300px;"
+						value="#{staffBean.staffSelected.endDate}" showOn="button"
+						mindate="#{staffBean.staffSelected.startDate}" id="esdate"
+						converterMessage="#{msg['common.dialog.datemessage']}"
+						yearRange="c-70:c+70" pattern="dd/MM/yyyy" navigator="true">
+						<p:ajax event="dateSelect" update="@([id$=ssdate])" />
+					</p:calendar>
+					<p:outputLabel/><p:message for="esdate" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['common.status']}" />
+					<p:selectOneMenu id="type" style="width:300px;"
+						value="#{staffBean.staffSelected.staffStatus}">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+						<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+					</p:selectOneMenu>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['staff.tablestaff.column.username']}" />
+					<p:autoComplete value="#{staffBean.staffSelected.userName}"
+						completeMethod="#{staffBean.autoCompleteUsername}" dropdown="true"
+						style="width:300px;" scrollHeight="150" forceSelection="true"
+						emptyMessage="#{msg['staff.tablestaff.emptymessage']}">
+						
+					</p:autoComplete>
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-search"
+						action="#{staffBean.filterSearch}" value="#{msg['common.dialog.search']}"
+						update="@([id$=tblStaff]),@([id$=panelStaffSearch]), @([id$=shopTree])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+						 oncomplete="PF('dlSearch').hide()">
+						<p:resetInput target=":frmSearch:dlSearch" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

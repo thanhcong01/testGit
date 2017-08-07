@@ -1,0 +1,555 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="#{positionBean.resourceLog}" />
+		<h:form id="frm">
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad5">
+
+				<p:outputPanel styleClass="Container100 Responsive100">
+
+					<!-- Table Content -->
+					<div class="Container100 Responsive100">
+						<!-- Tree layout-->
+						<div class="Container20 Pad5 Responsive50">
+							<p:panel styleClass="DispBlock Fleft Wid100"
+								style="min-height:480px"
+								header="#{msg['positon.left.shop.title2']}">
+								<div
+									style="clear: both; display: block; width: 100%; height: 35px">
+									<p:outputPanel>
+										<p:inputText styleClass="Fleft Wid100" id="txtKeyFilter"
+											label="Lọc dữ liệu" placeholder="Tìm kiếm kho"
+											onkeypress="if (event.keyCode == 13) { return false; }"
+											value="#{shopBean.strKeyFilter}">
+											<p:ajax event="keyup" listener="#{shopBean.treesSelect}"
+												update="@([id$=shopTree])" />
+										</p:inputText>
+									</p:outputPanel>
+								</div>
+								<div class="treeShopPo" style="clear: both">
+									<p:outputPanel id="tree">
+										<p:tree value="#{shopBean.root}" var="node" id="shopTree"
+											selectionMode="single"
+											selection="#{positionBean.selectedNode}">
+											<p:treeNode>
+												<h:outputText value="#{node.shopCode} - #{node.shopName}" />
+											</p:treeNode>
+											<p:ajax event="select" update="@([id$=updateForm])"
+												listener="#{positionBean.onNodeSelect}">
+											</p:ajax>
+										</p:tree>
+
+									</p:outputPanel>
+								</div>
+							</p:panel>
+						</div>
+
+						<!-- Form layout-->
+						<p:outputPanel id="updateForm"
+							styleClass="Container80 Pad5 Responsive50">
+
+							<p:panel styleClass="Responsive50" style="width:930 !important; max-width:930 !important"
+								header="#{msg['positon.top.postion.title']}">
+								<svg id="position-layer" viewBox="0 0 930 400"
+									xmlns1="http://www.w3.org/2000/svg"
+									preserveAspectRatio="xMinYMin meet" >
+									<g class="toll-bg" id="featuresImg">
+										<image id="bg-lane0" class="bg-lane" x="0" y="0" width="930"
+										height="400" xmlns:xlink="http://www.w3.org/1999/xlink"
+										xlink:href="/equipment/resources/media/lane.svg"></image>
+									</g>
+									<g class="statusping" id="features" escape='false'></g>
+									</svg>
+								<h:outputScript type="text/ecmascript" library="js"
+									name="position.js" target="head" />
+							</p:panel>
+							<p:commandButton icon="#{ui-icon-plus}"
+								onclick="save_position()"
+								value="#{msg['common.dialog.save']}">
+							</p:commandButton>
+							<p:remoteCommand name="savePosition" process="@this"
+								update="@([id$=tblPosition]),@([id$=panelPosition])" 
+								actionListener="#{positionBean.savePosition()}" />
+							<div id="reloadPage">
+								<p:outputPanel id="updateScript">
+									<h:inputHidden id="hPosData"
+										value="#{positionBean.getPositionsAsJson()}" />
+								</p:outputPanel>
+							</div>
+							<div class="Container100 Responsive50">
+								<p:panel styleClass="Container100"
+									header="#{msg['positon.top.postion.list']}">
+									<div style="float: right;">
+										<p:commandLink oncomplete="PF('dlSave').show();" 
+										PRIVILEGE="INSERT" 
+											update="@([id$=dlSave])">
+											<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+											<p:resetInput target=":frmDialog:dlSave" />
+											<f:setPropertyActionListener
+												target="#{positionBean.positionSelected}"
+												value="#{positionBean.reset()}" />
+											<f:setPropertyActionListener target="#{positionBean.type}"
+												value="#{positionBean.TYPE_ADD}" />
+										</p:commandLink>
+										<p:commandLink actionListener="#{positionBean.beforeSave()}" process="@this"
+											PRIVILEGE="UPDATE" 
+											update="@([id$=dlSave])">
+											<i class="yellow icon-edit"
+												style="width: 20px; height: 40px;"></i>
+											<p:resetInput target=":frmDialog:dlSave" />
+											<f:setPropertyActionListener target="#{positionBean.type}"
+												value="#{positionBean.TYPE_EDIT}" />
+										</p:commandLink>
+										<p:commandButton id="confirmButton" style="display: none"  process="@this"
+											actionListener="#{positionBean.delete()}" update="@([id$=tblPosition])">
+											<p:confirm header="#{msg['common.confirm.header']}"
+												icon="ui-icon-alert"
+												message="#{msg['common.confirm.message']}" />
+										</p:commandButton>
+										<p:commandLink actionListener="#{positionBean.beforeDelete()}" process="@this"
+											PRIVILEGE="DELETE" >
+											<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+										</p:commandLink>
+										<p:commandLink oncomplete="PF('dlSearch').show();"
+											update="@([id$=dlSearch])">
+											<i class="gray icon-search"
+												style="width: 20px; height: 40px;"></i>
+											<f:setPropertyActionListener
+												target="#{positionBean.positionSelected}"
+												value="#{positionBean.reset()}" />
+											<f:setPropertyActionListener target="#{positionBean.type}"
+												value="#{positionBean.TYPE_SEARCH}" />
+										</p:commandLink>
+										<p:spacer width="10" />
+									</div>
+
+									<div class="EmptyBox5" />
+
+									<p:dataTable var="position"
+										value="#{positionBean.lazyPosition}" id="tblPosition"
+										paginator="true" paginatorPosition="bottom"
+										selection="#{positionBean.listPositionSelecteds}"
+										rowIndexVar="rowCount"
+										paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										rowsPerPageTemplate="5,10,20,50,100"
+										currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+										lazy="true" rows="10"
+										emptyMessage="#{msg['common.table.emptymessage']}">
+										<!-- <p:ajax event="rowSelect" listener="#{positionBean.onRowSelect}"  /> -->
+
+										<p:ajax event="rowSelect"
+											listener="#{positionBean.onRowSelected}"
+											update="@([id$=updateForm]), @([id$=hPosData]), :frm"
+											oncomplete="updatesvg()" />
+										<p:ajax event="rowSelectCheckbox"
+											listener="#{positionBean.onRowSelected}"
+											update="@([id$=updateForm]), @([id$=hPosData]), :frm"
+											oncomplete="updatesvg()" />
+										<p:ajax event="rowUnselectCheckbox"
+											listener="#{positionBean.onRowSelected}"
+											update="@([id$=updateForm]), @([id$=hPosData]), :frm"
+											oncomplete="updatesvg()" />
+										<p:ajax event="toggleSelect"
+											listener="#{positionBean.onRowSelected}"
+											update="@([id$=updateForm]), @([id$=hPosData]), :frm"
+											oncomplete="updatesvg()" />
+
+										<f:facet name="header">
+											<p:commandButton styleClass="toggler" id="togglertblPosition"
+												type="button" value="#{msg['chooseColumns']}"
+												icon="ui-icon-calculator" />
+											<p:columnToggler datasource="tblPosition"
+												trigger="togglertblPosition" />
+
+										</f:facet>
+										<p:column selectionMode="multiple" style="text-align: center"
+											styleClass="Wid3" />
+										<p:column styleClass="Wid5"
+											headerText="#{msg['commont.grid.indext']}">
+											<h:outputText id="stt" value="#{rowCount + 1}"
+												lable="#{rowCount + 1}" />
+										</p:column>
+										<p:column headerText="#{msg['equipmentsDetail.Shop']}"
+											sortBy="#{position.shopId}">
+											<h:outputText id="Shop"
+												value="#{sessionBean.getShopNameById(position.shopId)}" />
+											<p:tooltip for="Shop"
+												value="#{sessionBean.getShopNameById(position.shopId)}" />
+										</p:column>
+										<p:column styleClass="Wid10" sortBy="#{position.positionCode}"
+											headerText="#{msg['positon.field.positionCode']}">
+											<h:outputText id="mnv" value="#{position.positionCode}" />
+											<p:tooltip for="mnv" value="#{position.positionCode}" />
+										</p:column>
+										<p:column styleClass="Wid10" sortBy="#{position.positionName}"
+											headerText="#{msg['positon.field.positionName']}">
+											<h:outputText id="tnv" value="#{position.positionName}" />
+											<p:tooltip for="tnv" value="#{position.positionName}" />
+										</p:column>
+										<p:column headerText="#{msg['positon.field.description']}"
+											sortBy="#{position.description}">
+											<h:outputText id="chc" value="#{position.description}" />
+											<p:tooltip for="chc" value="#{position.description}" />
+										</p:column>
+										<p:column headerText="#{msg['positon.field.lane']}"
+											sortBy="#{position.laneCode}">
+											<h:outputText id="lc" value="#{position.laneCode}" />
+											<p:tooltip for="lc" value="#{position.laneCode}" />
+										</p:column>
+										<p:column styleClass="Wid7" sortBy="#{position.figureX}"
+											headerText="#{msg['positon.field.figurex']}">
+											<h:outputText id="figurex2" value="#{position.figureX}">
+											</h:outputText>
+											<p:tooltip for="figurex2" value="#{position.figureX}" />
+										</p:column>
+										<p:column styleClass="Wid7" sortBy="#{position.figureY}"
+											headerText="#{msg['positon.field.figurey']}">
+											<h:outputText id="nc" value="#{position.figureY}" />
+											<p:tooltip for="nc" value="#{position.figureY}" />
+										</p:column>
+										<p:column headerText="#{msg['positon.field.linkId']}"
+											sortBy="#{position.linkPostionCode}">
+											<h:outputText id="sdt" value="#{position.linkPostionCode}" />
+											<p:tooltip for="sdt" value="#{position.linkPostionCode}" />
+										</p:column>
+										<p:column headerText="#{msg['positon.field.figureName']}"
+											sortBy="#{position.figureName}">
+											<h:outputText id="figure"
+												value="#{positionBean.getFigureName(position.figureName)}" />
+											<p:tooltip for="figure"
+												value="#{positionBean.getFigureName(position.figureName)}" />
+										</p:column>
+										<p:column headerText="#{msg['positon.field.managementType']}"
+											sortBy="#{position.managementType}">
+											<h:outputText id="management"
+												value="#{positionBean.getManagementName(position.managementType)}" />
+											<p:tooltip for="management"
+												value="#{positionBean.getManagementName(position.managementType)}" />
+										</p:column>
+										<!--<p:column headerText="#{msg['positon.field.lane']}">-->
+										<!--<h:outputText id="em" value="#{position.laneCode}" />-->
+										<!--<p:tooltip for="em" value="#{position.laneCode}" />-->
+										<!--</p:column>-->
+										<p:column headerText="#{msg['positon.field.ipAddress']}"
+											sortBy="#{position.ipAddress}">
+											<h:outputText id="Address" value="#{position.ipAddress}">
+											</h:outputText>
+											<p:tooltip for="Address" value="#{position.ipAddress}" />
+										</p:column>
+										<p:column headerText="#{msg['common.status']}"
+											sortBy="#{position.positionStatus}">
+											<h:outputText id="positionStatusGr"
+												value="#{position.positionStatus == 1?msg['common.status.1']:msg['common.status.0']}" />
+											<p:tooltip for="positionStatusGr"
+												value="#{position.positionStatus == 1?msg['common.status.1']:msg['common.status.0']}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:panel>
+							</div>
+						</p:outputPanel>
+					</div>
+				</p:outputPanel>
+				<div class="EmptyBox10"></div>
+			</div>
+		</h:form>
+
+		<h:form id="frmDialog">
+			<p:confirmDialog widgetVar="dlgDelete" global="true"
+				showEffect="fade" hideEffect="fade">
+				<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+					type="button" styleClass="ui-confirmdialog-yes"
+					icon="ui-icon-check" />
+				<p:commandButton value="#{msg['common.confirmdialog.no']}"
+					type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true"
+				resizable="false" closable="true" height="380" width="500"
+				header="#{msg['position.dialog.header']}">
+
+				<p:panelGrid id="panelPosition" columns="2">
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.positionCode']} (*)" />
+					<p:inputText style="width:300px;" id="positonCode"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						value="#{positionBean.positionSelected.positionCode}"
+						validator="#{positionBean.validate}" maxlength="30">
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.positionCode']}" />
+						<f:validator validatorId="emtyValidator" />
+						<f:validator validatorId="codeValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgPositionCode" for="positonCode" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.positionName']} (*)" />
+					<p:inputText style="width:300px;" id="positionName"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						value="#{positionBean.positionSelected.positionName}"
+						maxlength="50">
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.positionName']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgPositonName" for="positionName" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.lane']}" />
+					<p:inputText style="width:300px;" id="laneCode"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						value="#{positionBean.positionSelected.laneCode}" maxlength="30">
+						<f:attribute name="msglabel" value="#{msg['positon.field.lane']}" />
+						<!--<f:validator validatorId="emtyValidator" />-->
+						<f:validator validatorId="codeValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msglaneCode" for="laneCode" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.figurex']}" />
+					<p:inputText style="width:300px;" id="figurex"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						validator="#{positionBean.validate}"
+						value="#{positionBean.positionSelected.figureX}" maxlength="9">
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.figurex']}" />
+						<!--<f:validator validatorId="emtyValidator" />-->
+					</p:inputText>
+					<p:outputLabel />
+					<p:message for="figurex" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.figurey']}" />
+					<p:inputText style="width:300px;" id="figureY"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						validator="#{positionBean.validate}"
+						value="#{positionBean.positionSelected.figureY}" maxlength="9">
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.figurey']}" />
+						<!--<f:validator validatorId="emtyValidator" />-->
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgFigureY" for="figureY" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.figureName']} (*)" />
+					<p:selectOneMenu id="figureName" style="width:300px;"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						value="#{positionBean.positionSelected.figureName}">
+						<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+							noSelectionOption="true" />
+						<f:selectItems value="#{positionBean.listDomainsPositionType}"
+							var="domain" itemLabel="#{domain.name}"
+							itemValue="#{domain.value}" />
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.figureName']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message id="msgfigureName" for="figureName" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.managementType']} (*)" />
+					<p:selectOneMenu id="managementType" style="width:300px;"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						value="#{positionBean.positionSelected.managementType}">
+						<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+							noSelectionOption="true" />
+						<f:selectItems value="#{positionBean.lstPositionType}"
+							var="domain" itemLabel="#{domain.name}"
+							itemValue="#{domain.value}" />
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.managementType']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message id="msgmanagementType" for="managementType" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.ipAddress']} (*)" />
+					<p:inputText style="width:300px;" id="ipAddress" maxlength="50"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						validator="#{positionBean.validate}"
+						value="#{positionBean.positionSelected.ipAddress}">
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.ipAddress']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel />
+					<p:message id="msgIpAddress" for="ipAddress" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.linkId']}" />
+					<p:selectOneMenu id="linkId" style="width:300px;"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						value="#{positionBean.positionSelected.linkId}">
+						<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+							noSelectionOption="true" />
+						<f:selectItems value="#{positionBean.positionAll}" var="position"
+							itemLabel="#{position.positionCode} | #{position.positionName}"
+							itemValue="#{position.positionId}" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message id="msglinkId" for="linkId" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.description']}" />
+					<p:inputTextarea rows="4" style="width:300px;height: 150px"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						id="description"
+						value="#{positionBean.positionSelected.description}"
+						maxlength="50">
+						<f:attribute name="msglabel"
+							value="#{msg['positon.field.description']}" />
+					</p:inputTextarea>
+					<p:outputLabel />
+					<p:message id="msgDdescription" for="description" />
+
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['common.status']} (*)" />
+					<p:selectOneMenu id="frmStatus" style="width:300px;"
+						value="#{positionBean.positionSelected.positionStatus}"
+						disabled="true">
+						<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+						<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+					</p:selectOneMenu>
+					<p:outputLabel />
+					<p:message for="frmStatus" />
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="#{ui-icon-plus}"
+						disabled="#{positionBean.positionSelected.positionStatus==0?true:false}"
+						action="#{positionBean.save}" value="#{msg['common.dialog.save']}"
+						update="@([id$=tblPosition]),@([id$=panelPosition])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						oncomplete="PF('dlSave').hide()">
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+		</h:form>
+
+		<h:form id="frmSearch">
+			<p:dialog widgetVar="dlSearch" id="dlSearch" modal="true"
+				resizable="false" closable="true" height="280" width="700"
+				header="#{msg['position.dialog.header']}">
+				<p:panelGrid id="panelPositionSearch" columns="2">
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.positionCode']}">
+						<p:inputText style="width:300px;" maxlength="30"
+							value="#{positionBean.positionSelected.positionCode}">
+						</p:inputText>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.positionName']}">
+						<p:inputText style="width:300px;"
+							value="#{positionBean.positionSelected.positionName}"
+							maxlength="150">
+						</p:inputText>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.lane']}">
+						<p:inputText style="width:300px;"
+							value="#{positionBean.positionSelected.laneCode}" maxlength="30">
+						</p:inputText>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.figurex']}">
+						<p:inputText style="width:300px;"
+							value="#{positionBean.positionSelected.figureX}" maxlength="9">
+						</p:inputText>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.figurey']}">
+						<p:inputText style="width:300px;"
+							value="#{positionBean.positionSelected.figureY}" maxlength="9">
+						</p:inputText>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.figureName']}">
+						<p:selectOneMenu style="width:300px;"
+							value="#{positionBean.positionSelected.figureName}">
+							<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+								noSelectionOption="true" />
+							<f:selectItems value="#{positionBean.listDomainsPositionType}"
+								var="domain" itemLabel="#{domain.name}"
+								itemValue="#{domain.value}" />
+						</p:selectOneMenu>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.managementType']}">
+						<p:selectOneMenu style="width:300px;"
+							value="#{positionBean.positionSelected.managementType}">
+							<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+								noSelectionOption="true" />
+							<f:selectItems value="#{positionBean.lstPositionType}"
+								var="domain" itemLabel="#{domain.name}"
+								itemValue="#{domain.value}" />
+						</p:selectOneMenu>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.ipAddress']}">
+						<p:inputText style="width:300px;" maxlength="50"
+							value="#{positionBean.positionSelected.ipAddress}">
+						</p:inputText>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.linkId']}">
+						<p:selectOneMenu style="width:300px;"
+							value="#{positionBean.positionSelected.linkId}">
+							<f:selectItem itemLabel="#{msg['choosed']}" itemValue=""
+								noSelectionOption="true" />
+							<f:selectItems value="#{positionBean.positionAll}" var="position"
+								itemLabel="#{position.positionCode} | #{position.positionName}"
+								itemValue="#{position.positionId}" />
+						</p:selectOneMenu>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['positon.field.description']}">
+						<p:inputTextarea style="width:300px;height: 150px" rows="4"
+							value="#{positionBean.positionSelected.description}"
+							maxlength="250">
+						</p:inputTextarea>
+					</p:outputLabel>
+					<p:outputLabel style="font-size:12px;"
+						value="#{msg['common.status']}">
+						<p:selectOneMenu
+							value="#{positionBean.positionSelected.positionStatus}"
+							style="width:300px">
+							<f:selectItem itemLabel="" itemValue="" />
+							<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+							<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+						</p:selectOneMenu>
+					</p:outputLabel>
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-search"
+						action="#{positionBean.filterSearch}"
+						value="#{msg['common.dialog.search']}"
+						update="@([id$=tblPosition]),@([id$=panelPositionSearch])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						oncomplete="PF('dlSearch').hide()">
+						<p:resetInput target=":frmSearch:dlSearch" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+		</h:form>
+		
+	</ui:define>
+</ui:composition>

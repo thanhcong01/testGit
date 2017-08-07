@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+<h:body>
+
+	<composite:interface>
+		<composite:attribute name="step1Content" />
+		<composite:attribute name="step2Content" />
+		<composite:attribute name="step1-check" />
+		<composite:attribute name="step2-check" />
+	</composite:interface>
+
+	<composite:implementation>
+		<div class="StepMenu Wid100 block-left">
+			<div class="block-left #{cc.attrs.step1-check}" >
+				<div class="stepnum block-left #{cc.attrs.step1-check}">
+					<h:outputText value="1" />
+				</div>
+				<div class="stepcontent block-left #{cc.attrs.step1-check}">
+					<h:outputText value="#{cc.attrs.step1Content}" />
+				</div>
+			</div>
+			<div class="stepImg block-left"><i class="ui-breadcrumb-chevron ui-icon ui-icon-triangle-1-e"></i></div>
+			<div class="block-left #{cc.attrs.step2-check}">
+				<div class="stepnum block-left #{cc.attrs.step2-check}">
+					<h:outputText value="2" />
+				</div>
+				<div class="stepcontent block-left #{cc.attrs.step2-check}">
+					<h:outputText value="#{cc.attrs.step2Content}" />
+				</div>
+			</div>
+		</div>
+	</composite:implementation>
+</h:body>
+</html>

@@ -1,0 +1,365 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['imPShopExGoods']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['addSerial']}"></p:outputLabel></h2>-->
+
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="EmptyBox10"></div>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['transInfo.tttb']}" id="searchfield">
+					<p:panelGrid>
+						<p:row>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['orderCode.myc']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100" disabled="true"
+											 value="#{imPShopExGoods.std.transactionActionCode}" />
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['equipment.group.profile']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100" disabled="true"
+											 value="#{sessionBean.getGoodsGroupNameByGoods(imPShopExGoods.std.goodsId.toString())}" />
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['equipment.profile.code']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid12">
+								<p:inputText styleClass="Wid100 " disabled="true"
+											 value="#{sessionBean.getEquipProfileCode(imPShopExGoods.std.goodsId.toString())}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['equipment.profile.name']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100" disabled="true"
+											 value="#{sessionBean.getEquipProfileName(imPShopExGoods.std.goodsId.toString())}"></p:inputText>
+							</p:column>
+							<p:column  styleClass="Wid9">
+								<p:outputLabel value="#{msg['quantity.slyc']}"></p:outputLabel>
+							</p:column>
+							<p:column  style="width: 60px">
+								<p:inputText disabled="true" styleClass="Wid100"
+											 value="#{imPShopExGoods.std.quantity}"></p:inputText>
+							</p:column>
+						</p:row>
+						<!--<p:row>-->
+							<!--<p:column>-->
+								<!--<p:outputLabel value="#{msg['quantity']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column>-->
+								<!--<p:inputText styleClass="Wid100 disableText" disabled="true"-->
+									<!--value="#{imPShopExGoods.std.quantity}"></p:inputText>-->
+							<!--</p:column>-->
+						<!--</p:row>-->
+					</p:panelGrid>
+				</p:panel>
+				<p:panel header="#{msg['transInfo.cttb']}">
+					<p:panelGrid>
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['serial']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid40">
+								<p:inputText styleClass="Wid100"
+											 value="#{imPShopExGoods.fromSerial}"
+											 onkeypress="if (event.keyCode == 13) { return false; }"
+											 validatorMessage="#{msg['fromSerialReq']}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu
+										styleClass="select Wid100" value="#{imPShopExGoods.statusIdFrm}">
+									<f:selectItem itemValue="" itemLabel="" noSelectionOption="true"/>
+									<!--<p:ajax event="valueChange" update="@this"-->
+									<!--listener="#{searchEquipmentBean.changeStatus()}"></p:ajax>-->
+									<f:selectItems value="#{sessionBean.listStatusNotError}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+									<p:ajax update=""></p:ajax>
+								</p:selectOneMenu>
+							</p:column>
+							<p:column>
+
+								<p:commandButton style="float:right"
+												 icon="fa fa-search Fs14 white" value="#{msg['search']}"
+												 disabled="#{imPShopExGoods.disableSub}" update=":frm"
+												 actionListener="#{imPShopExGoods.searchSerial}"></p:commandButton>
+								<p:outputLabel style="display: none" value="#{imPShopExGoods.searchSerial()}"></p:outputLabel>
+							</p:column>
+						</p:row>
+						<!--<p:row>-->
+							<!--<p:column colspan="5"></p:column>-->
+							<!--<p:column>-->
+								<!--<p:commandButton style="float:right"-->
+									<!--icon="fa fa-search Fs14 white" value="#{msg['search']}"-->
+									<!--disabled="#{imPShopExGoods.disableSub}" update=":frm"-->
+									<!--actionListener="#{imPShopExGoods.searchSerial}"></p:commandButton>-->
+							<!--</p:column>-->
+						<!--</p:row>-->
+
+					</p:panelGrid>
+				</p:panel>
+				<div style="clear: both"></div>
+				<table>
+					<tr>
+						<td style="vertical-align: top; width: 50%"><p:panel>
+
+							<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+										 rowIndexVar="rowIndex" value="#{imPShopExGoods.listAnaSerial}"
+										 paginator="true" rows="5" paginatorPosition="bottom"
+										 resizableColumns="false"
+										 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+										 id="dtSearch" selection="#{imPShopExGoods.listAnaSerialSelect}"
+										 rowsPerPageTemplate="5,10,20,50,100"
+										 rowKey="#{c.rowKey}">
+								<f:facet name="header">
+									<span class="dtHead" style="">#{msg['searchResult']}</span>
+									<p:commandButton styleClass="toggler" id="togglerdtSearch"
+													 value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+									<p:columnToggler datasource="dtSearch"
+													 trigger="togglerdtSearch" />
+									<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch">
+										<p:ajax event="toggle" listener="#{imPShopExGoods.onToggleActiveEtag4}"
+												update="@([id$=dtSearch])"/>
+									</p:columnToggler>
+								</f:facet>
+								<p:ajax event="rowSelect"
+										listener="#{imPShopExGoods.hanleLsDataSelect}"
+										update="@([id$=sumDataselected])" />
+								<p:ajax event="rowSelectCheckbox"
+										listener="#{imPShopExGoods.hanleLsDataSelect}"
+										update="@([id$=sumDataselected])" />
+								<p:ajax event="rowUnselectCheckbox"
+										listener="#{imPShopExGoods.hanleLsDataSelect}"
+										update="@([id$=sumDataselected])" />
+								<p:ajax event="toggleSelect"
+										listener="#{imPShopExGoods.hanleLsDataSelect}"
+										update="@([id$=sumDataselected])" />
+								<p:column styleClass="index" visible="#{imPShopExGoods.visibleTable4[0]}">
+									<f:facet name="header">
+										<h:outputText value="#{msg['index']}" />
+									</f:facet>
+									<h:outputText value="#{rowIndex+1}" />
+								</p:column>
+								<p:column sortBy="#{c.fromSerial}" visible="#{imPShopExGoods.visibleTable4[1]}">
+									<f:facet name="header">
+										<h:outputText value="Serial" />
+									</f:facet>
+									<h:outputText id="fromSerial" value="#{c.fromSerial}" />
+									<p:tooltip for="fromSerial"
+											   value="#{c.fromSerial}" />
+								</p:column>
+								<!--<p:column>-->
+								<!--<f:facet name="header">-->
+								<!--<h:outputText value="#{msg['toSerial']}" />-->
+								<!--</f:facet>-->
+								<!--<h:outputText value="#{c.toSerial}" />-->
+								<!--</p:column>-->
+								<p:column sortBy="#{c.count}" visible="#{imPShopExGoods.visibleTable4[2]}">
+									<f:facet name="header">
+										<h:outputText value="#{msg['quantity']}" />
+									</f:facet>
+									<h:outputText id="count" value="#{c.count}" />
+									<p:tooltip for="count"
+											   value="#{c.count}" />
+								</p:column>
+								<p:column sortBy="#{c.getInstockDatetimeStr2()}" visible="#{imPShopExGoods.visibleTable4[3]}">
+									<f:facet name="header">
+										<h:outputText value="#{msg['equiment.stock.create.ncc']}" />
+									</f:facet>
+									<h:outputText id="instockDatetimeStr" value="#{c.instockDatetimeStr}" />
+									<p:tooltip for="instockDatetimeStr"
+											   value="#{c.instockDatetimeStr}" />
+								</p:column>
+								<p:column visible="#{imPShopExGoods.visibleTable4[4]}"
+										  sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+									<f:facet name="header">
+										<h:outputText value="#{msg['audit.status']}" />
+									</f:facet>
+									<h:outputText id="getEquipsStatusName"
+											value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+									<p:tooltip for="getEquipsStatusName"
+											   value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+								</p:column>
+								<p:column sortBy="#{sessionBean.getStockStatusName(c.stockStatus)}"
+										  visible="#{imPShopExGoods.visibleTable4[5]}">
+									<f:facet name="header">
+										<h:outputText value="#{msg['stock.status']}" />
+									</f:facet>
+									<h:outputText id="getStockStatusName"
+											value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+									<p:tooltip for="getStockStatusName"
+											   value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+								</p:column>
+
+								<p:column selectionMode="multiple" style="text-align: center"
+										  visible="#{imPShopExGoods.visibleTable4[6]}">
+								</p:column>
+							</p:dataTable>
+							</p:panel></td>
+					</tr>
+					<tr style="width: 100%; text-align: center">
+						<td>
+							<p:commandButton icon="fa fa-plus Fs14 white"
+											 value="Chọn"
+											 disabled="#{imPShopExGoods.disableSub}"
+											 update=":frm:dtSearch, :frm:infoChose,:frm:messages"
+											 actionListener="#{imPShopExGoods.saveSerial}"
+											 styleClass="ui-priority-primary">
+							</p:commandButton>
+						</td>
+					</tr>
+				</table>
+				<p:panel id="infoChose">
+					<p:panelGrid>
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['quantityChoose']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid13"> <p:inputText styleClass="texbox disableText" disabled="true" value="#{imPShopExGoods.sizers_}"></p:inputText></p:column>
+                            <p:column style="width: 74%"></p:column>
+                        </p:row>
+                    </p:panelGrid>
+					<p:dataTable  id="dtChose" emptyMessage="#{msg['noRecordFound']}"
+								 var="c" rowIndexVar="rowIndex"
+								 value="#{imPShopExGoods.std.setSerial}" paginator="true" rows="5"
+								 paginatorPosition="bottom" resizableColumns="false"
+								 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								  rowsPerPageTemplate="5,10,20,50,100">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['infoChoosedSerial']}</span>
+							<p:commandButton styleClass="toggler" id="togglerinfoChose"
+											 value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+
+							<p:columnToggler datasource="dtChose" trigger="togglerinfoChose">
+								<p:ajax event="toggle" listener="#{imPShopExGoods.onToggleActiveEtag3}"
+										update="@([id$=dtChose])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:column styleClass="index" visible="#{imPShopExGoods.visibleTable3[0]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column sortBy="#{c.serial}" visible="#{imPShopExGoods.visibleTable3[1]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['serial']}" />
+							</f:facet>
+							<h:outputText id="serial" value="#{c.serial}" />
+							<p:tooltip for="serial"
+									   value="#{c.serial}" />
+						</p:column>
+						<p:column sortBy="#{c.lastMaintenDate}" visible="#{imPShopExGoods.visibleTable3[2]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['mansten.schedule.last']}" />
+							</f:facet>
+							<h:outputText id="lastMaintenDate" value="#{c.lastMaintenDate}" />
+							<p:tooltip for="lastMaintenDate"
+									   value="#{c.lastMaintenDate}" />
+						</p:column>
+						<p:column sortBy="#{c.reasonName}" visible="#{imPShopExGoods.visibleTable3[3]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equipment.reason.waranty']}" />
+							</f:facet>
+							<h:outputText id="reasonName" value="#{c.reasonName}" />
+							<p:tooltip for="reasonName"
+									   value="#{c.reasonName}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}" visible="#{imPShopExGoods.visibleTable3[4]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['provider']}" />
+							</f:facet>
+							<h:outputText id="getProviderName"
+									value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							<p:tooltip for="getProviderName"
+									   value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" visible="#{imPShopExGoods.visibleTable3[5]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equiment.status.waranty']}" />
+							</f:facet>
+							<h:outputText id="getWarranStatus"
+									value="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+							<p:tooltip for="getWarranStatus"
+									   value="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+						</p:column>
+						<p:column sortBy="#{imPShopExGoods.getWarranExpriDate2(c.equipmentProfileId, c.serial)}" visible="#{imPShopExGoods.visibleTable3[6]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['equiment.expire.waranty']}" />
+							</f:facet>
+							<h:outputText id="getWarranExpriDate"
+									value="#{imPShopExGoods.getWarranExpriDate(c.equipmentProfileId, c.serial)}" />
+							<p:tooltip for="getWarranExpriDate"
+									   value="#{imPShopExGoods.getWarranExpriDate(c.equipmentProfileId, c.serial)}" />
+						</p:column>
+
+						<p:column sortBy="#{equipmentsProfileBean.getOriginName(sessionBean.getEquipProfileOrigin(c.equipmentProfileId.toString()))}"
+								  visible="#{imPShopExGoods.visibleTable3[7]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods.tableProfile.column.origin']}" />
+							</f:facet>
+							<h:outputText id="equipmentsProfileBean"
+									value="#{equipmentsProfileBean.getOriginName(sessionBean.getEquipProfileOrigin(c.equipmentProfileId.toString()))}" />
+							<p:tooltip for="equipmentsProfileBean"
+									   value="#{equipmentsProfileBean.getOriginName(sessionBean.getEquipProfileOrigin(c.equipmentProfileId.toString()))}" />
+						</p:column>
+						<p:column styleClass="deleteCol" style="max-width: 70px;" visible="#{imPShopExGoods.visibleTable3[8]}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['delete']}" />
+							</f:facet>
+							<p:commandLink value="X" styleClass="delete" update=":frm:infoChose, :frm:dtSearch" actionListener="#{imPShopExGoods.removeSerial(c)}"></p:commandLink>
+						</p:column>
+					</p:dataTable>
+					<div style="clear: both; width: 100%; text-align: center">
+						<p:commandButton icon="fa fa-check Fs14 white"
+										 value="Chấp nhận"
+										 update=":frm:dtSearch, :frm:infoChose,:frm:messages"
+										 actionListener="#{imPShopExGoods.approSerialSelected}"
+										 styleClass="ui-priority-primary">
+						</p:commandButton>
+						<p:commandButton value="#{msg['Exit']}"
+										 icon="fa fa-times Fs14 white"
+										 actionListener="#{imPShopExGoods.clickStd}"
+										 update="@([id$=frm])"
+										 styleClass="ui-priority-primary">
+						</p:commandButton>
+						<p:dialog widgetVar="cfImport" >
+							<f:facet name="header">
+								<p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+							</f:facet>
+							<p:panelGrid columns="1" styleClass="pngConfirm">
+								<p:outputLabel value="#{msg['close.click.confirm.serial']}"></p:outputLabel>
+							</p:panelGrid>
+							<div style="width: 100%; text-align: center;">
+								<p:commandButton value="#{msg['yes']}" action="#{imPShopExGoods.removeSerialSelected}"
+												 styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="#{msg['no']}"  onclick="PF('cfImport').hide();"
+												 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</div>
+						</p:dialog>
+					</div>
+				</p:panel>
+			</div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

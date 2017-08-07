@@ -1,0 +1,264 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frm">
+            <title>#{msg['exSubShopRequire']}</title>
+<!--            <h2 ><p:outputLabel value="#{msg['exSubShopRequire']}"></p:outputLabel></h2>-->
+            <div class="EmptyBox10"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <div class="EmptyBox10"></div>
+            <div class="Pad10">
+                <p:growl id="messages" showDetail="true" />
+                <p:panel header="#{msg['transInfo']}" id="info" >
+                    <p:panelGrid id="pgs">
+                        <p:row>
+                            <p:column styleClass="Wid13">           
+                                <p:outputLabel  value="#{msg['orderCode']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText styleClass="Wid100 disableText" value="#{exSubShopRequire.orderCode}" disabled="true"></p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['orderTypeReturn']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu disabled="#{exSubShopRequire.disableReason}" styleClass="select Wid100" value="#{exSubShopRequire.typeId}"  >
+                                    <p:ajax event="valueChange" update=":frm" listener="#{exSubShopRequire.changeType}"></p:ajax>
+                                    <f:selectItems value="#{exSubShopRequire.listTransType}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                            <!-- <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['reason']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu disabled="true" styleClass="select Wid100 disableText" value="#{exSubShopRequire.reasonId}"  >
+                                    <f:selectItems value="#{exSubShopRequire.listReason}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column> -->
+                            <p:column>
+                                <p:outputLabel value="#{msg['fromShop']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.shop.shopName}" ></p:inputText>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                        	<p:column>
+                                <p:outputLabel  value="#{msg['createDate']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:calendar styleClass="Wid100" readonlyInput="false" disabled="true"
+                                            value="#{exSubShopRequire.createDate}" id="createDate"
+                                            converterMessage="Ngày lập không đúng định dạng"
+                                            yearRange="c-70:c+70"
+                                            showOn="button" pattern="dd/MM/yyyy" navigator="true">
+                                </p:calendar>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel  value="#{msg['createStaff']}"></p:outputLabel>
+                            </p:column>
+                            <p:column>
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.staff.staffName}" ></p:inputText>
+                            </p:column>
+                            
+                        </p:row>
+                    </p:panelGrid>
+
+                </p:panel>
+                <p:panel header="#{msg['detailInfo']}">
+                    <p:panelGrid  >
+                        <p:row>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['equipment.group']}(*)"></p:outputLabel></p:column>
+                            <p:column style="max-width:240px!important;"><p:selectOneMenu styleClass="select Wid100" value="#{exSubShopRequire.goodsGroupId}"  >
+                                    <p:ajax event="valueChange" update=":frm" listener="#{exSubShopRequire.changeGoodsGroup()}"></p:ajax>
+                                    <f:selectItems value="#{sessionBean.lsgGroupActive}" var="c" itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+                                </p:selectOneMenu></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['equipment.code']}(*)"></p:outputLabel></p:column>
+                            <p:column style="max-width:240px!important;">
+                                <p:autoComplete styleClass="ui-autocomplete-select" dropdown="true"
+                                    value="#{exSubShopRequire.goods}" completeMethod="#{exSubShopRequire.completeGoods}" >
+                                    <p:ajax event="itemSelect" listener="#{exSubShopRequire.goodsSelect}" update="@this, :frm:profileName" />
+                                </p:autoComplete>
+                            </p:column>
+                            <p:column styleClass="Wid13">           
+                                <p:outputLabel  value="#{msg['equipment.name']}(*)"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText id="profileName" styleClass="Wid100 disableText" 
+                                value="#{exSubShopRequire.selectedProfile.profileName}" disabled="true"></p:inputText>
+                            </p:column>
+                            <!-- <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['status']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:selectOneMenu disabled="true" styleClass="select disableText" value="#{exSubShopRequire.goodStatus}" style="width: 190px">
+                                    <f:selectItems value="#{sessionBean.listStatus}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu></p:column> -->
+                        </p:row>
+                        <p:row>
+                        	<p:column styleClass="Wid13">           
+                                <p:outputLabel  value="#{msg['quantity']}(*)"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText styleClass="Wid100" value="#{exSubShopRequire.quantity}" ></p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13">           
+                                <p:outputLabel  value="#{msg['note']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203" colspan = "3">
+                                <p:inputText styleClass="Wid100" value="#{exSubShopRequire.description}" ></p:inputText>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid >
+                    <p:panelGrid styleClass="Wid100">
+                        <p:column styleClass="Wid203"></p:column>
+                        <p:column style="width:79.6%">
+                            <div class="Fright">
+                                <p:commandButton  value="#{msg['add']}" actionListener="#{exSubShopRequire.detailInfo}" update="frm"  ></p:commandButton>
+                                <p:commandButton id="infoAdd"  value="#{msg['infoAdd']}" disabled="#{exSubShopRequire.btnViewClick()}"
+                                                  actionListener="#{exSubShopRequire.viewClick}"
+                                                 update="frm"  ></p:commandButton>
+                                <p:commandButton value="#{msg['viewStock']}" update=":leftform:viewStock" actionListener="#{viewStock.viewStockFromButton}" ></p:commandButton>
+                                <!-- <p:commandButton value="#{msg['Exit']}"  action="index?faces-redirect=true" styleClass="ui-priority-primary" ></p:commandButton> -->
+                            </div>
+                        </p:column>   
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel >
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex"
+                                 value="#{exSubShopRequire.st.lsDetail}"
+                    			paginator="true" rows="5" paginatorPosition="bottom" 
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 widgetVar="dtWidgetVar" id="dtDetail" lazy="false"
+                                 selectionMode="single" selection="#{exSubShopRequire.stDetail}"
+                                 rowKey="#{c.rowkey}">
+                        <f:facet  name="header">
+                        	<span class="dtHead" style="">#{msg['transDetailInfo']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtDetail"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <!--<p:columnToggler datasource="dtDetail" trigger="togglerdtDetail" />-->
+                            <p:columnToggler datasource="dtDetail" trigger="togglerdtDetail">
+                                <p:ajax event="toggle" listener="#{exSubShopRequire.onToggleActiveEtag}"
+                                        update="@([id$=dtDetail])"/>
+                            </p:columnToggler>
+                        </f:facet>
+                         <p:ajax event="rowSelect"  update="@([id$=infoAdd])"  />
+                        <p:ajax event="rowSelectRadio"
+                                update="@([id$=infoAdd]), :frm" />
+
+                        <p:column styleClass="index" visible="#{exSubShopRequire.visibleTable[0]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[1]}"
+                                  sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goodsGroup']}" />
+                            </f:facet>
+                            <h:outputText id="goodsGroup" value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                            <p:tooltip for="goodsGroup"
+                                       value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[2]}"
+                                  sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.profile.code']}" />
+                            </f:facet>
+                            <h:outputText id="code" value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                            <p:tooltip for="code"
+                                       value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[3]}"
+                                  sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.profile.name']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                            <p:tooltip for="getEquipProfileName"
+                                       value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[4]}"
+                                  sortBy="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.spec']}" />
+                            </f:facet>
+                            <h:outputText id = "specification"
+                                          value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+                            <p:tooltip for="specification"
+                                       value="#{sessionBean.getEquipmentSpecification(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[5]}" sortBy="#{c.quantity}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['quantity']}" />
+                            </f:facet>
+                            <h:outputText id="quantity" value="#{c.quantity}" />
+                            <p:tooltip for="quantity"
+                                       value="#{c.quantity}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[6]}"
+                                  style="text-align: center;" sortBy="#{c.description}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['note']}" />
+                            </f:facet>
+
+                            <h:outputText id="description" value="#{c.description}" />
+                            <p:tooltip for="description"
+                                       value="#{c.description}" />
+                        </p:column>
+                        <p:column visible="#{exSubShopRequire.visibleTable[7]}"
+                                  style="text-align: center;" styleClass="deleteCol">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['delete']}" />
+                            </f:facet>
+                            <p:commandLink value="X" styleClass="delete" update=":frm" actionListener="#{exSubShopRequire.removeDtRs(c)}"></p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                    <p:panelGrid styleClass="Wid100">
+                        <p:column styleClass="Wid203"></p:column>
+                        <p:column style="width:79.6%">
+                            <div class="Fright">
+                                <p:commandButton value="#{msg['accept']}" update="frm" disabled="#{exSubShopRequire.disableAdd}" actionListener="#{exSubShopRequire.save}" styleClass="ui-priority-primary" >
+                                </p:commandButton>
+                                <p:commandButton value="#{msg['cancel']}"  update=":frm"  actionListener="#{exSubShopRequire.refresh}" styleClass="ui-priority-primary cancel" >
+                                </p:commandButton>
+                                <!-- <p:commandButton value="#{msg['print']}" update=":frm"   styleClass="ui-priority-primary" ></p:commandButton> -->
+                                <p:commandButton icon="fa fa-times Fs14 white" value="#{msg['Exit']}"  action="index?faces-redirect=true" styleClass="ui-priority-primary" >
+                                </p:commandButton>
+                                <p:dialog widgetVar="cfExSReq" >
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid styleClass="pngConfirm">
+                                        <p:row>
+                                            <p:column><p:outputLabel value="#{msg['orderCode']}"></p:outputLabel></p:column>
+                                            <p:column><p:inputText styleClass="disableText" disabled="true" value="#{exSubShopRequire.ta.transactionActionCode}"></p:inputText></p:column>
+                                            <p:column><p:outputLabel value="#{msg['reason']}"></p:outputLabel></p:column>
+                                            <p:column><p:inputText styleClass="disableText" disabled="true" value="#{exSubShopRequire.ta.reasonName}"></p:inputText></p:column>
+                                        </p:row>
+                                       <!--  <p:row>
+                                            <p:column><p:outputLabel value="#{msg['note']}"></p:outputLabel></p:column>
+                                            <p:column colspan="3"> <p:inputTextarea maxlength="200"  rows="3" value="#{exSubShopRequire.description}"></p:inputTextarea></p:column>
+                                        </p:row> -->
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update="@all"  actionListener="#{exSubShopRequire.action}" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"  onclick="PF('cfExSReq').hide();" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+                            </div>
+                        </p:column>
+                    </p:panelGrid>
+                </p:panel>
+            </div>
+        </h:form>
+        <script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+        </script>
+    </ui:define>
+</ui:composition>

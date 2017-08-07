@@ -1,0 +1,362 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="EQUIPMENT.PROVIDER" />
+		<h:form id="frm">
+
+			<!-- BreadCumb -->
+			
+             <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <div class="Pad10">
+			<p:outputPanel styleClass="Container100 Responsive100">
+
+				<!-- Table Content -->
+				<div class="Container100 Responsive100">
+
+					<!-- Form layout-->
+					<p:outputPanel id="updateForm">
+						<div class="Container100 Responsive50">
+							<p:panel styleClass="Container100" header="#{msg['provider.header']}">
+								<div class="Pad5">
+								<div style="float: right;">
+									<p:commandLink oncomplete="PF('dlSave').show();"
+												   PRIVILEGE="INSERT" update="@([id$=dlSave])">
+										<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+										<p:resetInput target=":frmDialog:dlSave" />
+										<f:setPropertyActionListener target="#{providerBean.providerSelected}" value="#{providerBean.reset()}"/>
+										<f:setPropertyActionListener target="#{providerBean.type}" value="#{providerBean.TYPE_ADD}" />
+									</p:commandLink>
+									<p:commandLink action="#{providerBean.beforeSave}"
+												   PRIVILEGE="UPDATE"  update="@([id$=dlSave])">
+										<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+										<p:resetInput target=":frmDialog:dlSave" />
+										<f:setPropertyActionListener target="#{providerBean.type}" value="#{providerBean.TYPE_EDIT}" />
+									</p:commandLink>
+									<p:commandButton id="confirmButton" style="display: none" action="#{providerBean.delete}" update="@([id$=tblProvider])">
+										<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert" 
+											message="#{msg['common.confirm.message']}"	/>
+									</p:commandButton>
+									<p:commandLink  action="#{providerBean.beforeDelete}" PRIVILEGE="DELETE" >
+										<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+									</p:commandLink>
+									<p:commandLink oncomplete="PF('dlSearch').show();" update="@([id$=dlSearch])">
+										<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+										<f:setPropertyActionListener target="#{providerBean.providerSelected}" value="#{providerBean.reset()}"/>
+										<f:setPropertyActionListener target="#{providerBean.type}" value="#{providerBean.TYPE_SEARCH}" />
+									</p:commandLink>
+									<p:spacer width="10" />
+								</div>
+
+								<div class="EmptyBox5" />
+
+								<p:dataTable var="pro" value="#{providerBean.listProviders}" id="tblProvider"
+									paginator="true" paginatorPosition="bottom" rowIndexVar="rowCount"
+									selection="#{providerBean.listProviderSelected}"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+									rowKey="#{pro.providerId}" lazy="false" rows="10"
+									emptyMessage="#{msg['common.table.emptymessage']}">
+									<!-- <p:ajax event="rowSelect" listener="#{providerBean.onRowSelect}"  /> -->
+									<p:ajax event="toggleSelect"
+										listener="#{providerBean.onRowSelected}" update="@this" />
+									<p:ajax event="rowSelectCheckbox"
+										listener="#{providerBean.onRowSelected}" update="@this" />
+									<p:ajax event="rowUnselectCheckbox"
+										listener="#{providerBean.onRowSelected}" update="@this" />
+									<f:facet name="header">
+										<p:commandButton styleClass="toggler" id="togglertblProvider"
+														 type="button" value="#{msg['chooseColumns']}"
+														 icon="ui-icon-calculator" />
+										<p:columnToggler datasource="tblProvider" trigger="togglertblProvider">
+											<p:ajax event="toggle" listener="#{providerBean.onToggleActiveEtag}"
+													update="@([id$=tblProvider])"/>
+										</p:columnToggler>
+									</f:facet>
+
+									<p:column selectionMode="multiple" style="text-align: center"
+											  visible="#{providerBean.visibleTable[0]}" styleClass="Wid3" />
+									<p:column headerText="#{msg['commont.grid.indext']}"
+											  visible="#{providerBean.visibleTable[1]}" >
+										<h:outputText id="stt" value="#{rowCount + 1}" lable="#{rowCount + 1}"/>
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.code']}"
+											  visible="#{providerBean.visibleTable[2]}"  sortBy="#{pro.providerCode}">
+										<h:outputText id="providerCode" value="#{pro.providerCode}" />
+										<p:tooltip for="providerCode" value="#{pro.providerCode}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.name']}"
+											  visible="#{providerBean.visibleTable[3]}"  sortBy="#{pro.providerName}">
+										<h:outputText id="providerName" value="#{pro.providerName}" />
+										<p:tooltip for="providerName" value="#{pro.providerName}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.contractno']}"
+											  visible="#{providerBean.visibleTable[4]}"  sortBy="#{pro.contractNo}">
+										<h:outputText id="contractNo" value="#{pro.contractNo}" />
+										<p:tooltip for="contractNo" value="#{pro.contractNo}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.contractdate']}"
+											  visible="#{providerBean.visibleTable[50]}" sortBy="#{pro.contractDate}">
+										<h:outputText id="contractDate" value="#{pro.contractDate}">
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7"/>
+										</h:outputText>
+										<p:tooltip for="contractDate" value="#{pro.contractDate}" >
+											<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+7"/>
+										</p:tooltip>
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.address']}"
+											  visible="#{providerBean.visibleTable[6]}"  sortBy="#{pro.address}">
+										<h:outputText id="address" value="#{pro.address}" />
+										<p:tooltip for="address" value="#{pro.address}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.phone']}"
+											  visible="#{providerBean.visibleTable[7]}" sortBy="#{pro.phone}">
+										<h:outputText id="phone" value="#{pro.phone}" />
+										<p:tooltip for="phone" value="#{pro.phone}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.fax']}"
+											  visible="#{providerBean.visibleTable[8]}"  sortBy="#{pro.fax}">
+										<h:outputText id="faxG" value="#{pro.fax}" />
+										<p:tooltip for="faxG" value="#{pro.fax}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.contactName']}"
+											  visible="#{providerBean.visibleTable[9]}" sortBy="#{pro.contactName}">
+										<h:outputText id="contactNameG"  value="#{pro.contactName}" />
+										<p:tooltip for="contactNameG" value="#{pro.contactName}" />
+									</p:column>
+									<p:column headerText="#{msg['provider.tableprovider.column.contactNumber']}"
+											  visible="#{providerBean.visibleTable[10]}" sortBy="#{pro.contactNumber}">
+										<h:outputText id="contactNumberG" value="#{pro.contactNumber}" />
+										<p:tooltip for="contactNumberG" value="#{pro.contactNumber}" />
+									</p:column>
+									<p:column headerText="#{msg['common.status']}"
+											  visible="#{providerBean.visibleTable[11]}"  sortBy="#{pro.status}">
+										<h:outputText id="statuGs" value="#{pro.status==1?msg['common.status.1']:msg['common.status.0']}" />
+										<p:tooltip for="statuGs" value="#{pro.status==1?msg['common.status.1']:msg['common.status.0']}" />
+									</p:column>
+								</p:dataTable>
+							  </div>	
+							</p:panel>
+						</div>
+					</p:outputPanel>
+				</div>
+			</p:outputPanel>
+            </div>
+		</h:form>
+
+		<h:form id="frmDialog">
+			<p:confirmDialog widgetVar="dlgDelete" global="true"
+				showEffect="fade" hideEffect="fade">
+				<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+					 styleClass="ui-confirmdialog-yes"
+					icon="ui-icon-check" />
+				<p:commandButton value="#{msg['common.confirmdialog.no']}"
+					 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+			
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true" resizable="false" closable="true"
+				height="300"
+				header="#{msg['provider.header']}">
+				<p:panelGrid id="panelProvider" columns="2">
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.code']} (*)" />
+					<p:inputText style="width:250px;" id="code"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+								 validator="#{providerBean.validate}"
+								 value="#{providerBean.providerSelected.providerCode}"
+								 maxlength="10">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.code']}" />
+						<f:validator validatorId="codeValidator" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgCode" for="code" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.name']} (*)" />
+					<p:inputText style="width:250px;" id="name" value="#{providerBean.providerSelected.providerName}"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+						maxlength="40">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.name']}" />
+						<f:validator validatorId="emtyValidator" />
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgName" for="name" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.contractno']} (*)" />
+					<p:inputText style="width:250px;" id="idNo" value="#{providerBean.providerSelected.contractNo}" maxlength="20"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}" >
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.contractno']}" />
+						<f:validator validatorId="emtyValidator"/>
+						<f:validator validatorId="spaceValidator" />
+						<f:validator validatorId="codeValidator"/>
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgID" for="idNo" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.contractdate']} (*)" />
+					<p:calendar style="width:250px;" value="#{providerBean.providerSelected.contractDate}" id="idate"
+								disabled="#{providerBean.providerSelected.status==0?true:false}"
+						showOn="button" converterMessage="#{msg['common.dialog.datemessage']}"
+						validator="#{providerBean.validate}"
+						pattern="dd/MM/yyyy" navigator="true">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.contractdate']}" />
+						<f:validator validatorId="emtyValidator"/>
+					</p:calendar>
+					<p:outputLabel/> <p:message id="msgIDate" for="idate" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.address']} (*)" />
+					<p:inputText style="width:250px;" id="iplace" value="#{providerBean.providerSelected.address}"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+						 maxlength="50">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.address']}" />
+						<f:validator validatorId="emtyValidator"/>
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgIPlace" for="iplace" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.phone']} (*)" />
+					<p:inputText style="width:250px;" id="no" value="#{providerBean.providerSelected.phone}"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+						maxlength="15">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.phone']}" />
+						<f:validator validatorId="emtyValidator"/>
+						<f:validator validatorId="numberValidator" />
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgNo" for="no" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.fax']} (*)" />
+					<p:inputText style="width:250px;" id="fax" value="#{providerBean.providerSelected.fax}"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+						maxlength="15">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.fax']}" />
+						<f:validator validatorId="emtyValidator"/>
+						<f:validator validatorId="numberValidator" />
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgIm" for="fax" />
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.contactName']}" />
+					<p:inputText style="width:250px;" id="contactName" value="#{providerBean.providerSelected.contactName}"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+								 maxlength="20">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.fax']}" />
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgContactName" for="contactName" />
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.contactNumber']}" />
+					<p:inputText style="width:250px;" id="contactNumber" value="#{providerBean.providerSelected.contactNumber}"
+								 disabled="#{providerBean.providerSelected.status==0?true:false}"
+								 maxlength="15">
+						<f:attribute name="msglabel" value="#{msg['provider.tableprovider.column.fax']}" />
+					</p:inputText>
+					<p:outputLabel/> <p:message id="msgContactNumber" for="contactNumber" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['common.status']} (*)" />
+                                        <p:selectOneMenu id="statusCbb" disabled="true" styleClass="disableText"
+						value="#{providerBean.providerSelected.status}"
+						style="width:250px">
+						<f:selectItem itemLabel="#{msg['common.status.1']}"
+							itemValue="1" />
+						<f:selectItem itemLabel="#{msg['common.status.0']}"
+							itemValue="0" />
+					</p:selectOneMenu>
+					<p:outputLabel/><p:message for="statusCbb" />
+					
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-plus"
+						action="#{providerBean.save}"
+									 disabled="#{providerBean.providerSelected.status==0?true:false}"
+						value="#{msg['common.dialog.save']}"
+						update="@([id$=tblProvider]),@([id$=panelProvider])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						
+						oncomplete="PF('dlSave').hide()"
+						>
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+			
+		</h:form>
+
+		<h:form id="frmSearch">
+			<p:dialog widgetVar="dlSearch" id="dlSearch" modal="true" resizable="false" closable="true"
+				height="300"
+				header="#{msg['provider.header']}">
+				<p:panelGrid id="panelProSearch" columns="2">
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.code']}" />
+					<p:inputText style="width:250px;" value="#{providerBean.providerSelected.providerCode}"
+								 maxlength="100">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.name']}" />
+					<p:inputText style="width:250px;" value="#{providerBean.providerSelected.providerName}"
+						maxlength="100">
+					</p:inputText>
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.contractno']}" />
+					<p:inputText style="width:250px;" value="#{providerBean.providerSelected.contractNo}" maxlength="50">
+					</p:inputText>
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.contractdate']}" />
+					<p:calendar id="nk" style="width:250px;" value="#{providerBean.providerSelected.contractDate}" showOn="button"
+						converterMessage="#{msg['common.dialog.datemessage']}"
+						pattern="dd/MM/yyyy" navigator="true">
+					</p:calendar>
+					<p:outputLabel/><p:message for="nk" />
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.address']}" />
+					<p:inputText style="width:250px;" maxlength="100" value="#{providerBean.providerSelected.address}"
+						 >
+					</p:inputText>
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.phone']}" />
+					<p:inputText style="width:250px;" maxlength="30" value="#{providerBean.providerSelected.phone}">
+					</p:inputText>
+					
+					<p:outputLabel style="font-size:12px;" value="#{msg['provider.tableprovider.column.fax']}" />
+					<p:inputText style="width:250px;" value="#{providerBean.providerSelected.fax}"
+						maxlength="30">
+					</p:inputText>
+					
+					<p:outputLabel style="font-size:12px;" value="Trạng thái" />
+					<p:selectOneMenu id="status"
+						value="#{providerBean.providerSelected.status}"
+						style="width:250px">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="Hiệu lực"
+							itemValue="1" />
+						<f:selectItem itemLabel="Hết hiệu lực"
+							itemValue="0" />
+					</p:selectOneMenu>
+					
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-search"
+						action="#{providerBean.filterSearch}"
+						value="#{msg['common.dialog.search']}"
+						update="@([id$=tblProvider]),@([id$=panelProSearch])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+						value="#{msg['common.dialog.cancel']}"
+						
+						oncomplete="PF('dlSearch').hide()"
+						>
+						<p:resetInput target=":frmSearch:dlSearch" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+		
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

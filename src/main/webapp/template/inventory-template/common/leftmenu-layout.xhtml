@@ -1,0 +1,422 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ps="http://primefaces.org/sentinel"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:tp="http://java.sun.com/jsf/composite/component">
+	<h:form id="leftform">
+		<!--<p:outputLabel style="display: none" value="#{accessController.validateActive()}"></p:outputLabel>-->
+		<!--<p:outputLabel value="#{transactionNotificationBean.init()}"></p:outputLabel>-->
+		<div class="layout-menubarinner-box">
+			<p:dialog id="genReport" widgetVar="genReport"
+				header="#{msg['inven.creat.report']}" footer="" width="auto"
+				style="height: 99%;overflow: scroll;z-index: 222222222;margin-top:50px;">
+				<p:tabView id="tabView">
+					<p:tab title="#{msg['inven.reject.good.report']}"></p:tab>
+				</p:tabView>
+
+			</p:dialog>
+		</div>
+		<div id="layout-menubar" class=" fontRegular">
+			<div class="layout-menubarinner-box" id="buttonArea">
+				<a href="#" id="layout-menubar-resize" class="BordRad3"
+					title="Menu Resize"><i class="icon-th-list-2 white"></i></a> <a
+					href="#" id="layout-menubar-resize2" class="BordRad3"
+					title="Open Menu"><i class="icon-menu white"></i></a>
+			</div>
+
+
+
+			<div class="layout-menubarinner-box">
+				<!--                <i class="icon-search floatLeft lightgray"></i>
+                                <i class="icon-menu123"></i>
+                                <input type="text" class="layout-menubar-search floatLeft Animated05" placeholder="#{msg['search']}"/>-->
+				<!-- xem kho, báo cáo hàng tồn kho -->
+				<p:dialog id="viewStock" widgetVar="viewStock" footer=""
+					width="auto"
+					style="height: 99%;overflow: scroll;z-index: 222222222;margin-top:20px;">
+					<p:growl id="viewStockmessages" showDetail="true" />
+					<p:outputPanel styleClass="dialog" id="dialog"
+						style="margin-top: 15px;">
+						<!--                        <h2 ><p:outputLabel value="#{msg['viewStock']}"></p:outputLabel></h2>-->
+						<p:panel header="#{msg['stockGoodsInfo']}"
+							styleClass="Container100">
+							<p:panelGrid styleClass="Wid100" id="pnl">
+								<p:row>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['shop']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:inputText disabled="true"
+											value="#{viewStock.shop.shopName}"></p:inputText>
+										<!--                    <p:inputText class="textbox disableText" disabled="true"></p:inputText>-->
+									</p:column>
+									<p:column>
+										<p:outputLabel value="#{msg['availableQuan']}"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText disabled="true" value="#{viewStock.inStockSum}"></p:inputText>
+									</p:column>
+									<p:column>
+										<p:outputLabel value="#{msg['blockQuan']}"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText disabled="true" value="#{viewStock.blockSum}"></p:inputText>
+									</p:column>
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:selectOneMenu styleClass="select Wid100"
+											value="#{viewStock.stockGoodsStatus}">
+											<p:ajax event="valueChange"
+												listener="#{viewStock.searchStockGood}"
+												update="@([id$=dtEtagSerial]), @([id$=dtStockGoods]), @([id$=pnl])"></p:ajax>
+											<f:selectItem itemLabel="" itemValue=""
+												noSelectionOption="true" />
+											<f:selectItems value="#{viewStock.listGoodStt}" var="c"
+												itemLabel="#{c.name}" itemValue="#{c.value}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:selectOneMenu styleClass="select Wid100"
+											value="#{viewStock.groupId}">
+											<f:selectItem itemLabel="" itemValue=""
+												noSelectionOption="true" />
+											<p:ajax event="valueChange"
+												update="@([id$=dtEtagSerial]), @([id$=dtStockGoods]), @([id$=listGoods]), @([id$=pnl])"
+												listener="#{viewStock.changeGoodsGroup}"></p:ajax>
+											<f:selectItems value="#{sessionBean.lsgGroup}" var="c"
+												itemLabel="#{c.equipmentsGroupName}"
+												itemValue="#{c.equipmentsGroupId}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['equipment.name']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:selectOneMenu styleClass="select Wid100" id="listGoods"
+											value="#{viewStock.goodsId}">
+											<f:selectItem itemLabel="" itemValue=""
+												noSelectionOption="true" />
+											<p:ajax event="valueChange"
+												listener="#{viewStock.searchStockGood}"
+												update="@([id$=dtEtagSerial]), @([id$=dtStockGoods]), @([id$=pnl])"></p:ajax>
+											<f:selectItems value="#{viewStock.lsGoods}" var="c"
+												itemLabel="#{c.profileName}" itemValue="#{c.profileId}" />
+										</p:selectOneMenu>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+							<p:outputLabel id="updateWaranty" style="display: none" value="#{imPShopExGoods.initWaranty()}"></p:outputLabel>
+							<div class="Pad5">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+									rowIndexVar="rowIndex" value="#{viewStock.lsStockGoods}"
+									paginator="true" rows="5" paginatorPosition="bottom"
+									resizableColumns="true"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									id="dtStockGoods" selection="#{viewStock.sg}"
+									rowKey="#{c.rowKey}">
+									<p:ajax event="rowSelectRadio"
+										listener="#{viewStock.viewClick}"
+										update=":leftform:dialog, :leftform:dtEtagSerial, :leftform:viewStockmessages, :leftform:updateWaranty" />
+									<f:facet name="header">
+										<p:commandButton styleClass="toggler" id="togglerdtStockGoods"
+											value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+										<p:columnToggler datasource="dtStockGoods" trigger="togglerdtStockGoods">
+											<p:ajax event="toggle" listener="#{viewStock.onToggleActiveEtag}"
+													update="@([id$=dtStockGoods])"/>
+										</p:columnToggler>
+									</f:facet>
+									<p:column visible="#{viewStock.visibleTable[0]}"
+											  styleClass="Wid5" selectionMode="single"
+										style="text-align: center">
+										<f:facet name="header">
+											<h:outputText value="#{msg['choosed']}" />
+										</f:facet>
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[1]}"
+											  styleClass="index Wid5" style="text-align: center">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[2]}"
+											  styleClass="Wid9" sortBy="#{c.equipmentsGroup}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.group']}" />
+										</f:facet>
+										<h:outputText value="#{c.equipmentsGroup}" id="equipmentsGroup"/>
+										<p:tooltip for="equipmentsGroup" value="#{c.equipmentsGroup}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[3]}"
+											  styleClass="Wid9" sortBy="#{c.profileCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.code']}" />
+										</f:facet>
+										<h:outputText value="#{c.profileCode}" id="profileCode" />
+										<p:tooltip for="profileCode" value="#{c.profileCode}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[4]}"
+											  styleClass="Wid13" sortBy="#{c.profileName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.name']}" />
+										</f:facet>
+										<h:outputText value="#{c.profileName}" id="profileName" />
+										<p:tooltip for="profileName" value="#{c.profileName}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[5]}"
+											  styleClass="Wid9" style="text-align: center" sortBy="#{c.goodsStatusName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.status']}" />
+										</f:facet>
+										<h:outputText value="#{c.goodsStatusName}" id="goodsStatusName"/>
+										<p:tooltip for="goodsStatusName" value="#{c.goodsStatusName}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[6]}"
+											  styleClass="Wid13" sortBy="#{c.availableQuantity}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['availableQuan']}" />
+										</f:facet>
+										<!--<h:outputText value="#{c.availableQuantity}" />-->
+										<h:outputText id="availableQuantity" value="#{c.availableQuantity}" />
+										<p:tooltip for="availableQuantity" value="#{c.availableQuantity}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[7]}"
+											  styleClass="Wid13" sortBy="#{c.quantityBlock}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['blockQuan']}" />
+										</f:facet>
+										<h:outputText value="#{c.quantityBlock}" id="quantityBlock"/>
+										<p:tooltip for="quantityBlock" value="#{c.quantityBlock}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[8]}"
+											  styleClass="Wid13" sortBy="#{c.errorQuantity}">
+										<f:facet name="header">
+											<h:outputText value="Thanh hủy" />
+										</f:facet>
+										<h:outputText value="#{c.errorQuantity}" id="errorQuantity" />
+										<p:tooltip for="errorQuantity" value="#{c.errorQuantity}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[9]}"
+											  styleClass="Wid13" sortBy="#{c.exStaffQuantity}">
+										<f:facet name="header">
+											<h:outputText value="Đã xuất KTV" />
+										</f:facet>
+										<h:outputText value="#{c.exStaffQuantity}" id="exStaffQuantity"/>
+										<p:tooltip for="exStaffQuantity" value="#{c.exStaffQuantity}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[10]}"
+											  styleClass="Wid13" sortBy="#{c.usedQuantity}">
+										<f:facet name="header">
+											<h:outputText value="Đã lắp đặt" />
+										</f:facet>
+										<h:outputText value="#{c.usedQuantity}" id="usedQuantity" />
+										<p:tooltip for="usedQuantity" value="#{c.usedQuantity}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[11]}"
+											  styleClass="Wid13" sortBy="#{c.warrantyQuantity}">
+										<f:facet name="header">
+											<h:outputText value="Bảo hành" />
+										</f:facet>
+										<h:outputText value="#{c.warrantyQuantity}" id="warrantyQuantity"/>
+										<p:tooltip for="warrantyQuantity" value="#{c.warrantyQuantity}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable[12]}"
+											  styleClass="Wid13" sortBy="#{c.exchangedQuantity}">
+										<f:facet name="header">
+											<h:outputText value="Đổi trả" />
+										</f:facet>
+										<h:outputText value="#{c.exchangedQuantity}"  id="exchangedQuantity"/>
+										<p:tooltip for="exchangedQuantity" value="#{c.exchangedQuantity}" />
+									</p:column>
+								</p:dataTable>
+							</div>
+							<p:panelGrid styleClass="Wid100">
+								<p:column styleClass="Wid203"></p:column>
+								<p:column style="width:79.6%">
+									<div class="Fright">
+										<p:commandButton icon="fa fa-times Fs14 white" actionListener="#{viewStock.deleteSelected}"
+											value="#{msg['Exit']}" onclick="PF('viewStock').hide();"
+											styleClass="ui-priority-primary">
+										</p:commandButton>
+									</div>
+								</p:column>
+							</p:panelGrid>
+						</p:panel>
+						<div class="EmptyBox10"></div>
+						<p:panel header="#{msg['transSerialInfo']}"
+							styleClass="Container100">
+							<p:panelGrid styleClass="Wid100">
+								<p:row>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['equipment.code']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:inputText disabled="true" styleClass="Wid100"
+											value="#{viewStock.sg.profileCode}"></p:inputText>
+									</p:column>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['equipment.name']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:inputText disabled="true" styleClass="Wid100"
+											value="#{viewStock.sg.profileName}"></p:inputText>
+									</p:column>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['stockStatus']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:selectOneMenu styleClass="Wid100"
+											value="#{viewStock.stockStatus}">
+											<f:selectItem itemLabel="" itemValue=""
+												noSelectionOption="true" />
+											<f:selectItems value="#{viewStock.listStatus}" var="c"
+												itemLabel="#{c.name}" itemValue="#{c.value}" />
+										</p:selectOneMenu>
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column styleClass="Wid13">
+										<p:outputLabel value="#{msg['provider']}"></p:outputLabel>
+									</p:column>
+									<p:column styleClass="Wid203">
+										<p:selectOneMenu styleClass="Wid100"
+											value="#{viewStock.providerId}">
+											<f:selectItem itemLabel="" itemValue=""
+												noSelectionOption="true" />
+											<f:selectItems value="#{sessionBean.lsProvider}" var="c"
+												itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+										</p:selectOneMenu>
+									</p:column>
+									<p:column>
+										<p:outputLabel value="#{msg['serial']}"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText styleClass="Wid100"
+											onkeypress="if (event.keyCode == 13) { return false; }"
+											value="#{viewStock.fromSerial}"></p:inputText>
+									</p:column>
+									<p:column colspan="4">
+										<p:commandButton icon="fa fa-search Fs14 white"
+											style="float: right" value="#{msg['search']}"
+											update=":leftform:dtEtagSerial,:leftform:viewStockmessages"
+											actionListener="#{viewStock.search}" id="search_"></p:commandButton>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+							<div class="Pad5">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+									disabledTextSelection="false" rowIndexVar="rowIndex"
+									value="#{viewStock.lsData}" disabledSelection="false"
+									paginator="true" rows="10" paginatorPosition="bottom"
+									resizableColumns="true"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									id="dtEtagSerial" lazy="true">
+									<f:facet name="header">
+										<p:commandButton styleClass="toggler" id="togglerdtEtagSerial"
+											value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+										<!--<p:columnToggler datasource="dtEtagSerial"-->
+											<!--trigger="togglerdtEtagSerial" />-->
+										<p:columnToggler datasource="dtEtagSerial" trigger="togglerdtEtagSerial">
+											<p:ajax event="toggle" listener="#{viewStock.onToggleActiveEtag2}"
+													update="@([id$=dtEtagSerial])"/>
+										</p:columnToggler>
+									</f:facet>
+									<p:column visible="#{viewStock.visibleTable2[0]}"
+											  styleClass="index">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[1]}"
+											  sortBy="#{c.serial}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['serial']}" />
+										</f:facet>
+										<h:outputText  value="#{c.serial}" id="serialGr" />
+										<p:tooltip for="serialGr" value="#{c.serial}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[2]}"
+											  sortBy="#{c.stockStatus}">
+										<f:facet name="header">
+											<h:outputText value="Trạng thái kho" />
+										</f:facet>
+										<h:outputText value="#{sessionBean.getStockStatusName(c.stockStatus)}" id="stockStatusGr" />
+										<p:tooltip for="stockStatusGr" value="#{sessionBean.getStockStatusName(c.stockStatus)}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[3]}"
+											  sortBy="#{c.warrantyStatus}">
+										<f:facet name="header">
+											<h:outputText value="Trạng thái bảo hành" />
+										</f:facet>
+										<h:outputText id="getWarranStatus"
+											value="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+										<p:tooltip for="getWarranStatus" value="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[4]}"
+											  sortBy="#{c.warantyExpiredDate}">
+										<f:facet name="header">
+											<h:outputText value="Hết hạn bảo hành" />
+										</f:facet>
+										<h:outputText id="getWarranExpriDate"
+											value="#{imPShopExGoods.getWarranExpriDate(c.equipmentProfileId, c.serial)}" />
+										<p:tooltip for="getWarranExpriDate" value="#{imPShopExGoods.getWarranExpriDate(c.equipmentProfileId, c.serial)}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[5]}"
+											  sortBy="#{c.reasonsWarranty}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.warrantyReason']}" />
+										</f:facet>
+										<h:outputText value="#{imPShopExGoods.getWarrantyReason(c.equipmentProfileId, c.serial)}" id="getWarrantyReason"/>
+										<p:tooltip for="getWarrantyReason" value="#{imPShopExGoods.getWarrantyReason(c.equipmentProfileId, c.serial)}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[6]}"
+											  sortBy="#{c.providerName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.provider']}" />
+										</f:facet>
+										<h:outputText id="getProviderName"
+											value="#{c.providerName}" />
+										<p:tooltip for="getProviderName" value="#{c.providerName}" />
+									</p:column>
+									<p:column visible="#{viewStock.visibleTable2[7]}"
+											  sortBy="#{c.origin}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.origin']}" />
+										</f:facet>
+										<h:outputText value="#{sessionBean.getOrigin(c.origin)}" id="getOrigin" />
+										<p:tooltip for="getOrigin" value="#{sessionBean.getOrigin(c.origin)}" />
+									</p:column>
+								</p:dataTable>
+							</div>
+						</p:panel>
+					</p:outputPanel>
+				</p:dialog>
+			</div>
+			<ps:menu id="sm_leftmenu" model="#{languageBean.model}">
+				<!--                <p:menuitem id="sm_dashboard" value="Dashboard" icon="icon-home-outline white" url="/"  containerStyleClass="layout-menubar-active"/>
+
+                -->
+			</ps:menu>
+
+		</div>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</h:form>
+</ui:composition>

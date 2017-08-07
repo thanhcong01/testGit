@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchTrans']}</title>
+			<!--            <h2 ><p:outputLabel value="#{msg['searchTrans']}"></p:outputLabel></h2>-->
+
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="EmptyBox10"></div>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['detailInfo']}">
+					<p:panelGrid>
+						<p:row>
+							<p:column styleClass="Wid9">
+								<p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:inputText styleClass="Wid100 disableText"
+									value="#{searchTransaction.trans.transactionActionCode}"
+									disabled="true"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['equipment.group']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:inputText styleClass="Wid100 disableText"
+									value="#{sessionBean.getGoodsGroupNameByGoods(searchTransaction.transDetail.goodsId.toString())}"
+									disabled="true"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid9">
+								<p:outputLabel value="#{msg['equipment.code']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{sessionBean.getEquipProfileCode(searchTransaction.transDetail.goodsId.toString())}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid9">
+								<p:outputLabel value="#{msg['equipment.name']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{sessionBean.getEquipProfileName(searchTransaction.transDetail.goodsId.toString())}"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:outputLabel value="#{msg['quantity']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid7">
+								<p:inputText styleClass="Wid100 disableText" disabled="true"
+									value="#{searchTransaction.transDetail.quantity}"></p:inputText>
+							</p:column>
+						</p:row>
+						<!-- <p:row>
+                            <p:column styleClass="Wid13"><p:outputLabel value="#{msg['orderCode']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{searchTransaction.trans.transactionActionCode}" >
+                                </p:inputText></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel value="#{msg['provider']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{sessionBean.getProviderName(searchTransaction.transDetail.providerId.toString())}" >
+                                </p:inputText></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{sessionBean.getGoodsGroupNameByGoods(searchTransaction.transDetail.goodsId.toString())}" >
+                                </p:inputText></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column> <p:outputLabel value="#{msg['goods']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{sessionBean.getEquipProfileName(searchTransaction.transDetail.goodsId.toString())}" >
+                                </p:inputText></p:column>
+                            <p:column><p:outputLabel value="#{msg['profileCode']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{sessionBean.getEquipProfileCode(searchTransaction.transDetail.goodsId.toString())}" >
+                                </p:inputText></p:column>
+                            <p:column><p:outputLabel value="#{msg['quantity']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{searchTransaction.transDetail.quantity}" >
+                                </p:inputText></p:column>
+                        </p:row> -->
+					</p:panelGrid>
+
+				</p:panel>
+				<p:panel header="#{msg['transSerialInfo']}">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid9">
+								<p:outputLabel value="#{msg['serial']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid35">
+								<p:inputText styleClass="Wid100"
+									value="#{searchTransaction.fromSerial}"
+									onkeypress="if (event.keyCode == 13) { return false; }"></p:inputText>
+							</p:column>
+							<p:column styleClass="Wid15">
+								<p:outputLabel value="#{msg['equipment.status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid20">
+								<p:selectOneMenu styleClass="Wid100 select disableText"
+									value="#{searchTransaction.goodsStatus}">
+									<f:selectItem itemLabel="" itemValue=""></f:selectItem>
+									<f:selectItems value="#{searchTransaction.listGoodsStatus}"
+										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+								<!-- <p:selectOneMenu styleClass="Wid100 select disableText"
+									value="#{exPShopApprove.goodStatus}" >
+									<f:selectItems value="#{sessionBean.listStatus}" var="c"
+										itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu> -->
+							</p:column>
+
+							<p:column>
+								<p:commandButton icon="fa fa-search Fs14 white"
+									value="#{msg['search']}" style="float: right" update="frm"
+									actionListener="#{searchTransaction.searchSerial}">
+								</p:commandButton>
+							</p:column>
+						</p:row>
+						<!-- <p:row>
+                            <p:column styleClass="Wid13"> 
+                                <p:outputLabel value="#{msg['fromSerial']}"></p:outputLabel>
+
+                            </p:column>
+                            <p:column styleClass="Wid203"> 
+                                <p:inputText styleClass="Wid100" value="#{searchTransaction.fromSerial}" onkeypress="if (event.keyCode == 13) { return false; }" validatorMessage="#{msg['fromSerialReq']}" >
+                                </p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13"> 
+                                <p:outputLabel value="#{msg['toSerial']}"></p:outputLabel>     
+                            </p:column>
+                            <p:column styleClass="Wid203"> 
+                                <p:inputText styleClass="Wid100" value="#{searchTransaction.toSerial}"  >
+                                </p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13">                   
+                                <p:outputLabel value="#{msg['status']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203"> 
+                                <p:selectOneMenu styleClass="select Wid100" value="#{searchTransaction.goodsStatus}"  ><f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{searchTransaction.listGoodsStatus}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="5"></p:column>
+                            <p:column><p:commandButton icon="fa fa-search Fs14 white" value="#{msg['search']}" style="float: right" update="frm" actionListener ="#{searchTransaction.searchSerial}"></p:commandButton></p:column>
+                        </p:row> -->
+					</p:panelGrid>
+					<p:panel>
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+							rowIndexVar="rowIndex" value="#{searchTransaction.lsData}"
+							paginator="true" rows="5" paginatorPosition="bottom"
+							resizableColumns="true"
+							paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+							id="dtResult" lazy="false">
+							<f:facet name="header">
+								<span class="dtHead" style="">#{msg['searchResult']}</span>
+								<p:commandButton styleClass="toggler" id="togglerdtResult"
+									value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+								<!--<p:columnToggler datasource="dtResult" trigger="togglerdtResult" />-->
+								<p:columnToggler datasource="dtResult" trigger="togglerdtResult">
+									<p:ajax event="toggle" listener="#{searchTransaction.onToggleActiveEtag3}"
+											update="@([id$=dtResult])"/>
+								</p:columnToggler>
+							</f:facet>
+							<p:column visible="#{searchTransaction.visibleTable3[0]}"
+									  styleClass="index">
+							<f:facet name="header">
+								<h:outputText value="#{msg['index']}" />
+							</f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column visible="#{searchTransaction.visibleTable3[1]}"
+								  sortBy="#{c.serial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['serial']}" />
+							</f:facet>
+							<h:outputText id="serial" value="#{c.serial}" />
+							<p:tooltip for="serial" value="#{c.serial}" />
+						</p:column>
+						<p:column visible="#{searchTransaction.visibleTable3[2]}"
+								  sortBy="1">
+							<f:facet name="header">
+								<h:outputText value="#{msg['quantity']}" />
+							</f:facet>
+							<h:outputText id="quantity" value="1" />
+							<p:tooltip for="quantity" value="1" />
+						</p:column>
+						
+						<p:column visible="#{searchTransaction.visibleTable3[3]}"
+								  sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="Trạng thái hàng" />
+							</f:facet>
+							<h:outputText id="getEquipsStatusName"
+								value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+							<p:tooltip for="quantity" value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+						</p:column>
+						<p:column visible="#{searchTransaction.visibleTable2[6]}"
+								  styleClass="Wid203" sortBy="#{c.reason}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['reason.waranty']}" />
+							</f:facet>
+							<h:outputText id="reason" value="#{c.reason}" />
+							<p:tooltip for="reason" value="#{c.reason}" />
+						</p:column>
+						</p:dataTable>
+						<p:panelGrid>
+						<p:column styleClass="Wid203"></p:column>
+						<p:column style="width:79.6%">
+							<div class="Fright">
+								<p:commandButton icon="fa fa-times Fs14 white"
+									value="#{msg['Exit']}" action="search-transaction"></p:commandButton>
+							</div>
+						</p:column>
+					</p:panelGrid>
+					</p:panel>
+				</p:panel>
+			</div>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

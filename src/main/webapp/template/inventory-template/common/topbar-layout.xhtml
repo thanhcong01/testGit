@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="top-layout">
+		<div id="layout-header" class="Unselectable fontRegular">
+			<p:outputLabel value="#{transactionNotificationBean.init()}"></p:outputLabel>
+			<a href="index.xhtml" id="layout-logo"> <h:graphicImage
+					name="images/logo2.png" styleClass="Fleft"
+					library="sentinel-layout" /> <span style="font-style: italic;"
+				class="Fs22 Fleft LHei60p"> - HỆ THỐNG THU PHÍ KHÔNG DỪNG</span>
+			</a>
+			<ul id="sm-topmenu" class="layout-header-widgets white Fs14 ">
+
+				<span class="Fs14 FontTitilliumSemiBoldItalic Fleft MarLef5 MarBot5">
+					<span class="softblue">#{msgs['page.control.text.language']}
+
+						<h:selectOneMenu styleClass="languageSelect"
+							value="#{languageBean.localeCode}" onchange="submit()"
+							valueChangeListener="#{languageBean.countryLocaleCodeChanged}">
+							<f:selectItems value="#{languageBean.countriesInMap}" />
+						</h:selectOneMenu> <f:view locale="#{languageBean.locale}"></f:view>
+				</span>
+				</span>
+				<li class="Fleft BordRadHalf TexAlCenter"><i
+					class="white icon-bell-alt"></i> <p:outputLabel
+						style="position: relative;bottom: 30px;left: 10px;font-weight: 900 !important;color: red"
+						value="#{transactionNotificationBean.total}"></p:outputLabel>
+					<ul style="width: 180px; padding: 0px"
+						class="dtlistNotification layout-header-widgets-submenu BordRad5 shadows white Animated05">
+						<li class="Animated05"><p:dataList emptyMessage=""
+								value="#{transactionNotificationBean.listNotification}" var="c"
+								type="ordered">
+								<p:commandLink
+									action="#{transactionNotificationBean.action(c.url,c.transactionType)}"
+									value="#{c.count!=null?c.count.toString():''} #{c.name}"></p:commandLink>
+							</p:dataList></li>
+					</ul></li>
+				<li class="Fleft BordRadHalf TexAlCenter"><i
+					class="white icon-user-male"></i>
+					<ul
+						class="layout-header-widgets-submenu BordRad5 shadows white Animated05">
+						<li class="Animated05"><a class="white Unselectable"><i
+								class="icon-user-male Fs26 OvHidden"></i><span class="Fs18"><p:outputLabel
+										value="#{sessionBean.staff.staffName}"></p:outputLabel><br />
+									<span class="Fs10"><p:outputLabel
+											value="#{sessionBean.shop.shopName}"></p:outputLabel></span></span></a></li>
+					</ul></li>
+
+				<li class="Fleft BordRadHalf TexAlCenter"><i
+					class="white icon-power"></i>
+					<ul
+						class="layout-header-widgets-submenu BordRad5 shadows white Animated05">
+
+						<li class="Animated05"><p:commandLink id="btnLogout"
+								value="#{msg['logOut']}" action="#{accessController.logout()}"
+								styleClass="white Unselectable">
+								<i class="icon-logout"></i>
+							</p:commandLink></li>
+						<li class="Animated05"><p:commandLink
+								update=":frmChangePwd:dlg" styleClass="whiteI Unselectable"
+								process="@this" oncomplete="PF('dlgChangePassword').show();">
+								#{msg['page.caption.topbar-admin.label.change_password']}
+								<p:resetInput target=":frmChangePwd:dlg" />
+							</p:commandLink></li>
+					</ul></li>
+			</ul>
+
+			<!-- NEVER REMOVE FOLLOWING 'UL' TAG ! BECAUSE THIS CONTAINS RESPONSIVE MODE HEADER MENU OPEN-CLOSE BUTTON -->
+			<ul id="sm-mobiletopmenu" class="layout-header-widgets white Fs14">
+				<li
+					class="Fleft BordRadHalf TexAlCenter Animated05 DisplayOnResponsive"><i
+					class="icon-th-1"></i></li>
+			</ul>
+			<!-- ****** -->
+
+		</div>
+	</h:form>
+
+
+	<ui:include src="change-password.xhtml"></ui:include>
+</ui:composition>

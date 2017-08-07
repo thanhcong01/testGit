@@ -1,0 +1,191 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frm">
+            <title>#{msg['viewSerial']}</title>
+
+            <div class="EmptyBox10"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <div class="EmptyBox10"></div>
+            <div class="Pad10">
+                <p:panel header="#{msg['serialInfo']}">
+                    <p:panelGrid>
+                        <p:row>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['serial']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{searchEtag.etag.serial}" ></p:inputText></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['shop']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText disabled="true"  styleClass="Wid100 disableText" value="#{searchEtag.etag.shopName}" ></p:inputText></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['goods']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText disabled="true"  styleClass="Wid100 disableText" value="#{searchEtag.etag.profileName}" ></p:inputText></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column><p:outputLabel  value="#{msg['provider']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText disabled="true" styleClass="Wid100 disableText" value="#{sessionBean.getProviderName(searchEtag.etag.providerId.toString())}" ></p:inputText></p:column>
+                            <p:column><p:outputLabel  value="#{msg['status']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText disabled="true"  styleClass="Wid100 disableText" value="#{searchEtag.etag.statusName}" ></p:inputText></p:column>
+                            <p:column><p:outputLabel  value="#{msg['stockStatus']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText disabled="true"  styleClass="Wid100 disableText" value="#{sessionBean.getStockStatusName(searchEtag.etag.stockStatus)}" ></p:inputText></p:column>
+                        </p:row>
+                        <p:row>
+                        <p:column><p:outputLabel  value="Etag number"></p:outputLabel></p:column>
+                        <p:column><p:inputText disabled="true"  styleClass="Wid100 disableText" value="#{searchEtag.etag.etagNumber}" ></p:inputText></p:column>
+                        </p:row>
+                        <!--                    <p:outputLabel  value="itc"></p:outputLabel>
+                                            <p:inputText disabled="true"  styleClass="textbox disableText" value="#{searchEtag.etadDetail.itc}" ></p:inputText>
+                                            <p:outputLabel  value="pid"></p:outputLabel>
+                                            <p:inputText disabled="true"  styleClass="textbox disableText" value="#{searchEtag.etadDetail.pid}" ></p:inputText>-->
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel >
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{searchEtag.listTrans}" paginator="true" rows="10" paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtTrans" lazy="false">
+                        <f:facet  name="header">
+                            <span class="dtHead"  style="">#{msg['transHis']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtTrans"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="dtTrans" trigger="togglerdtTrans" />
+                        </f:facet>
+                        <p:column styleClass="index">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column sortBy="#{c.transactionActionCode}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['orderCode']}" />
+                            </f:facet>
+                            <h:outputText id="transactionActionCode" value="#{c.transactionActionCode}" />
+                            <p:tooltip for="transactionActionCode" value="#{c.transactionActionCode}" />
+                        </p:column>
+                        <p:column sortBy="#{c.typeName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['orderType']}" />
+                            </f:facet>
+                            <h:outputText id="typeName" value="#{c.typeName}" />
+                            <p:tooltip for="typeName" value="#{c.typeName}" />
+                        </p:column>
+                        <p:column sortBy="#{c.reasonName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['reason']}" />
+                            </f:facet>
+                            <h:outputText id="reasonName" value="#{c.reasonName}" />
+                            <p:tooltip for="reasonName" value="#{c.reasonName}" />
+                        </p:column>
+                        <p:column sortBy="#{c.shopName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['fromShop']}" />
+                            </f:facet>
+                            <h:outputText id="shopNameG" value="#{c.shopName}" />
+                            <p:tooltip for="shopNameG" value="#{c.shopName}" />
+                        </p:column>
+                        <p:column sortBy="#{c.toShop}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['toShop']}" />
+                            </f:facet>
+                            <h:outputText id="toShop" value="#{c.toShop}" />
+                            <p:tooltip for="toShop" value="#{c.toShop}" />
+                        </p:column>
+                        <p:column sortBy="#{c.statusName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['status']}" />
+                            </f:facet>
+                            <h:outputText id="statusName" value="#{c.statusName}" />
+                            <p:tooltip for="statusName" value="#{c.statusName}" />
+                        </p:column>
+                        <p:column sortBy="#{c.createDateString}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['createDate']}" />
+                            </f:facet>
+                            <h:outputText id="createDateString" value="#{c.createDateString}" />
+                            <p:tooltip for="createDateString" value="#{c.createDateString}" />
+                        </p:column>
+                        <p:column sortBy="#{c.description}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['note']}" />
+                            </f:facet>
+                            <h:outputText id="description" value="#{c.description}" >
+                            </h:outputText>
+                            <p:tooltip for="description" value="#{c.description}" />
+                        </p:column>
+                    </p:dataTable>  
+                </p:panel>
+                <p:panel >
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{searchEtag.listStatusTrans}" paginator="true" rows="10" paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtTransStatus" lazy="false">
+                        <f:facet  name="header">
+                            <span class="dtHead"  style="">#{msg['evaluateHis']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtTransStatus"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="dtTransStatus" trigger="togglerdtTransStatus" />
+                        </f:facet>
+                        <p:column styleClass="index">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsTrans.shopName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['shop']}" />
+                            </f:facet>
+                            <h:outputText id="shopName" value="#{c.goodsTrans.shopName}" />
+                            <p:tooltip for="shopName" value="#{c.goodsTrans.shopName}" />
+                        </p:column>
+                        <p:column sortBy="#{c.oldStatus}" >
+
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['oldStatus']}" />
+                            </f:facet>
+                            <h:outputText id="oldStatus" value="#{c.oldStatus}" />
+                            <p:tooltip for="shopName" value="#{c.oldStatus}" />
+                        </p:column>
+                        <p:column sortBy="#{c.newStatus}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['statusChange']}" />
+                            </f:facet>
+                            <h:outputText id="newStatus" value="#{c.newStatus}" />
+                            <p:tooltip for="newStatus" value="#{c.newStatus}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsTrans.transDate}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['transDate']}" />
+                            </f:facet>
+                            <h:outputText id="transDate" value="#{c.goodsTrans.transDate}" />
+                            <p:tooltip for="transDate" value="#{c.goodsTrans.transDate}" />
+                        </p:column>
+                        
+                        <p:column sortBy="#{c.goodsTrans.reason}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['reason']}" />
+                            </f:facet>
+                            <h:outputText id="reason" value="#{c.goodsTrans.reason}" />
+                            <p:tooltip for="reason" value="#{c.goodsTrans.reason}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsTrans.note}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['note']}" />
+                            </f:facet>
+                            <h:outputText id="note" value="#{c.goodsTrans.note}" />
+                            <p:tooltip for="note" value="#{c.goodsTrans.note}" />
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+                <p:panelGrid>
+                    <p:column styleClass="Wid203"></p:column>
+                    <p:column style="width:79.6%">
+                        <div class="Fright">
+                            <p:commandButton value="#{msg['print']}"></p:commandButton>
+                            <p:commandButton value="#{msg['Exit']}" action="search-etag" styleClass="ui-priority-primary" >
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:panelGrid>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

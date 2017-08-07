@@ -1,0 +1,638 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/template-invoice.xhtml"
+	xmlns:compositeComponent="http://java.sun.com/jsf/composite/compositeComponent">
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="EI.M.CREATE" />
+
+		<p:growl id="growl" showDetail="true" sticky="false" life="3000" />
+		<p:focus context="frmSearch" />
+		<compositeComponent:accessLog />
+		<!-- <BreadCumb> -->
+		<div class="EmptyBox5"></div>
+		<h:form id="frmBreadcrumb">
+			<compositeComponent:breadcrumb />
+		</h:form>
+		<!-- <Content> -->
+		<p:outputPanel styleClass="Container100 Pad5">
+			<!-- <WrapButtonBar> -->
+			<!-- Toolbar -->
+			<p:outputPanel styleClass="Container100">
+			</p:outputPanel>
+			<div class="EmptyBox5"></div>
+			<!-- </WrapButtonBar> -->
+			<!-- <WrapTableContent> -->
+			<div class="Container100">
+
+				<!-- <TableContent> -->
+				<p:outputPanel id="opnlContent" styleClass="Wid100">
+					<h:form id="frmSearch">
+						<p:panel toggleable="true"
+							header="#{msgs['invoice.panel.title.search.info']}"
+							styleClass="Container100">
+							<!-- <p:fieldset legend="#{msgs['invoice.panel.title.search.info']}" toggleable="true">
+							<p:ajax event="toggle" listener="#{fieldsetView.handleToggle}" /> -->
+
+							<table class="Wid100">
+								<tr>
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.service-type.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.serviceType}"
+											id="serviceType">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.servicetype']}"
+												noSelectionOption="true"></f:selectItem>
+											<f:selectItems
+												value="#{invoiceCreateController.lstServiceType}" var="item"
+												itemValue="#{item.value}" itemLabel="#{item.name}" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.cycle_type.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.cycleType}"
+											id="cycleType">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.cycletype']}"
+												noSelectionOption="true"></f:selectItem>
+											<f:selectItems
+												value="#{invoiceCreateController.lstCycleType}" var="item"
+												itemValue="#{item.value}" itemLabel="#{item.name}" />
+											<p:ajax update="@this,@([id$=transType])" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.toll_in.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.tollInId}"
+											id="tollIn" filter="true" filterMatchMode="contains">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.tollin']}"
+												itemValue="#{null}"></f:selectItem>
+											<f:selectItems value="#{invoiceCreateController.lstToll}"
+												var="item" itemValue="#{item.tollId}"
+												itemLabel="#{item.tollName}" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.toll_out.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu id="tollOut"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.tollOutId}"
+											filter="true" filterMatchMode="contains">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.tollout']}"
+												itemValue="#{null}" />
+											<f:selectItems value="#{invoiceCreateController.lstToll}"
+												var="item" itemValue="#{item.tollId}"
+												itemLabel="#{item.tollName}" />
+										</p:selectOneMenu></td>
+
+								</tr>
+								<tr>
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.contract-status.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu id="invStatus"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.invStatus}">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.invstatus']}"
+												itemValue="#{null}" />
+											<f:selectItems
+												value="#{invoiceCreateController.lstInvStatus}" var="item"
+												itemValue="#{item.value}" itemLabel="#{item.name}" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.from-date.title']}" /></td>
+									<td class="Wid15"><p:calendar
+											value="#{invoiceCreateController.iSearchEntity.fromDate}"
+											id="fromDate" style="width: 152px" readonlyInput="false"
+											showOn="button" pattern="dd/MM/yyyy HH:mm:ss">
+											<p:ajax event="dateSelect" update="@([id$=fromDate])" />
+										</p:calendar></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.to-date.title']}" /></td>
+									<td class="Wid15"><p:calendar
+											value="#{invoiceCreateController.iSearchEntity.toDate}"
+											id="toDate" style="width: 152px" readonlyInput="false"
+											showOn="button" pattern="dd/MM/yyyy HH:mm:ss">
+											<p:ajax event="dateSelect" update="@([id$=toDate])" />
+										</p:calendar></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.transaction-code.title']}" /></td>
+									<td class="Wid15"><p:inputText id="transactionCode"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.transCode}">
+										</p:inputText></td>
+
+								</tr>
+
+								<tr>
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.transaction-type.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu id="transType"
+											disabled="#{(item.cycleType == '2') || (item.cycleType == '3')}"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.transType}">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.trantype']}"
+												itemValue="#{null}" />
+											<f:selectItems
+												value="#{invoiceCreateController.lstTransType}" var="item"
+												itemValue="#{item.value}" itemLabel="#{item.name}" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.contract-template.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu id="contractTemplate"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.templateCode}">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.templatecode']}"
+												itemValue="#{null}" />
+											<f:selectItems
+												value="#{invoiceCreateController.lstInvTemplate}" var="item"
+												itemValue="#{item.value}" itemLabel="#{item.name}" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.contract-symbol.title']}" /></td>
+									<td class="Wid15"><p:selectOneMenu id="contractSymbol"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.invSeries}">
+											<f:selectItem
+												itemLabel="#{msgs['invoice.field.label.invseries']}"
+												itemValue="#{null}" />
+											<f:selectItems
+												value="#{invoiceCreateController.lstInvSeries}" var="item"
+												itemValue="#{item.value}" itemLabel="#{item.name}" />
+										</p:selectOneMenu></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.acount-code.title']}" /></td>
+									<td class="Wid15"><p:inputText id="acountCode"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.buyerCode}">
+										</p:inputText></td>
+								</tr>
+								<tr>
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.from-contract-no.title']}" /></td>
+									<td class="Wid15"><p:inputText id="fromContractNo"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.fromInvNumber}">
+										</p:inputText></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.to-contract-no.title']}" /></td>
+									<td class="Wid15"><p:inputText id="toContractNo"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.toInvNumber}">
+										</p:inputText></td>
+
+									<td class="Wid10"><h:outputLabel
+											value="#{msgs['invoice-exchange-print.label.identity-card.title']}" /></td>
+									<td class="Wid15"><p:inputText id="identityCard"
+											style="width: 152px"
+											value="#{invoiceCreateController.iSearchEntity.buyerIdentityCard}">
+										</p:inputText></td>
+
+									<td class="Wid10"></td>
+									<td class="Wid15 Fright"></td>
+								</tr>
+
+							</table>
+							<div class="Fright Pad5">
+								<p:commandButton id="btnSearch"
+									value="#{msgs['invoice.button.search']}"
+									title="#{msgs['invoice.button.search']}"
+									onclick="PF('dlgProcessVar').show();"
+									oncomplete="PF('dlgProcessVar').hide();"
+									actionListener="#{invoiceCreateController.search()}"
+									update="@([id$=frmSearch]),@([id$=opnlTransactionDetail])" />
+							</div>
+							<!-- </p:fieldset> -->
+						</p:panel>
+					</h:form>
+					<h:form id="frmContent">
+						<div class="EmptyBox10"></div>
+						<!-- <p:fieldset legend="#{msgs['invoice.table.paneldetail.title']}" toggleable="true">
+							<p:ajax event="toggle" listener="#{fieldsetView.handleToggle}" /> -->
+						<p:outputPanel id="opnlTransactionDetail"
+							styleClass="Wid100 tableSize fullHeight">
+							<h:outputScript name="min-fullheight.js" library="js" />
+							<h:outputScript name="width3.js" library="js" />
+							<p:dataTable styleClass="invoice_table"
+								value="#{invoiceCreateController.lstInvTransSummary}" var="row"
+								id="tblTransactionDetail" widgetVar="tblTransactionDetailVar"
+								resizableColumns="true" rowKey="#{row.tsId}" scrollable="true"
+								scrollHeight="400"
+								selection="#{invoiceCreateController.lstInvTransSummarySelected}"
+								emptyMessage="#{msgs['common.data.empty']}"
+								disabledSelection="#{(row.invStatus == '5') ||(row.invStatus == '3') ||(row.invStatus == '2')}"
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								rowsPerPageTemplate="15,50,100,150,300,500,1000,2000"
+								currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+								lazy="true" rows="100" paginator="true"
+								paginatorPosition="bottom">
+								<p:ajax event="rowSelect"
+									listener="#{invoiceCreateController.onRowSelect}" />
+								<p:ajax event="rowUnselect"
+									listener="#{invoiceCreateController.onRowUnselect}" />
+								<p:ajax event="rowSelectCheckbox"
+									listener="#{invoiceCreateController.onRowSelect}" />
+								<p:ajax event="rowUnselectCheckbox"
+									listener="#{invoiceCreateController.onRowUnselect}" />
+								<f:facet name="header"> 
+									#{msgs['invoice.table.paneltrans.title']}
+        							<p:commandButton id="toggler" type="button"
+										value="#{msgs['invoice.table.toggle.hidecolumn']}"
+										style="float:right" icon="ui-icon-calculator" />
+									<p:columnToggler datasource="tblTransactionDetail"
+										trigger="toggler">
+										<p:ajax event="toggle"
+											listener="#{invoiceCreateController.lstInvTransSummary.onToggle}" />
+									</p:columnToggler>
+									<br />
+								</f:facet>
+
+								<p:column selectionMode="multiple" styleClass="Wid30p" />
+
+								<p:column headerText="STT" styleClass="Wid50p"
+									style="text-align:right;">
+									#{invoiceCreateController.lstInvTransSummary.rowIndexAsc}
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid100p"
+									headerText="ID" style="text-align:right;">
+									<h:outputText id="tsId" value="#{row.tsId}" title="#{row.tsId}" />
+									<p:tooltip for="tsId" value="#{row.tsId}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.transaction-code.title']}">
+									<!-- <h:outputText value="#{row.transCode}"
+											title="#{row.transCode}" /> -->
+									<!-- 									<p:commandLink
+										value="#{(row.transCode == null) ? msgs['invoice.table.summarydetail.lable'] : row.transCode}"
+										title="#{msgs['invoice.button.detail']}"
+										actionListener="#{invoiceCreateController.goDetail(row)}"
+										style="text-decoration: underline;">
+										<f:setPropertyActionListener value="#{row}"
+											target="#{sessionController.currentInvTransSummary}" />
+									</p:commandLink> -->
+
+									<p:commandLink
+										value="#{(row.transCode == null) ? msgs['invoice.table.summarydetail.lable'] : row.transCode}"
+										title="#{msgs['invoice.button.detail']}"
+										actionListener="#{invoiceDetailController.showDetailDialog()}"
+										style="text-decoration: underline;">
+										<f:setPropertyActionListener value="#{row}"
+											target="#{sessionController.currentInvTransSummary}" />
+									</p:commandLink>
+								</p:column>
+
+
+								<p:column resizable="true" style="width:130px;"
+									headerText="#{msgs['invoice.table.column.issuedate.title']}">
+									<h:outputText value="#{row.issueDate}" title="#{row.issueDate}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"
+											timeZone="GMT+7" type="date" />
+									</h:outputText>
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.transaction-type.title']}">
+									<h:outputText
+										value="#{(row.cycleType == '1') ? row.transTypeName : msgs['invoice.table.summary.lable']}"
+										title="#{(row.cycleType == '1') ? row.transTypeName : msgs['invoice.table.summary.lable']}" />
+								</p:column>
+
+
+								<p:column resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.toll_in.title']}">
+									<h:outputText value="#{row.tollInName}"
+										title="#{row.tollInName}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.toll_out.title']}">
+									<h:outputText value="#{row.tollOutName}"
+										title="#{row.tollOutName}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.account-code.title']}">
+									<h:outputText value="#{row.buyerCode}" title="#{row.buyerCode}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.customer-name.title']}">
+									<h:outputText value="#{row.buyerName}" title="#{row.buyerName}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.table.tran-detail.column.tax-code.title']}">
+									<h:outputText value="#{row.buyerTaxCode}"
+										title="#{row.buyerTaxCode}" />
+								</p:column>
+
+
+
+								<!-- 								<p:column hide="1" resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.valueaddedtax.title']}">
+									<h:outputText value="#{row.valueAddedTax}"
+										title="#{row.valueAddedTax}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column> -->
+
+								<p:column resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.trans-amount-without-vat.title']}">
+									<h:outputText value="#{row.transAmountWthvat}"
+										title="#{row.transAmountWthvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.trans-amount.title']}">
+									<h:outputText value="#{row.transAmountWvat}"
+										title="#{row.transAmountWvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column>
+
+
+								<!-- 								<p:column hide="1" resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.discount-amount-without-vat.title']}">
+									<h:outputText value="#{row.discountAmountWthvat}"
+										title="#{row.discountAmountWthvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column> -->
+
+								<p:column hide="1" resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.discount-amount.title']}">
+									<h:outputText value="#{row.discountAmountWvat}"
+										title="#{row.discountAmountWvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column>
+
+
+								<!-- 								<p:column hide="1" resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.promotion-amount-without-vat.title']}">
+									<h:outputText value="#{row.promotionAmountWthvat}"
+										title="#{row.promotionAmountWthvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column> -->
+
+								<p:column hide="1" resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.promotion-amount.title']}">
+									<h:outputText value="#{row.promotionAmountWvat}"
+										title="#{row.promotionAmountWvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column>
+
+
+								<p:column hide="1" resizable="true" styleClass="Wid100p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.total-without-vat.title']}">
+									<h:outputText value="#{row.totalAmountWthvat}"
+										title="#{row.totalAmountWthvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column>
+
+								<p:column resizable="true" style="width:80px;"
+									headerText="#{msgs['invoice-exchange-print.label.vat-category-percentage.title']}">
+									<h:outputText value="#{row.vatCategoryPercentage}%"
+										title="#{row.vatCategoryPercentage}%" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid90p"
+									style="text-align:right;"
+									headerText="#{msgs['invoice-exchange-print.label.total-amount.title']}">
+									<h:outputText value="#{row.totalAmountWvat}"
+										title="#{row.totalAmountWvat}">
+										<f:convertNumber pattern="#,###" currencySymbol="vnd"
+											type="currency" />
+									</h:outputText>
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.contract-symbol.title']}">
+									<h:outputText value="#{row.invSeries}" title="#{row.invSeries}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.inv-number.title']}">
+									<h:outputText value="#{row.invNumber}" title="#{row.invNumber}" />
+									<!-- <p:commandLink value="#{row.invNumber}"
+											title="#{row.invNumber}"
+											actionListener="#{invoiceCreateController.goDetail(row)}">
+											<f:setPropertyActionListener value="#{row}"
+												target="#{sessionController.currentInvTransSummary}" />
+										</p:commandLink> -->
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.inv-number-ref.title']}">
+									<h:outputText value="#{row.invNumberRef}"
+										title="#{row.invNumberRef}" />
+								</p:column>
+
+
+								<p:column hide="1" resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.service-type.title']}">
+									<h:outputText value="#{row.serviceTypeName}"
+										title="#{row.serviceTypeName}" />
+								</p:column>
+
+								<p:column resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.contract-status.title']}">
+									<h:outputText
+										style="#{invoiceCreateController.lstInvTransSummary.getInvStatusColor(row.invStatus)} text-decoration: none;"
+										value="#{row.invStatusName}" title="#{row.invStatusName}" />
+									<p:commandLink rendered="#{row.reasonId != null}"
+										styleClass="icon-doc-text-inv"
+										style="#{invoiceCreateController.lstInvTransSummary.getInvStatusColor(row.invStatus)}"
+										title="#{msgs['invoice.reason.info.title']}"
+										actionListener="#{invoiceDetailController.showReasonDialog()}">
+										<f:setPropertyActionListener value="#{row}"
+											target="#{sessionController.currentInvTransSummary}" />
+									</p:commandLink>
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.contract-template.title']}">
+									<h:outputText value="#{row.templateCode}"
+										title="#{row.templateCode}" />
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.corporate-name.title']}">
+									<h:outputText value="#{row.buyerLegalName}"
+										title="#{row.buyerLegalName}" />
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.table.tran-detail.column.address.title']}">
+									<h:outputText value="#{row.buyerAddress}"
+										title="#{row.buyerAddress}" />
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid120p"
+									headerText="#{msgs['invoice-exchange-print.label.identity-card.title']}">
+									<h:outputText value="#{row.buyerIdentityCard}"
+										title="#{row.buyerIdentityCard}" />
+								</p:column>
+
+								<p:column hide="1" resizable="true" styleClass="Wid100p"
+									headerText="#{msgs['invoice-exchange-print.label.cycle_type.title']}">
+									<h:outputText value="#{row.cycleTypeName}"
+										title="#{row.cycleTypeName}" />
+								</p:column>
+
+								<!-- 									<p:column resizable="true" styleClass="Wid120p"
+										headerText="#{msgs['invoice-exchange-print.table.tran-detail.column.tax-code.title']}">
+										<h:outputText value="#{row.buyerPhone}"
+											title="#{row.buyerPhone}" />
+									</p:column> -->
+							</p:dataTable>
+
+						</p:outputPanel>
+						<div class="EmptyBox20">
+							<hr class="ui-separator ui-state-default ui-corner-all" />
+						</div>
+						<p:outputPanel id="opnlButton" styleClass="Wid100">
+							<div class="Fright">
+								<p:commandButton PRIVILEGE="CREATE" id="btnCreate"
+									value="#{msgs['invoice.button.create']}"
+									title="#{msgs['invoice.button.create']}"
+									actionListener="#{invoiceCreateController.doEffect(1)}"
+									update="@([id$=opnlTransactionDetail]),@([id$=growl])"
+									onclick="PF('dlgProcessingVar').show();processStart('Đang #{msgs['invoice.button.create']}');"
+									oncomplete="processFinished('#{msgs['invoice.button.create']} hoàn thành')">
+									<p:confirm header="#{msgs['common.dialog.message.title']}"
+										message="#{msgs['invoice.create.doeffect.description']}"
+										icon="ui-icon-alert" />
+								</p:commandButton>
+								<p:commandButton PRIVILEGE="APPROVE" id="btnCreateAndApproved"
+									value="#{msgs['invoice.button.createapprove']}"
+									title="#{msgs['invoice.button.createapprove']}"
+									actionListener="#{invoiceCreateController.doEffect(2)}"
+									update="@([id$=opnlTransactionDetail]),@([id$=growl])"
+									onclick="PF('dlgProcessingVar').show();processStart('Đang #{msgs['invoice.button.create']}');"
+									oncomplete="processFinished('#{msgs['invoice.button.create']} hoàn thành')">
+									<p:confirm header="#{msgs['common.dialog.message.title']}"
+										message="#{msgs['invoice.createapprove.doeffect.description']}"
+										icon="ui-icon-alert" />
+								</p:commandButton>
+							</div>
+
+						</p:outputPanel>
+						<!-- </p:fieldset> -->
+					</h:form>
+				</p:outputPanel>
+				<!-- </TableContent> -->
+
+			</div>
+			<p:dialog header="Trạng thái xử lý" id="dlgProcessing"
+				styleClass="dlgprocessing" widgetVar="dlgProcessingVar" modal="true"
+				resizable="false" closable="true" width="800" height="400">
+				<p:panelGrid columns="1" styleClass="Wid100" style="border:none;">
+					<p:graphicImage id="logProcessing"
+						value="/resources/image/ajaxloadingbar.gif" />
+					<p:inputTextarea id="logInvoice" styleClass="Wid100" rows="15"
+						readonly="true"></p:inputTextarea>
+				</p:panelGrid>
+			</p:dialog>
+			<p:socket onMessage="handleMessage" channel="/invoice-output" />
+
+			<script type="text/javascript">
+			
+				function scrollToBottom() {
+				  $('#logInvoice').scrollTop($('#logInvoice')[0].scrollHeight);
+				} 
+			
+				function handleMessage(output) {
+					try {
+						$('#logInvoice').append(output.message+"\n");
+						scrollToBottom();
+					}
+					catch(err) {
+					    setTimeout(null,1000);
+					}
+				}
+
+				function processStart(title) {
+					console.log("processStart");
+					$('#dlgProcessing_title').text(title);
+					$(".ui-dialog-titlebar-close").hide();
+					$('#logProcessing').show();
+					
+					$('#logInvoice').css({"overflow-y":"visible !important"});
+
+				}
+
+				function processFinished(title) {
+					console.log("processFinished");
+
+					$('#dlgProcessing_title').text(title);
+					$(".ui-dialog-titlebar-close").show();
+					$('#logProcessing').hide();
+					
+					$('#logInvoice').append("...\n");
+				}
+
+			</script>
+		</p:outputPanel>
+		<!-- </WrapTable> -->
+
+		<h:form>
+			<p:dialog header="Đang xử lý" widgetVar="dlgProcessVar" modal="true"
+				resizable="false" closable="false">
+				<p:graphicImage value="/resources/image/ajaxloadingbar.gif" />
+			</p:dialog>
+		</h:form>
+		<!-- <DialogBox> -->
+		<h:form id="frmDialog">
+
+			<!-- <p:hotkey bind="esc"
+				handler="$('.ui-dialog').hide(); $('.ui-widget-overlay').hide();" />
+			<p:hotkey bind="shift+n" oncomplete="PF('dlgVar').show();"
+				async="true" actionListener="#{invoiceCreateControllerresetNodeSelected}" />
+			<p:hotkey bind="shift+f" oncomplete="PF('dlgVar').show();"
+				async="true" actionListener="#{invoiceCreateControllerresetNodeSelected}" />
+			<p:hotkey bind="shift+f2" oncomplete="PF('dlgVar').show();"
+				async="true" /> -->
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

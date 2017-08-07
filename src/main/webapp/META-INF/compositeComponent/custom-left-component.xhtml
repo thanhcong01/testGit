@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:composite="http://java.sun.com/jsf/composite">
+
+<h:body>
+
+	<composite:interface>
+
+		<composite:attribute name="value" />
+		<composite:attribute name="item" />
+		<composite:attribute name="itemLable" />
+		<composite:attribute name="itemValue" />
+
+		<composite:attribute name="action"
+			method-signature="void action(javax.faces.event.AjaxBehaviorEvent)" />
+
+
+	</composite:interface>
+
+	<composite:implementation>
+		<p:selectOneListbox id="selectRole" style="width:93%;border-width:0">
+			<f:selectItems value="#{cc.attrs.value}" var="#{cc.attrs.item}"
+				itemLabel="#{cc.attrs.itemLable}" itemValue="#{cc.attrs.itemValue}" />
+			<p:ajax event="change"
+				update="@([id$=dgprivilege]) @([id$=confirmMessages])"
+				listener="#{cc.action}">
+			</p:ajax>
+		</p:selectOneListbox>
+		
+            <p:commandButton action ="#{cc.attrs.action}"></p:commandButton>
+	</composite:implementation>
+</h:body>
+</html>

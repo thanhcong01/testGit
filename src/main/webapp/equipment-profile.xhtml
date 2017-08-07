@@ -1,0 +1,554 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="EQUIPMENT.DEVICE" />
+		<h:form id="frmBr">
+			<!-- BreadCumb -->
+			 <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            
+		</h:form>
+        <div class="Pad7">
+		<p:outputPanel styleClass="Container100 Responsive100">
+			<div class="Container100 Pad5 Responsive100">
+				<p:panel styleClass="Container100" header="#{msg['equipmentProfile.top.title']}">
+					<div class="Container100 Pad3 Responsive50">
+
+						<h:form id="frmG">
+							<p:outputPanel id="updateFormG">
+								<div class="Container100 Responsive100">
+									<div class="EmptyBox5" />
+									<div style="float: right;">
+										<p:commandLink oncomplete="PF('dlSaveG').show();"
+													   PRIVILEGE="INSERT"
+													   update="@([id$=dlSaveG])">
+											<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+											<p:resetInput target="frmDialogG:dlSaveG" />
+											<f:setPropertyActionListener target="#{equipmentsProfileBean.profileSelected}"
+																		 value="#{equipmentsProfileBean.reset()}" />
+											<f:setPropertyActionListener target="#{equipmentsProfileBean.type}"
+																		 value="#{equipmentsProfileBean.TYPE_ADD}" />
+										</p:commandLink>
+										<p:commandLink action="#{equipmentsProfileBean.beforeSave}"
+													   PRIVILEGE="UPDATE"
+													   update="@([id$=dlSaveG])">
+											<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+											<p:resetInput target="frmDialogG:dlSaveG" />
+											<f:setPropertyActionListener target="#{equipmentsProfileBean.type}"
+																		 value="#{equipmentsProfileBean.TYPE_EDIT}" />
+										</p:commandLink>
+										<p:commandButton id="confirmButtonG" style="display: none"
+														 action="#{equipmentsProfileBean.delete}" update="@([id$=tblG])">
+											<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+													   message="#{msg['common.confirm.message']}" />
+										</p:commandButton>
+										<p:commandLink action="#{equipmentsProfileBean.beforeDelete}" PRIVILEGE="DELETE">
+											<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+										</p:commandLink>
+										<p:commandLink oncomplete="PF('dlSearchG').show();"
+													   update="@([id$=dlSearchG])">
+											<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+											<f:setPropertyActionListener target="#{equipmentsProfileBean.profileSelected}"
+																		 value="#{equipmentsProfileBean.reset()}" />
+											<f:setPropertyActionListener target="#{equipmentsProfileBean.type}"
+																		 value="#{equipmentsProfileBean.TYPE_SEARCH}" />
+										</p:commandLink>
+										<p:spacer width="10" />
+									</div>
+
+									<div class="EmptyBox10" />
+
+									<p:dataTable var="g" value="#{equipmentsProfileBean.listGoods}" id="tblG"
+												 paginator="true" paginatorPosition="bottom"
+												 rowIndexVar="rowCount"
+												 selection="#{equipmentsProfileBean.listProfilesSelected}"
+												 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+												 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+												 rowKey="#{g.profileId}" lazy="false" rows="10"
+												 emptyMessage="#{msg['common.table.emptymessage']}">
+										<!-- <p:ajax event="rowSelect" listener="#{goodsBean.onRowSelect}"  update="@([id$=tree]),@this"/> -->
+										<p:ajax event="toggleSelect" listener="#{equipmentsProfileBean.onRowSelected}"
+												update="@this" />
+										<p:ajax event="rowSelectCheckbox"
+												listener="#{equipmentsProfileBean.onRowSelected}" update="@this" />
+										<p:ajax event="rowUnselectCheckbox"
+												listener="#{equipmentsProfileBean.onRowSelected}" update="@this" />
+										<f:facet name="header">
+											<p:commandButton styleClass="toggler" id="togglertblG"
+															 type="button" value="#{msg['chooseColumns']}"
+															 icon="ui-icon-calculator" />
+											<p:columnToggler datasource="tblG" trigger="togglertblG">
+												<p:ajax event="toggle" listener="#{equipmentsProfileBean.onToggleActiveEtag}"
+														update="@([id$=tblG])"/>
+											</p:columnToggler>
+										</f:facet>
+										<p:column selectionMode="multiple" visible="#{equipmentsProfileBean.visibleTable[0]}"
+												  style="text-align: center" styleClass="Wid3" />
+
+										<p:column headerText="#{msg['commont.grid.indext']}"
+												  visible="#{equipmentsProfileBean.visibleTable[1]}" style="width: 40px">
+											<h:outputText id="stt" value="#{rowCount + 1}" lable="#{rowCount + 1}"/>
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.groupCode']}"
+												  visible="#{equipmentsProfileBean.visibleTable[2]}" sortBy="#{g.equipmentsGroup.equipmentsGroupCode}">
+											<h:outputText id="equipmentsGroupCode" value="#{g.equipmentsGroup.equipmentsGroupCode}" />
+											<p:tooltip  for="equipmentsGroupCode"
+														 value="#{g.equipmentsGroup.equipmentsGroupCode}" />
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.code']}" visible="#{equipmentsProfileBean.visibleTable[3]}"
+												  sortBy="#{g.profileCode}">
+											<h:outputText  id="profileCode"  value="#{g.profileCode}" />
+											<p:tooltip  for="profileCode"
+													   value="#{g.profileCode}" />
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.name']}"
+												  visible="#{equipmentsProfileBean.visibleTable[4]}" sortBy="#{g.profileName}">
+											<h:outputText id="profileName2" value="#{g.profileName}" />
+											<p:tooltip for="profileName2"
+														value="#{g.profileName}" />
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.unit']}" visible="#{equipmentsProfileBean.visibleTable[5]}"
+										sortBy="#{equipmentsProfileBean.getUnitName(g.unit)}">
+											<h:outputText id="getUnitName" value="#{equipmentsProfileBean.getUnitName(g.unit)}" />
+											<p:tooltip for="getUnitName"
+													   value="#{equipmentsProfileBean.getUnitName(g.unit)}" />
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.serial']}"
+												  visible="#{equipmentsProfileBean.visibleTable[6]}" sortBy="#{g.serial}">
+											<p:selectBooleanCheckbox value="#{g.serial}" disabled="true"/>
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.sparePart']}"
+												  visible="#{equipmentsProfileBean.visibleTable[7]}" sortBy="#{g.sparePart}">
+											<p:selectBooleanCheckbox value="#{g.sparePart}" disabled="true" />
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.manufacture.tat']}"
+												  visible="#{equipmentsProfileBean.visibleTable[8]}" sortBy="#{equipmentsProfileBean.getManufacturyName(g.manufacture)}">
+											<!--<h:outputText value="#{g.manufacture}" />-->
+											<h:outputText id="manufacture2" value="#{equipmentsProfileBean.getManufacturyName(g.manufacture)}" />
+											<p:tooltip for="manufacture2"
+													   value="#{equipmentsProfileBean.getManufacturyName(g.manufacture)}" />
+										</p:column>
+										<p:column headerText="#{msg['goods.tableProfile.column.origin']}" visible="#{equipmentsProfileBean.visibleTable[9]}"
+										sortBy="#{equipmentsProfileBean.getOriginName(g.origin)}">
+											<!--<h:outputText value="#{g.origin}" />-->
+											<h:outputText id="origin2" value="#{equipmentsProfileBean.getOriginName(g.origin)}" />
+											<p:tooltip for="origin2"
+													   value="#{equipmentsProfileBean.getOriginName(g.origin)}" />
+										</p:column>
+
+										<p:column headerText="#{msg['goods.tableProfile.column.icon']}"
+												  visible="#{equipmentsProfileBean.visibleTable[10]}" sortBy="#{g.icon}">
+											<h:outputText id="iconGr" value="#{g.icon}" />
+											<p:tooltip for="iconGr" value="#{g.icon}" />
+										</p:column>
+
+										<p:column headerText="#{msg['equipment.specifile']}"
+												  visible="#{equipmentsProfileBean.visibleTable[11]}" sortBy="#{g.specification}">
+											<h:outputText id="specificationGr" value="#{g.specification}" />
+											<p:tooltip for="specificationGr" value="#{g.specification}" />
+
+										</p:column>
+
+										<p:column headerText="#{msg['common.status']}" visible="#{equipmentsProfileBean.visibleTable[12]}"
+										sortBy="#{g.getEquipProfileStatus()}">
+											<h:outputText id="getEquipProfileStatus"
+													value="#{g.getEquipProfileStatus() == 1?msg['common.status.1']:msg['common.status.0']}" />
+											<p:tooltip for="getEquipProfileStatus"
+													   value="#{g.getEquipProfileStatus() == 1?msg['common.status.1']:msg['common.status.0']}" />
+										</p:column>
+									</p:dataTable>
+								</div>
+							</p:outputPanel>
+						</h:form>
+
+						<h:form id="frmDialogG">
+							<p:confirmDialog widgetVar="dlgDeleteG" global="true"
+											 showEffect="fade" hideEffect="fade">
+								<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+												 styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+								<p:commandButton value="#{msg['common.confirmdialog.no']}"
+												 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+							</p:confirmDialog>
+
+							<p:dialog widgetVar="dlSaveG" id="dlSaveG" modal="true"
+									  resizable="false" closable="true" height="350"
+									  header="#{msg['header.profile']}">
+								<p:panel id="panelStaffSearch" style="border: 0px">
+								<table id="eqipDlg">
+									<tr>
+										<td style="width: 120px">
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.groupCode.Add']} (*)" />
+										</td>
+										<td style="width: 350px">
+											<p:selectOneMenu id="ggId" style="width:350px;"
+															 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+															 value="#{equipmentsProfileBean.profileSelected.equipmentsGroupId}"
+															 rendered="#{equipmentsProfileBean.profileSelected != null}">
+												<f:selectItems value="#{equipmentsProfileBean.listGroups}" var="gg"
+															   itemLabel="#{gg.equipmentsGroupCode} | #{gg.equipmentsGroupName}" itemValue="#{gg.equipmentsGroupId}" />
+												<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.groupCode.Add']}" />
+												<f:validator validatorId="emtyValidator" />
+											</p:selectOneMenu>
+											<p:message for="ggId" />
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.code']} (*)" />
+										</td>
+										<td>
+											<p:inputText style="width:350px;" id="codeG"
+														 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+														 validator="#{equipmentsProfileBean.validate}"
+														 value="#{equipmentsProfileBean.profileSelected.profileCode}" maxlength="50">
+												<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.code']}" />
+												<f:validator validatorId="emtyValidator" />
+												<f:validator validatorId="spaceValidator" />
+												<f:validator validatorId="codeValidator" />
+											</p:inputText>
+											<p:message id="msgCodeG" for="codeG" />
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.name']} (*)" />
+										</td>
+										<td>
+											<p:inputText style="width:350px;" id="profileName"
+														 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+														 value="#{equipmentsProfileBean.profileSelected.profileName}" maxlength="50">
+												<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.name']}" />
+												<f:validator validatorId="emtyValidator" />
+											</p:inputText>
+											<p:message id="msgProfileName" for="profileName" />
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.unit']} (*)" />
+										</td>
+										<td>
+											<p:selectOneMenu   id="unit" value="#{equipmentsProfileBean.profileSelected.unit}"
+															   disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+															   validator="#{equipmentsProfileBean.validate}"
+															   style="width: 350px">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listUnit}" var="c"
+															   itemLabel="#{c.name}" itemValue="#{c.value}" />
+												<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.unit']}" />
+												<f:validator validatorId="emtyValidator" />
+											</p:selectOneMenu>
+											<p:message id="msgUnit" for="unit" />
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;margin-right: 12px" value="#{msg['goods.tableProfile.column.serial']}" />
+											<p:selectBooleanCheckbox disabled="#{equipmentsProfileBean.profileSelected.disableSerial || equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"  value="#{equipmentsProfileBean.profileSelected.serial}" >
+											</p:selectBooleanCheckbox>
+										</td>
+										<td>
+											<p:outputLabel style="font-size:12px;margin-right: 12px" value="#{msg['goods.tableProfile.column.sparePartIs']}" />
+											<p:selectBooleanCheckbox value="#{equipmentsProfileBean.profileSelected.sparePart}"
+																	 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}">
+											</p:selectBooleanCheckbox>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.manufacture']} (*)" />
+										</td>
+										<td>
+											<!--<p:inputText style="width:350px;" id="manufacture"-->
+														 <!--validator="#{equipmentsProfileBean.validate}"-->
+														 <!--value="#{equipmentsProfileBean.profileSelected.manufacture}" maxlength="100">-->
+												<!--<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.manufacture']}" />-->
+												<!--<f:validator validatorId="emtyValidator" />-->
+											<!--</p:inputText>-->
+											<p:selectOneMenu   id="manufacture" value="#{equipmentsProfileBean.profileSelected.manufacture}"
+															   disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+															   validator="#{equipmentsProfileBean.validate}"
+															   style="width: 350px">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listManufactury}" var="c"
+															   itemLabel="#{c.name}" itemValue="#{c.value}" />
+												<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.manufacture']}" />
+												<f:validator validatorId="emtyValidator" />
+											</p:selectOneMenu>
+											<p:message id="msgManufacture" for="manufacture" />
+
+
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.origin']} (*)" />
+
+										</td>
+										<td>
+											<!--<p:inputText style="width:350px;" id="origin"-->
+														 <!--value="#{equipmentsProfileBean.profileSelected.origin}" maxlength="100">-->
+												<!--<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.origin']}" />-->
+												<!--<f:validator validatorId="emtyValidator" />-->
+											<!--</p:inputText>-->
+											<p:selectOneMenu   id="origin" value="#{equipmentsProfileBean.profileSelected.origin}"
+															   disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+															   validator="#{equipmentsProfileBean.validate}"
+															   style="width: 350px">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listOrigin}" var="c"
+															   itemLabel="#{c.name}" itemValue="#{c.value}" />
+												<f:attribute name="msglabel" value="#{msg['goods.tableProfile.column.origin']}" />
+												<f:validator validatorId="emtyValidator" />
+											</p:selectOneMenu>
+											<p:message id="msgOrigin" for="origin" />
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.icon']}" />
+
+										</td>
+										<td>
+											<p:inputText style="width:350px;" id="icon"
+														 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+														 value="#{equipmentsProfileBean.profileSelected.icon}" maxlength="100">
+											</p:inputText>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['equipment.specifile']}" />
+										</td>
+										<td>
+											<p:inputTextarea style="width:350px; height: 300px" rows="5" id="specificationDlg"
+															 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+															 value="#{equipmentsProfileBean.profileSelected.specification}">
+											</p:inputTextarea>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['common.status']} (*)" />
+										</td>
+										<td>
+											<p:selectOneMenu id="frmStatus" style="width:350px;"
+															 value="#{equipmentsProfileBean.profileSelected.equipProfileStatus}" disabled="true">
+												<f:selectItem itemLabel="#{msg['common.status.1']}" itemValue="1" />
+												<f:selectItem itemLabel="#{msg['common.status.0']}" itemValue="0" />
+											</p:selectOneMenu>
+											<p:outputLabel />
+											<p:message for="frmStatus" />
+										</td>
+									</tr>
+								</table>
+
+								</p:panel>
+								<f:facet name="footer">
+									<p:commandButton icon="ui-icon-plus" action="#{equipmentsProfileBean.save}"
+													 disabled="#{equipmentsProfileBean.profileSelected.equipProfileStatus==0?true:false}"
+													 value="#{msg['common.dialog.save']}"
+													 update="@([id$=tblG]),@([id$=panelG]), @([id$=panelStaffSearch]) ">
+									</p:commandButton>
+									<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+													 oncomplete="PF('dlSaveG').hide()">
+										<p:resetInput target="frmDialogG:dlSaveG" />
+									</p:commandButton>
+								</f:facet>
+							</p:dialog>
+
+						</h:form>
+
+						<h:form id="frmSearchG">
+							<p:dialog widgetVar="dlSearchG" id="dlSearchG" modal="true"
+									  resizable="false" closable="true" height="300"
+									  header="#{msg['header.profile']}">
+
+								<table>
+									<tr>
+										<td style="width: 100px">
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.groupCode.Add']}" />
+										</td>
+										<td style="width: 350px">
+											<p:selectOneMenu style="width:350px;"
+															 value="#{equipmentsProfileBean.profileSelected.equipmentsGroupId}"
+															 rendered="#{equipmentsProfileBean.profileSelected != null}">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listGroupsAll}" var="gg"
+															   itemLabel="#{gg.equipmentsGroupCode} | #{gg.equipmentsGroupName}"
+															   itemValue="#{gg.equipmentsGroupId}" />
+											</p:selectOneMenu>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.code']}" />
+										</td>
+										<td>
+											<p:inputText style="width:350px;"
+														 value="#{equipmentsProfileBean.profileSelected.profileCode}" maxlength="100">
+											</p:inputText>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.name']}" />
+										</td>
+										<td>
+											<p:inputText style="width:350px;"
+														 validator="#{equipmentsProfileBean.validate}"
+														 value="#{equipmentsProfileBean.profileSelected.profileName}" maxlength="100">
+											</p:inputText>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.unit']}" />
+										</td>
+										<td>
+											<p:selectOneMenu   value="#{equipmentsProfileBean.profileSelected.unit}"
+															   style="width: 350px">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listUnit}" var="c"
+															   itemLabel="#{c.name}" itemValue="#{c.value}" />
+											</p:selectOneMenu>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['common.status']}" />
+										</td>
+										<td>
+											<p:selectOneMenu
+													value="#{equipmentsProfileBean.profileSelected.equipProfileStatus}"
+													style="width:350px">
+												<f:selectItem itemLabel="" itemValue="" />
+												<f:selectItem itemLabel="#{msg['common.status.1']}"
+															  itemValue="1" />
+												<f:selectItem itemLabel="#{msg['common.status.0']}"
+															  itemValue="0" />
+											</p:selectOneMenu>
+										</td>
+									</tr>
+									<!--<tr>-->
+										<!--<td>-->
+											<!--<p:outputLabel style="font-size:12px;margin-right: 12px" value="#{msg['goods.tableProfile.column.serial']}" />-->
+											<!--<p:selectBooleanCheckbox  value="#{equipmentsProfileBean.profileSelected.serial}" >-->
+											<!--</p:selectBooleanCheckbox>-->
+										<!--</td>-->
+										<!--<td>-->
+											<!--<p:outputLabel style="font-size:12px;margin-right: 12px" value="#{msg['goods.tableProfile.column.sparePartIs']}" />-->
+											<!--<p:selectBooleanCheckbox value="#{equipmentsProfileBean.profileSelected.sparePart}">-->
+											<!--</p:selectBooleanCheckbox>-->
+										<!--</td>-->
+									<!--</tr>-->
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.manufacture']}" />
+										</td>
+										<td>
+											<!--<p:inputText style="width:350px;"-->
+														 <!--validator="#{equipmentsProfileBean.validate}"-->
+														 <!--value="#{equipmentsProfileBean.profileSelected.manufacture}" maxlength="100">-->
+											<!--</p:inputText>-->
+											<p:selectOneMenu   value="#{equipmentsProfileBean.profileSelected.manufacture}"
+															   style="width: 350px">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listManufactury}" var="c"
+															   itemLabel="#{c.name}" itemValue="#{c.value}" />
+											</p:selectOneMenu>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.origin']}" />
+
+										</td>
+										<td>
+											<!--<p:inputText style="width:350px;"-->
+														 <!--value="#{equipmentsProfileBean.profileSelected.origin}" maxlength="100">-->
+											<!--</p:inputText>-->
+											<p:selectOneMenu   value="#{equipmentsProfileBean.profileSelected.origin}"
+															   style="width: 350px">
+												<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+												<f:selectItems value="#{equipmentsProfileBean.listOrigin}" var="c"
+															   itemLabel="#{c.name}" itemValue="#{c.value}" />
+											</p:selectOneMenu>
+
+										</td>
+									</tr>
+									<!--<tr>-->
+										<!--<td>-->
+											<!--<p:outputLabel style="font-size:12px;" value="#{msg['goods.tableProfile.column.icon']}" />-->
+
+										<!--</td>-->
+										<!--<td>-->
+											<!--<p:inputText style="width:350px;" -->
+														 <!--value="#{equipmentsProfileBean.profileSelected.icon}" maxlength="100">-->
+											<!--</p:inputText>-->
+										<!--</td>-->
+									<!--</tr>-->
+								</table>
+								<!--<p:panelGrid id="panelGSearch" columns="2">-->
+
+									<!--<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.group']}" />-->
+									<!--<p:selectOneMenu style="width:350px;"-->
+													 <!--value="#{equipmentsProfileBean.profileSelected.equipmentsGroupId}"-->
+													 <!--rendered="#{equipmentsProfileBean.profileSelected != null}">-->
+										<!--<f:selectItems value="#{equipmentsProfileBean.listGroups}" var="gg"-->
+													   <!--itemLabel="#{gg.equipmentsGroupName}" itemValue="#{gg.equipmentsGroupId}" />-->
+									<!--</p:selectOneMenu>-->
+
+									<!--<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.management']}" />-->
+									<!--<p:selectOneMenu style="width:350px;"-->
+													 <!--value="#{equipmentsProfileBean.profileSelected.managementType}">-->
+										<!--<f:selectItem itemLabel="" itemValue="" />-->
+										<!--<f:selectItems value="#{equipmentsProfileBean.listDomains}" var="domain"-->
+													   <!--itemLabel="#{domain.name}" itemValue="#{domain.name}" />-->
+									<!--</p:selectOneMenu>-->
+
+									<!--<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.code']}" />-->
+									<!--<p:inputText style="width:350px;" validator="#{equipmentsProfileBean.validate}"-->
+												 <!--value="#{equipmentsProfileBean.profileSelected.profileCode}" maxlength="50">-->
+									<!--</p:inputText>-->
+
+									<!--<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.name']}" />-->
+									<!--<p:inputText style="width:350px;"-->
+												 <!--value="#{equipmentsProfileBean.profileSelected.profileName}" maxlength="50">-->
+									<!--</p:inputText>-->
+
+								<!--</p:panelGrid>-->
+								<f:facet name="footer">
+									<p:commandButton icon="ui-icon-plus"
+													 action="#{equipmentsProfileBean.filterSearch}" value="#{msg['common.dialog.search']}"
+													 update="@([id$=tblG])">
+									</p:commandButton>
+									<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+													 oncomplete="PF('dlSearchG').hide()">
+										<p:resetInput target="tv:frmSearchG:dlSearchG" />
+									</p:commandButton>
+								</f:facet>
+							</p:dialog>
+						</h:form>
+					</div>
+
+				</p:panel>
+			</div>
+		</p:outputPanel>
+	  </div>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+
+</ui:composition>

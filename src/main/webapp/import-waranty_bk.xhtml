@@ -1,0 +1,511 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frm" enctype="multipart/form-data">
+
+            <title>#{msg['importGoods']}</title>
+
+            <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <p:growl id="messages" showDetail="true" />
+
+            <div class="Pad10">
+                <p:panel header="#{msg['transInfo']}" >
+                    <p:panelGrid styleClass="Container100" id="pgs" >
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['orderCode']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText styleClass="Wid100 disableText" value="#{importGoods.orderCode}" disabled="true"></p:inputText>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['reason']}(*)"></p:outputLabel> 
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu styleClass="Wid100" value="#{importGoods.reasonId}"  >
+                                    <f:selectItems value="#{importGoods.listReason}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['createStaff']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:inputText styleClass="Wid100 disableText" disabled="true" value="#{importGoods.usser}" ></p:inputText>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="4"></p:column>
+                            <p:column colspan="2">
+                            	<p:commandButton icon="fa fa-upload Fs14 white" style="float: right" value="#{msg['import.equipment.single']}"
+                                	update=":frm:upload" id="import_single" actionListener="#{importGoods.showImportSinglePopUp}" 
+                                	styleClass="ui-priority-primary">
+                                </p:commandButton>
+                                <p:commandButton icon="fa fa-upload Fs14 white" style="float: right" value="#{msg['importFile']}" 
+                                	update=":frm:upload" id="import" actionListener="#{importGoods.showImportPopUp}" 
+                                	styleClass="ui-priority-primary">
+                                </p:commandButton>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <div class="EmptyBox5"></div>
+
+                    <p:dialog id="dlgSingle" header="#{msg['import.equipment.single']}" widgetVar="dlgSingle" height="50%" >
+                        <p:ajax event="close" update=":frm:pgs,:frm:ttmh,:frm:ctmh"  />
+                        
+                            <p:panelGrid styleClass="Wid100">
+                                <p:row style="    visibility: hidden;">
+                                    <p:column styleClass="Wid15"></p:column>
+                                    <p:column styleClass="Wid35"></p:column>
+                                    <p:column styleClass="Wid15"></p:column>
+                                    <p:column styleClass="Wid35"></p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.profile.type']} (*)"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:selectOneMenu styleClass="select Wid100" value="#{importGoods.providerId}"  >
+                                            <p:ajax event="valueChange" listener="#{importGoods.selectProvider}" update=":frm:upload,:frm:messages" ></p:ajax>
+                                            <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+                                            <f:selectItems value="#{importGoods.lsProvider}" var="c" itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:selectOneMenu styleClass="select Wid100" value="#{importGoods.goodsGroup}"  >
+                                            <p:ajax event="valueChange" update=":frm:autoGoods,:frm:uploadBtn" listener="#{importGoods.changeGoodsGroup()}"></p:ajax>
+                                            <f:selectItems value="#{sessionBean.lsgGroup}" var="c" itemLabel="#{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                </p:row>
+                                <p:row>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['audit.equipment.code']} (*)"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:autoComplete id="autoGoodsSingle" styleClass="ui-autocomplete-select" dropdown="true" value="#{importGoods.goods}" completeMethod="#{importGoods.completeGoods}" >
+                                            <p:ajax event="itemSelect" listener="#{importGoods.goodsSelect}"  update=":frm:uploadBtn" />
+                                        </p:autoComplete>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="Serial"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                </p:row>
+                                 <p:row>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['inven.numberic']} (*)"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.provider.full']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:selectOneMenu styleClass="select Wid100" value="#{importGoods.providerId}"  >
+                                            <p:ajax event="valueChange" listener="#{importGoods.selectProvider}" update=":frm:upload,:frm:messages" ></p:ajax>
+                                            <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+                                            <f:selectItems value="#{importGoods.lsProvider}" var="c" itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                </p:row>
+                                <p:row>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.so.Co']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.so.Cq']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                </p:row>
+                                 <p:row>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.WARRANTY_PERIOD']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['search.equiment.warrDate']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                </p:row>
+                                 <p:row>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.MAINTANCE_PERIOD']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['equipment.LIFE_CYCLE']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                </p:row>
+                                <p:row>
+                                    <p:column colspan="3">
+                                      
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:commandButton icon="fa fa-upload Fs14 blue"
+                                 id="uploadBtnSingle" value="#{msg['common.button.save']}" disabled="#{importGoods.disableUpload}" update=":frm"  ajax="false" actionListener="#{importGoods.handleFileUpload}"/>
+                                <p:commandButton value="#{msg['Exit']}" icon="fa fa-times Fs14 blue" onclick="PF('dlgSingle').hide();" update=":frm:dtGoods" />
+                                    </p:column>   
+                                        
+                                </p:row>
+                            </p:panelGrid>
+                    </p:dialog>
+                    <p:dialog id="dlg" header="#{msg['importFile']}" widgetVar="dlg" height="50%" width="55%">
+                        <p:ajax event="close" update=":frm:pgs,:frm:ttmh,:frm:ctmh"  />
+                        <p:panel header="#{msg['importFile']}" id="upload">
+                            <p:panelGrid styleClass="Wid100">
+                                <p:row style="    visibility: hidden;">
+                                    <p:column styleClass="Wid15"></p:column>
+                                    <p:column styleClass="Wid35"></p:column>
+                                    <p:column styleClass="Wid15"></p:column>
+                                    <p:column styleClass="Wid35"></p:column>
+                                </p:row>
+
+                                <p:row>
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['provider']} (*)"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:selectOneMenu styleClass="select Wid100" value="#{importGoods.providerId}"  >
+                                            <p:ajax event="valueChange" listener="#{importGoods.selectProvider}" update=":frm:upload,:frm:messages" ></p:ajax>
+                                            <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+                                            <f:selectItems value="#{importGoods.lsProvider}" var="c" itemLabel="#{c.providerName}" itemValue="#{c.providerId}" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:selectOneMenu styleClass="select Wid100" value="#{importGoods.goodsGroup}"  >
+                                            <p:ajax event="valueChange" update=":frm:autoGoods,:frm:uploadBtn" listener="#{importGoods.changeGoodsGroup()}"></p:ajax>
+                                            <f:selectItems value="#{sessionBean.lsgGroup}" var="c" itemLabel="#{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+                                        </p:selectOneMenu>
+                                    </p:column>
+
+                                </p:row>
+                                <p:row>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['goods']} (*)"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:autoComplete id="autoGoods" styleClass="ui-autocomplete-select" dropdown="true" value="#{importGoods.goods}" completeMethod="#{importGoods.completeGoods}" >
+                                            <p:ajax event="itemSelect" listener="#{importGoods.goodsSelect}"  update=":frm:uploadBtn" />
+                                        </p:autoComplete>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['quantity']} (*)"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column>
+                                        <p:inputText maxlength="7"  styleClass="textbox Wid100" value="#{importGoods.quantity}"  >
+                                            <p:ajax  update=":frm:uploadBtn" ></p:ajax>
+                                        </p:inputText>
+                                    </p:column>
+
+                                </p:row>
+                                <p:row>
+                                    <p:column>
+                                        <p:outputLabel value="#{msg['choose']}"></p:outputLabel>
+                                    </p:column>
+
+                                    <p:column colspan="3">
+                                        <p:fileUpload   value="#{importGoods.uploadedFile}" label="#{msg['choose']}" mode="simple" skinSimple="true" >
+                                        </p:fileUpload>
+                                    </p:column>       
+                                </p:row>
+                            </p:panelGrid>
+                            <div class="EmptyBox5"></div>
+                            <div class="Fleft">
+                                <p:commandButton icon="fa fa-upload Fs14 white"
+                                 id="uploadBtn" value="#{msg['upload']}" disabled="#{importGoods.disableUpload}" update=":frm"  ajax="false" actionListener="#{importGoods.handleFileUpload}"/>
+                                <p:commandButton value="#{msg['Exit']}" icon="fa fa-times Fs14 white" onclick="PF('dlg').hide();" update=":frm:dtGoods" />
+                            </div>        
+                            <div class="EmptyBox5"></div>
+                            <p:panelGrid styleClass="Wid100"  >
+                                <p:row style="    visibility: hidden;">
+                                    <p:column styleClass="Wid15"></p:column>
+                                    <p:column styleClass="Wid35"></p:column>
+                                    <p:column styleClass="Wid15"></p:column>
+                                    <p:column styleClass="Wid35"></p:column>
+                                </p:row>
+                                <p:row >
+                                    <p:column styleClass="Wid15">
+                                        <p:outputLabel styleClass="note" value="#{msg['note']}"></p:outputLabel>
+                                    </p:column>
+                                    <p:column styleClass="Wid35">
+                                        <p:outputLabel style="color: red;" value="#{msg['importType']} *.xlsx (*)"></p:outputLabel>
+                                    </p:column>
+                                    <p:column styleClass="Wid15">
+                                        <p:outputLabel  value="#{msg['fileTemp']}"></p:outputLabel>
+                                    </p:column>
+                                    <p:column styleClass="Wid35">
+
+                                        <p:commandButton styleClass="Fright" value="#{msg['download']}" ajax="true" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s">
+                                            <p:fileDownload value="#{importGoods.fileDownload}" />
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                        </p:panel>
+                    </p:dialog>
+                    <div class="Pad5">
+                        <p:panel styleClass="Container100" id="ttmh"  >
+
+                            <p:dataTable emptyMessage="#{msg['noRecordFound']}"  var="c" rowIndexVar="rowIndex" value="#{importGoods.lsG}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                         paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                         id="dtGoods" lazy="false" selection="#{importGoods.stockDetail}" rowKey="#{c.rowkey}"  >
+                                <f:facet  name="header">
+                                    <span class="dtHead"  style="">#{msg['detailInfo']}</span>
+                                    <p:commandButton styleClass="toggler" id="togglerdtGoods"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                                    <p:columnToggler datasource="dtGoods" trigger="togglerdtGoods" />
+                                </f:facet>
+                                <p:ajax event="rowSelectRadio" listener="#{importGoods.viewClick}" update=":frm:pgs,:frm:ttmh,:frm:ctmh"  />
+<!--                                <p:ajax event="rowSelect" listener="#{importGoods.viewClick_}" update=":frm:pgs,:frm:ttmh,:frm:ctmh"  />-->
+                                <p:column  selectionMode="single" style="max-width: 70px">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['choosed']}" />
+                                    </f:facet>
+                                </p:column>
+                                <p:column styleClass="index">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['index']}" />
+                                    </f:facet>
+                                    <h:outputText value="#{rowIndex+1}" />
+                                </p:column>
+                                <p:column sortBy="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['goodsGroup']}" />
+                                    </f:facet>
+                                    <h:outputText id="getGoodsGroupNameByGoods"
+                                                  value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                                    <p:tooltip for="getGoodsGroupNameByGoods"
+                                               value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                                </p:column>
+                                <p:column sortBy="#{sessionBean.getEquipProfileName(c.goodsId.toString())}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['goods']}" />
+                                    </f:facet>
+                                    <h:outputText id="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                                    <p:tooltip for="getEquipProfileName"
+                                               value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                                </p:column>
+                                <p:column sortBy="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['goodsCode']}" />
+                                    </f:facet>
+                                    <h:outputText id="getEquipProfileCode" value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                                    <p:tooltip for="getEquipProfileCode"
+                                               value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                                </p:column>
+                                <p:column sortBy="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['status']}" />
+                                    </f:facet>                       
+                                    <h:outputText id="getEquipsStatusName" value="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}" />
+                                    <p:tooltip for="getEquipsStatusName"
+                                               value="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}" />
+                                </p:column>
+                                <p:column sortBy="#{c.lsSerial}">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['quantity']}" />
+                                    </f:facet>
+                                    <h:outputText id="lsSerial" value="#{c.lsSerial==null?'':c.lsSerial.size()}" />
+                                    <p:tooltip for="lsSerial"
+                                               value="#{c.lsSerial==null?'':c.lsSerial.size()}" />
+                                </p:column>
+                                <p:column styleClass="deleteCol" style="max-width: 70px;">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg['delete']}" />
+                                    </f:facet>
+                                    <p:commandLink value="X" styleClass="delete" update=":frm" actionListener="#{importGoods.removeLsg(c)}"></p:commandLink>
+                                </p:column>
+                            </p:dataTable>  
+
+                            <div class="EmptyBox5"></div>
+                            <div class="DisBlock Fright">
+                                <p:commandButton value="#{msg['import']}" icon="fa fa-check Fs14 white" disabled="#{importGoods.disableAdd}" id="save" update=":frm" actionListener="#{importGoods.save()}" styleClass="ui-priority-primary" />
+                                <p:commandButton value="#{msg['cancel']}" icon="fa fa-undo Fs14 white" disabled="#{importGoods.disableAdd}" id="delete" update=":frm"  actionListener="#{importGoods.reload}" styleClass="ui-priority-primary cancel" />
+
+                                <p:commandButton value="#{msg['print']}" icon="fa fa-fa fa-print Fs14 white" disabled="#{importGoods.disableAdd}" update=":frm:dlgPDF" actionListener="#{importGoods.print_}" styleClass="ui-priority-primary" />
+
+                                <p:commandButton value="#{msg['Exit']}" icon="fa fa-times Fs14 white"  action="index?faces-redirect=true" styleClass="ui-priority-primary" >
+                                </p:commandButton>
+                                <p:dialog header="PDF" id="dlgPDF" widgetVar="dlgPDF" width="70%" height="500">
+                                    <h3>PDF</h3><p:media value="#{importGoods.path}" player="pdf" width="100%" height="100%"/>
+                                </p:dialog>
+                                <p:dialog widgetVar="cfImport" >
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{msg['confirm']}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid columns="4" styleClass="pngConfirm">
+                                        <p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+                                        <p:inputText styleClass="disableText" disabled="true" value="#{importGoods.orderCode}"></p:inputText>
+                                        <p:outputLabel value="#{msg['reason']}"></p:outputLabel>
+                                        <p:inputText styleClass="disableText" disabled="true" value="#{importGoods.reasonName}"></p:inputText>
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update="frm" actionListener="#{importGoods.action}" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"  onclick="PF('cfImport').hide();" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+                            </div>
+                            <div class="EmptyBox5"></div>
+                        </p:panel>
+                    </div> 
+                    <div class="EmptyBox5"></div>
+                    <div class="Pad5">
+                        <p:panel id="ctmh" header="#{msg['transSerialInfo']}">
+                            <p:panelGrid styleClass="Wid100">
+
+                                <p:row>
+                                    <p:column styleClass="Wid13">
+                                        <p:outputLabel value="#{msg['fromSerial']}"></p:outputLabel>
+                                    </p:column>
+                                    <p:column styleClass="Wid203">
+                                        <p:inputText styleClass="Wid100" value="#{importGoods.fromSerial}" onkeypress="if (event.keyCode == 13) { return false; }"  >        
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column styleClass="Wid13">
+                                        <p:outputLabel value="#{msg['toSerial']}"></p:outputLabel>
+                                    </p:column>
+                                    <p:column styleClass="Wid203">
+                                        <p:inputText  styleClass="Wid100" value="#{importGoods.toSerial}"  >
+                                        </p:inputText>
+                                    </p:column>
+                                    <p:column styleClass="Wid13">
+
+                                    </p:column>
+                                    <p:column styleClass="Wid203">
+                                        <p:commandButton icon="fa fa-search Fs14 white" value="#{msg['search']}" styleClass="Fright" update="frm" actionListener ="#{importGoods.searchDetail}"></p:commandButton>
+                                    </p:column>
+                                </p:row>
+                            </p:panelGrid>
+                            <div class="Pad5">
+                                <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{importGoods.lsData}" paginator="true" rows="10" paginatorPosition="bottom" resizableColumns="true"
+                                             paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                             id="dtEtagSerial" lazy="false">
+                                    <f:facet  name="header">
+                                        <p:commandButton styleClass="toggler" id="togglerdtEtagSerial"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                                        <p:columnToggler datasource="dtEtagSerial" trigger="togglerdtEtagSerial" />
+                                    </f:facet>
+                                    <p:column styleClass="index">
+                                        <f:facet name="header">
+                                            <h:outputText value="#{msg['index']}" />
+                                        </f:facet>
+                                        <h:outputText value="#{rowIndex+1}" />
+                                    </p:column>
+                                    <p:column sortBy="#{c.fromSerial}" >
+                                        <f:facet name="header">
+                                            <h:outputText value="#{msg['fromSerial']}" />
+                                        </f:facet>
+                                        <h:outputText id="fromSerial" value="#{c.fromSerial}" />
+                                        <p:tooltip for="fromSerial" value="#{c.fromSerial}" />
+                                    </p:column>
+                                    <p:column sortBy="#{c.toSerial}">
+                                        <f:facet name="header">
+                                            <h:outputText value="#{msg['toSerial']}" />
+                                        </f:facet>
+                                        <h:outputText id="toSerial" value="#{c.toSerial}" />
+                                        <p:tooltip for="toSerial" value="#{c.toSerial}" />
+                                    </p:column>
+                                    <p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+                                        <f:facet name="header">
+                                            <h:outputText value="#{msg['provider']}" />
+                                        </f:facet>
+                                        <h:outputText id="getProviderName" value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                                        <p:tooltip for="getProviderName" value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                                    </p:column>
+                                    <p:column sortBy="#{c.count}" >
+                                        <f:facet name="header">
+                                            <h:outputText value="#{msg['quantity']}" />
+                                        </f:facet>
+                                        <h:outputText id="count" value="#{c.count}" />
+                                        <p:tooltip for="count" value="#{c.count}" />
+                                    </p:column>
+                                </p:dataTable>  
+                            </div> 
+                        </p:panel>
+                    </div> 
+                    <div class="EmptyBox10"></div>
+                </p:panel>
+            </div>          
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,541 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchEquipmentBean']}</title>
+
+			<div class="EmptyBox10"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['search']}" id="info">
+					<p:panelGrid styleClass="Wid100">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['audit.group.equiment']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+									value="#{searchEquipmentBean.stockGoodsInvForm.groupId}">
+									<!--<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>-->
+									<p:ajax event="valueChange" update="@this, @([id$=profileCodeSearch]), @([id$=equipmentNameSearch]), :frm "
+										listener="#{searchEquipmentBean.changeGoodsGroup()}"></p:ajax>
+									<f:selectItem itemLabel="#{msg['audit.select.all']}" itemValue=""></f:selectItem>
+									<f:selectItems value="#{sessionBean.getLsgGroupOrder()}" var="c"
+										itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}" itemValue="#{c.equipmentsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['audit.equipment.code']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete  styleClass="ui-autocomplete-select" id="profileCodeSearch"
+									dropdown="true" value="#{searchEquipmentBean.stockGoodsInvForm.profileName}"
+									completeMethod="#{searchEquipmentBean.completeGoods}">
+									<p:ajax event="itemSelect"
+										listener="#{searchEquipmentBean.goodsSelect}" update="@this, @([id$=equipmentNameSearch])" />
+								</p:autoComplete>
+							</p:column>
+							<p:column>
+								<p:outputLabel value="#{msg['audit.equipment.name']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText id="equipmentNameSearch" maxlength="200" rows="1" style="width: 100%"
+												 value="#{searchEquipmentBean.stockGoodsInvForm.nameStr}"></p:inputText>
+							</p:column>
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['audit.serial']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText styleClass="select Wid100" onkeypress="if (event.keyCode == 13) { return false; }"
+											 value="#{searchEquipmentBean.stockGoodsInvForm.serial}"></p:inputText>
+							</p:column>
+
+							<p:column styleClass="Wid13" >
+								<p:outputLabel value="#{msg['audit.status']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203" >
+								<p:selectOneMenu
+										styleClass="select Wid100" value="#{searchEquipmentBean.stockGoodsInvForm.equipmentProfileStatus}">
+									<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>
+									<!--<p:ajax event="valueChange" update="@this"-->
+											<!--listener="#{searchEquipmentBean.changeStatus()}"></p:ajax>-->
+									<f:selectItems value="#{sessionBean.listStatus}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['stockStatus']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{searchEquipmentBean.stockGoodsInvForm.stockStatus}">
+									<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>
+									<p:ajax event="valueChange" update="@this"
+											listener="#{searchEquipmentBean.changeStockStatus()}"></p:ajax>
+									<f:selectItems value="#{searchEquipmentBean.getLstStockUpdateDetail()}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}"/>
+								</p:selectOneMenu>
+							</p:column>
+
+						</p:row>
+
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['search.stock.management']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<!--<p:selectOneMenu styleClass="select Wid100"-->
+												 <!--value="#{searchEquipmentBean.stockGoodsInvForm.transactionActionId}">-->
+									<!--<f:selectItem itemValue="" itemLabel="#{msg['audit.select.all']}" noSelectionOption="true"/>-->
+									<!--<f:selectItems value="#{searchEquipmentBean.lstTransactionAction}" var="c"-->
+												   <!--itemLabel="#{c.transactionActionCode}" itemValue="#{c.transactionActionId}"/>-->
+								<!--</p:selectOneMenu>-->
+								<p:autoComplete styleClass="ui-autocomplete-select"
+												forceSelection="true" dropdown="true" scrollHeight="150"
+												style="width:300px;" maxlength="50"
+												value="#{searchEquipmentBean.createShop}"
+												emptyMessage="#{msg['common.table.emptymessage']}"
+												completeMethod="#{searchEquipmentBean.completeCreateShop}">
+									<p:ajax event="itemSelect"
+											listener="#{searchEquipmentBean.createShopSelect}" update="@this :frm:cbPosition" />
+								</p:autoComplete>
+							</p:column>
+
+							<!--<p:column styleClass="Wid13" >-->
+								<!--<p:outputLabel value="#{msg['search.lancode']}"></p:outputLabel>-->
+							<!--</p:column>-->
+							<!--<p:column styleClass="Wid203" >-->
+								<!--<p:inputText style="width:300px;"-->
+											 <!--value="#{searchEquipmentBean.stockGoodsInvForm.lanCode}" maxlength="10">-->
+								<!--</p:inputText>-->
+							<!--</p:column>-->
+
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['search.position']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100" id="cbPosition"
+												 value="#{searchEquipmentBean.stockGoodsInvForm.positionId}">
+									<f:selectItem itemLabel="#{msg['choosed']}" itemValue="" noSelectionOption="true"/>
+									<f:selectItems value="#{searchEquipmentBean.lsPosition}" var="position"
+												   itemLabel="#{position.positionName}" itemValue="#{position.positionId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column colspan="2"></p:column>
+
+						</p:row>
+						<p:row>
+							<p:column colspan="6" style="text-align: center">
+								<p:commandButton icon="fa fa-search Fs14 white"
+												 value="#{msg['search']}" style="float:right" update="@([id$=dtSearch]), :frm"
+												 actionListener="#{searchEquipmentBean.search}"></p:commandButton>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:panel>
+
+				<div class="EmptyBox5"></div>
+				<p:panel>
+
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{searchEquipmentBean.lsData}"
+						paginator="true" rows="5" paginatorPosition="bottom"
+						resizableColumns="false"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+								 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+
+						id="dtSearch" rowKey="#{c.rowKey}"
+						selection="#{searchEquipmentBean.dataSelect}">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['audit.search.result']}</span>
+							<p:commandButton styleClass="toggler" id="togglerdtSearch"
+								value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+							<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch" />
+							<p:columnToggler datasource="dtSearch" trigger="togglerdtSearch">
+								<p:ajax event="toggle" listener="#{searchEquipmentBean.onToggleActiveEtag}"
+										update="@([id$=dtSearch])"/>
+							</p:columnToggler>
+						</f:facet>
+						<p:ajax event="toggleSelect"
+								update="@this" />
+						<p:ajax event="rowSelect" update="@([id$=dtSearch]),@([id$=tabView]), :frm"
+								listener="#{searchEquipmentBean.view}" />
+						<p:ajax event="rowSelectRadio" update="@([id$=dtSearch]),@([id$=tabView])"
+								listener="#{searchEquipmentBean.view}" />
+						<p:column visible="#{searchEquipmentBean.visibleTable[0]}"
+								  style="width: 40px" headerText="#{msg['index']}">
+							<h:outputText value="#{rowIndex+1}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[1]}"
+								  sortBy="#{c.equipentGroupCode}" headerText ="#{msg['audit.group.equiment']}">
+							<h:outputText id="equipentGroupCodeGr"
+									value="#{c.equipentGroupCode}" />
+							<p:tooltip for="equipentGroupCodeGr" value="#{c.equipentGroupCode}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[2]}"
+								  headerText="#{msg['audit.equipment.code']}" sortBy="#{c.profileCode}">
+							<h:outputText id="profileCodeGr"
+								value="#{c.profileCode}" />
+							<p:tooltip for="profileCodeGr" value="#{c.profileCode}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[3]}"
+								  headerText="#{msg['audit.equipment.name']}" sortBy="#{c.profileName}" >
+							<h:outputText id="profileNameGr"
+								value="#{c.profileName}" />
+							<p:tooltip for="profileNameGr" value="#{c.profileName}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[4]}"
+								  headerText="#{msg['serial']}" sortBy="#{c.serial}">
+							<h:outputText value="#{c.serial}" id="serialGr"/>
+							<p:tooltip for="serialGr" value="#{c.serial}" />
+						</p:column>
+						<p:column  visible="#{searchEquipmentBean.visibleTable[5]}"
+								   headerText="#{msg['search.equipment.status']}" sortBy="#{searchEquipmentBean.getEquipmentStatusName(c.equipmentProfileStatus)}">
+							<h:outputText id="getEquipmentStatusName"
+									value="#{searchEquipmentBean.getEquipmentStatusName(c.equipmentProfileStatus)}" />
+							<p:tooltip for="getEquipmentStatusName" value="#{searchEquipmentBean.getEquipmentStatusName(c.equipmentProfileStatus)}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[6]}"
+								  headerText="#{msg['search.equipment.stockstatus']}" sortBy="#{searchEquipmentBean.getStocktatusNameByTaId(c.stockStatus, c.currentTaId)}">
+							<h:outputText id="getListSearchStocktatus"
+									value="#{searchEquipmentBean.getStocktatusNameByTaId(c.stockStatus, c.currentTaId)}" />
+							<p:tooltip for="getListSearchStocktatus" value="#{searchEquipmentBean.getStocktatusNameByTaId(c.stockStatus, c.currentTaId)}" />
+						</p:column>
+						<!--<p:column headerText="#{msg['search.equipment.tran.status']}" sortBy="#{searchEquipmentBean.getTransTypeName(c.transactionType)}">-->
+							<!--<h:outputText id="tranStatus"-->
+										  <!--value="#{searchEquipmentBean.getTransTypeName(c.transactionType)}" />-->
+							<!--<p:tooltip for="tranStatus" value="#{searchEquipmentBean.getTransTypeName(c.transactionType)}" />-->
+						<!--</p:column>-->
+						<p:column visible="#{searchEquipmentBean.visibleTable[7]}"
+								  headerText="#{msg['search.quantity']}" sortBy="#{c.quantity}">
+							<h:outputText id="searchAuantity"
+										  value="#{c.quantity}" />
+							<p:tooltip for="searchAuantity" value="#{c.quantity}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[8]}"
+								  headerText="#{msg['shop']}" sortBy="#{sessionBean.getShopNameById(c.shopId)}">
+							<h:outputText id="shopIdGr"
+										  value="#{sessionBean.getShopNameById(c.shopId)}" />
+							<p:tooltip for="shopIdGr" value="#{sessionBean.getShopNameById(c.shopId)}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[9]}"
+								  headerText="#{msg['search.equipment.goodStatus']}" sortBy="#{searchEquipmentBean.getWarantyStatusName(c.warrantyStatus)}">
+							<h:outputText id="warrantyStatusGr"
+									value="#{searchEquipmentBean.getWarantyStatusName(c.warrantyStatus)}" />
+							<p:tooltip for="warrantyStatusGr" value="#{searchEquipmentBean.getWarantyStatusName(c.warrantyStatus)}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[10]}"
+								  headerText="#{msg['search.equiment.warrTime']}" sortBy="#{c.warrantyPeriod}">
+							<h:outputText id="warrantyPeriodGr"
+									value="#{c.warrantyPeriod}" />
+							<p:tooltip for="warrantyPeriodGr" value="#{c.warrantyPeriod}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[11]}"
+								  headerText="#{msg['search.equiment.warrDate']}" sortBy="#{c.getWarantyExpiredDateStr2()}">
+							<h:outputText id="warantyExpiredDateStrGr"
+									value="#{c.warantyExpiredDateStr}" />
+							<p:tooltip for="warantyExpiredDateStrGr" value="#{c.warantyExpiredDateStr}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[12]}"
+								  headerText="#{msg['search.equiment.warrLessDay']}" sortBy="#{c.countDayWaran}">
+							<h:outputText id="countDayWaranGr"
+									value="#{c.countDayWaran}" />
+							<p:tooltip for="countDayWaranGr" value="#{c.countDayWaran}" />
+						</p:column>
+						<p:column visible="#{searchEquipmentBean.visibleTable[13]}"
+								  headerText="#{msg['provider']}" sortBy="#{c.providerName}">
+							<h:outputText id="providerNameGr"
+								value="#{c.providerName}" />
+							<p:tooltip for="providerNameGr" value="#{c.providerName}" />
+						</p:column>
+
+						<p:column visible="#{searchEquipmentBean.visibleTable[14]}"
+								  styleClass="Wid5" selectionMode="single" style="text-align: center">
+							<f:facet name="header">
+								<h:outputText value="#{msg['choosed']}" />
+							</f:facet>
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+
+			</div>
+			<div class="Pad10">
+			<p:panel header="#{msg['equiment.detail.ttct']}" id="tabView">
+
+				<p:dialog id="viewDetailHis" header="#{msg['detail.lstb']}" widgetVar="viewDetailHis"
+						  modal="true"
+						  resizable="false" closable="true"
+						  width="70%" height="50%" >
+					<p:panel id="viewDetailHisInput">
+						<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+									 rowIndexVar="rowIndex" value="#{searchEquipmentBean.lsHisDetail}"
+									 paginator="true" rows="10" paginatorPosition="bottom"
+									 resizableColumns="false"
+									 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+									 id="dtViewDetailHis" rowKey="#{c.equipmentHistoryDetailId}">
+							<p:column styleClass="index">
+								<f:facet name="header">
+									<h:outputText value="#{msg['index']}" />
+								</f:facet>
+								<h:outputText value="#{rowIndex+1}" />
+							</p:column>
+							<p:column sortBy="#{sessionBean.getFieldNameActionAudit(c.feildName.toString())}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['column.action']}" />
+								</f:facet>
+								<h:outputText id="getFieldNameActionAudit"
+										value="#{sessionBean.getFieldNameActionAudit(c.feildName.toString())}" />
+								<p:tooltip for="getFieldNameActionAudit" value="#{sessionBean.getFieldNameActionAudit(c.feildName.toString())}" />
+							</p:column>
+							<p:column sortBy="#{c.oldValue}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['column.value.old']}" />
+								</f:facet>
+								<h:outputText id="lbdgold" value="#{c.oldValue}" />
+								<p:tooltip for="lbdgold" value="#{c.oldValue}" />
+							</p:column>
+							<p:column sortBy="#{c.newValue}">
+								<f:facet name="header">
+									<h:outputText value="#{msg['column.value.new']}" />
+								</f:facet>
+								<h:outputText id="lbdgnew" value="#{c.newValue}" />
+								<p:tooltip for="lbdgnew" value="#{c.newValue}" />
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+					<div class="Fright">
+						<p:commandButton value="#{msg['Exit']}"
+										 onclick="PF('viewDetailHis').hide();"
+										 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</div>
+				</p:dialog>
+				<div style="clear: both; height: 5px"></div>
+				<div class="Container100 Responsive100 Pad3" style="display: block">
+					<p:tabView widgetVar="tabView" activeIndex="#{searchEquipmentBean.index}" id="tvInfor" styleClass="Container100">
+						<p:ajax event="tabChange" listener="#{searchEquipmentBean.onTabChanged}" update="@([id$=tblG]),@([id$=tree])" />
+						<!-- update="@previous"/> -->
+						<p:tab id="ggtab" title="#{msg['equiment.detail.ttct']} thiết bị">
+							<ui:insert name="goodsgroup">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+											 rowIndexVar="rowIndex" value="#{searchEquipmentBean.lsDataEquiment}"
+											 paginator="true" rows="5" paginatorPosition="bottom"
+											 resizableColumns="false"
+											 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+											 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+											 id="dtInfoTab1" rowKey="#{c.equimentDetailId}">
+									<p:column styleClass="index">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column sortBy="#{c.getSpecification()}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.specifile']}" />
+										</f:facet>
+										<h:outputText id="mnv"
+												value="#{c.getSpecification()}" />
+										<p:tooltip for="mnv" value="#{c.getSpecification()}" />
+									</p:column>
+									<p:column sortBy="#{c.shopName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.shop']}" />
+										</f:facet>
+										<h:outputText id="shopName"
+												value="#{c.shopName}" />
+										<p:tooltip for="shopName" value="#{c.shopName}" />
+									</p:column>
+									<p:column sortBy="#{c.positionName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.position']}" />
+										</f:facet>
+										<h:outputText id="positionName"
+												value="#{c.positionName}" />
+										<p:tooltip for="positionName" value="#{c.positionName}" />
+									</p:column>
+									<p:column sortBy="#{c.maintancePeriod}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.MAINTANCE_PERIOD']}" />
+										</f:facet>
+										<h:outputText id="maintancePeriod" value="#{c.maintancePeriod}" />
+										<p:tooltip for="maintancePeriod" value="#{c.maintancePeriod}" />
+									</p:column>
+									<p:column sortBy="#{c.warantiyCount}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equiment.count.waranty']}" />
+										</f:facet>
+										<h:outputText id="warantiyCount"
+												value="#{c.warantiyCount}" />
+										<p:tooltip for="warantiyCount" value="#{c.warantiyCount}" />
+									</p:column>
+									<p:column sortBy="#{c.lastWarantyStr}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['waranti.schedule.last']}" />
+										</f:facet>
+										<h:outputText id="lastWarantyStr"
+												value="#{c.lastWarantyStr}" />
+										<p:tooltip for="lastWarantyStr" value="#{c.lastWarantyStr}" />
+									</p:column>
+									<p:column sortBy="#{c.waranCount}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equiment.count.maintein']}" />
+										</f:facet>
+										<h:outputText id="waranCount"
+												value="#{c.waranCount}" />
+										<p:tooltip for="waranCount" value="#{c.waranCount}" />
+									</p:column>
+									<p:column sortBy="#{c.lastUsedDateStr}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['mansten.schedule.last']}" />
+										</f:facet>
+										<h:outputText id="lastUsedDateStr"
+												value="#{c.lastUsedDateStr}" />
+										<p:tooltip for="lastUsedDateStr" value="#{c.lastUsedDateStr}" />
+									</p:column>
+								</p:dataTable>
+							</ui:insert>
+						</p:tab>
+						<p:tab id="gtab" title="#{msg['equipment.history']}">
+							<ui:insert name="goods">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+											 rowIndexVar="rowIndex" value="#{searchEquipmentBean.lsDataAudit}"
+											 paginator="true" rows="5" paginatorPosition="bottom"
+											 resizableColumns="false"
+											 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+											 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+											 id="dtInfoTab2" rowKey="#{c.equipmentHistoryId}">
+									<p:column styleClass="index">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column sortBy="#{searchEquipmentBean.getSerial()}">
+										<f:facet name="header">
+											<h:outputText value="Serial" />
+										</f:facet>
+										<h:outputText id="getSerial"
+												value="#{searchEquipmentBean.getSerial()}" />
+										<p:tooltip for="getSerial" value="#{searchEquipmentBean.getSerial()}" />
+									</p:column>
+									<p:column sortBy="#{c.getCreateDateStr2()}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equiment.date.update']}" />
+										</f:facet>
+										<h:outputText id="createDateStr"
+												value="#{c.createDateStr}" />
+										<p:tooltip for="createDateStr" value="#{c.createDateStr}" />
+									</p:column>
+									<p:column sortBy="#{searchEquipmentBean.getActionTypeName(c.actionType)}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.actionType']}" />
+										</f:facet>
+										<h:outputText id="getActionTypeName"
+												value="#{searchEquipmentBean.getActionTypeName(c.actionType)}" />
+										<p:tooltip for="getActionTypeName" value="#{searchEquipmentBean.getActionTypeName(c.actionType)}" />
+									</p:column>
+									<p:column sortBy="#{searchEquipmentBean.getStaffName(c.staffId)}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.action.user']}" />
+										</f:facet>
+										<h:outputText id="getStaffName"
+												value="#{searchEquipmentBean.getStaffName(c.staffId)}" />
+										<p:tooltip for="getStaffName" value="#{searchEquipmentBean.getStaffName(c.staffId)}" />
+									</p:column>
+
+									<p:column styleClass="deleteCol">
+										<f:facet name="header">
+											<h:outputText value="#{msg['infoAdd']}" />
+										</f:facet>
+										<p:commandLink value="#{msg['view.info']}" styleClass="delete" update=":frm:viewDetailHis" ajax="true"
+													   actionListener="#{searchEquipmentBean.viewDetailHis(c.equipmentHistoryId)}"></p:commandLink>
+									</p:column>
+								</p:dataTable>
+							</ui:insert>
+						</p:tab>
+						<p:tab id="gptab" title="#{msg['equiment.history.maitein']}">
+							<ui:insert name="goodsPrice">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+											 rowIndexVar="rowIndex" value="#{searchEquipmentBean.lsDataMaintain}"
+											 paginator="true" rows="5" paginatorPosition="bottom"
+											 resizableColumns="false"
+											 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+											 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+											 id="dtInfoTab3" rowKey="#{c.mseId}">
+									<p:column styleClass="index">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column sortBy="#{c.serial}">
+										<f:facet name="header">
+											<h:outputText value="Serial" />
+										</f:facet>
+										<h:outputText id="serial"
+												value="#{c.serial}" />
+										<p:tooltip for="serial" value="#{c.serial}" />
+									</p:column>
+									<p:column sortBy="#{c.shopCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.shop']}" />
+										</f:facet>
+										<h:outputText id="shopCode"
+												value="#{c.shopCode} | #{c.shopName}" />
+										<p:tooltip for="shopCode" value="#{c.shopCode} | #{c.shopName}" />
+									</p:column>
+									<p:column sortBy="#{c.positionCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['history.position']}" />
+										</f:facet>
+										<h:outputText id="positionCode"
+												value="#{c.positionCode} | #{c.positionName}" />
+										<p:tooltip for="positionCode" value="#{c.positionCode} | #{c.positionName}" />
+									</p:column>
+									<p:column sortBy="#{c.actionDateStr}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.date.maintein']}" />
+										</f:facet>
+										<h:outputText id="actionDateStr"
+												value="#{c.actionDateStr}" />
+										<p:tooltip for="actionDateStr" value="#{c.actionDateStr}" />
+									</p:column>
+									<p:column sortBy="#{searchEquipmentBean.getMaintenStatusName(c.statusMse)}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.status.maintein']}" />
+										</f:facet>
+										<h:outputText id="getMaintenStatusName"
+												value="#{searchEquipmentBean.getMaintenStatusName(c.statusMse)}" />
+										<p:tooltip for="getMaintenStatusName" value="#{searchEquipmentBean.getMaintenStatusName(c.statusMse)}" />
+									</p:column>
+								</p:dataTable>
+							</ui:insert>
+						</p:tab>
+					</p:tabView>
+				</div>
+				<div style="clear: both; height: 5px"></div>
+			</p:panel>
+			</div>
+
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+
+</ui:composition>

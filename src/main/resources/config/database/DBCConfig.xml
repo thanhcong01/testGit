@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ConfigDBC>
+    <Session-factory>
+        <name>default session</name>
+        <url>/config/database/hibernate.cfg.xml</url>
+    </Session-factory>
+</ConfigDBC>
+    
+

@@ -1,0 +1,197 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<!-- <p:menubar model="#{MenuBarController.model}" /> -->
+		<!-- <BreadCumb> -->
+		<div class="EmptyBox5"></div>
+		<h:form id="frmMenu">
+			<title>#{msg['bc.th.xnt']}</title>
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+		</h:form>
+		<h:form id="frm">
+			<title>#{msg['report.export.shop']}</title>
+
+			<p:growl id="messages" showDetail="true" autoUpdate="true"
+			globalOnly="true" />
+		<div class="EmptyBox10" />
+		<div class="Pad10">
+			<p:outputPanel styleClass="Container100 Responsive100">
+				<div class="Container100 Responsive100">
+					<div class="Container20 Pad5 Responsive50">
+						<p:panel styleClass="DispBlock Fleft Wid100"
+								 header="#{msg['positon.left.shop.title2']}">
+							<div
+									style="clear: both; display: block; width: 100%; height: 35px">
+								<p:outputPanel>
+									<p:inputText styleClass="Fleft Wid100" id="txtKeyFilter"
+												 label="Lọc dữ liệu" placeholder="Tìm kiến kho"
+												 onkeypress="if (event.keyCode == 13) { return false; }"
+												 value="#{importExportReportBean.strKeyFilter}">
+										<p:ajax event="keyup" listener="#{importExportReportBean.treesSelect}"
+												update="@([id$=shopTree])" />
+									</p:inputText>
+								</p:outputPanel>
+							</div>
+							<div class="treeShopMin" style="clear: both">
+								<p:outputPanel id="tree">
+									<p:tree value="#{importExportReportBean.root}" var="node" id="shopTree"
+											selectionMode="single" selection="#{importExportReportBean.selectedNode}">
+										<p:treeNode>
+											<h:outputText value="#{node.shopCode} - #{node.shopName}" />
+										</p:treeNode>
+										<p:ajax event="select"  update=":frm, :frm:thongtin"
+												listener="#{importExportReportBean.onNodeSelect}">
+										</p:ajax>
+									</p:tree>
+								</p:outputPanel>
+							</div>
+						</p:panel>
+					</div>
+					<p:outputPanel styleClass="Container80 Pad5 Responsive20">
+						<p:panel header="#{msg['equipmentsDetail.search']}"
+								 styleClass="Container100">
+						<div class="max-width-cbb">
+							<p:panelGrid styleClass="Container100">
+								<p:columnGroup>
+									<p:column style="width:12%;"></p:column>
+									<p:column style="width:20%;"></p:column>
+									<p:column style="width:12%;"></p:column>
+									<p:column style="width:20%;"></p:column>
+									<p:column style="width:4%;"></p:column>
+								</p:columnGroup>
+								<p:row>
+									<!--<p:column  style="width: 10%; text-align: center">-->
+										<!--<p:outputLabel for="bot" value="#{msg['goods.tableProfile.column.unit']}:"></p:outputLabel>-->
+									<!--</p:column>-->
+									<!--<p:column style="width: 20%">-->
+										<!--<p:selectOneMenu id="bot" style="width: 200px"-->
+														 <!--value="#{importExportReportBean.shopId}">-->
+											<!--<f:selectItems-->
+													<!--value="#{importExportReportBean.mapShop.entrySet()}"-->
+													<!--var="entry" itemValue="#{entry.key}"-->
+													<!--itemLabel="#{entry.value}" />-->
+										<!--</p:selectOneMenu>-->
+									<!--</p:column>-->
+
+									<p:column  style="width: 10%; text-align: center">
+										<p:outputLabel for="tungay6" value="Từ ngày:(*)"></p:outputLabel>
+									</p:column>
+									<p:column style="width: 20%">
+										<p:calendar id="tungay6" mindate="23/09/2016" style="width: 200px"
+													value="#{importExportReportBean.fromCreateDate}"
+													maxdate="#{importExportReportBean.toCreateDate}"
+													>
+											<p:ajax event="dateSelect"
+													update=":frm" listener="#{importExportReportBean.getFromCreateDate()}" />
+										</p:calendar>
+									</p:column>
+									<p:column style="width: 10%; text-align: center">
+										<p:outputLabel for="denngay6" value="Đến ngày:(*)"></p:outputLabel>
+									</p:column>
+									<p:column style="width: 20%">
+										<!--maxdate="#{importExportReportBean.dateMax}"-->
+										<p:calendar id="denngay6" style="width: 200px"
+													maxdate="#{importExportReportBean.dateMax}"
+													mindate="#{importExportReportBean.fromCreateDate}"
+													value="#{importExportReportBean.toCreateDate}">
+											<p:ajax event="dateSelect"
+													update=":frm"  listener="#{importExportReportBean.getToCreateDate()}" />
+										</p:calendar>
+									</p:column>
+
+								</p:row>
+								<p:row>
+									<p:column colspan="4" style="text-align: center">
+										<p:commandButton
+														 actionListener="#{importExportReportBean.search()}"
+														 value="Tìm kiếm" update=":frm, :frm:thongtin">
+										</p:commandButton>
+										<p:commandButton  value="Xuất Excel"
+														  ajax="true" onclick="PrimeFaces.monitorDownload(start, stop);"
+														  actionListener="#{importExportReportBean.export_excel()}">
+											<p:fileDownload value="#{importExportReportBean.fileExport}" />
+										</p:commandButton>
+									</p:column>
+
+								</p:row>
+							</p:panelGrid>
+						</div>
+						</p:panel>
+						<div class="EmptyBox10" />
+						<p:outputPanel id="thongtin" styleClass="Container100">
+							<p:panel header="#{msg['tt.search.xnt']}" styleClass="Container100">
+								<p:dataTable id="bangthongtin" rows="10"
+											 emptyMessage="Không có dữ liệu" resizableColumns="false"
+											 liveResize="true" var="model" lazy="false" paginator="true"
+											 rowIndexVar="rowCount" paginatorPosition="bottom"
+											 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											 rowsPerPageTemplate="5,10,20,50,100"
+											 value="#{importExportReportBean.lazyReport}">
+									<p:column headerText="STT" width="5%"
+											  style="text-align: center">
+										<h:outputText id="stt" value="#{rowCount + 1}"
+													  lable="#{rowCount + 1}" />
+									</p:column>
+									<!--<p:column headerText="#{msg['goods.tableProfile.column.unit']}" width="10%"-->
+									<!--style="text-align: left" sortBy="#{model.shopName}">-->
+									<!--<h:outputText id="shopName" value="#{model.shopName}" />-->
+									<!--<p:tooltip for="shopName" value="#{model.shopName}" />-->
+									<!--</p:column>-->
+									<p:column headerText="Nhóm thiết bị" style="text-align: left" sortBy="#{model.equipmentGroupName}">
+										<h:outputText id="equipmentGroupName" value="#{model.equipmentGroupName}" />
+										<p:tooltip for="equipmentGroupName" value="#{model.equipmentGroupName}" />
+									</p:column>
+									<p:column headerText="Mã thiết bị" style="text-align: left" sortBy="#{model.profileCode}">
+										<h:outputText id="profileCode" value="#{model.profileCode}" />
+										<p:tooltip for="profileCode" value="#{model.profileCode}" />
+									</p:column>
+									<p:column headerText="Tên thiết bị" style="text-align: left" sortBy="#{model.profileName}">
+										<h:outputText id="profileName" value="#{model.profileName}">
+										</h:outputText>
+										<p:tooltip for="profileName" value="#{model.profileName}" />
+									</p:column>
+									<p:column headerText="ĐVT" width="10%"
+											  style="text-align: left" sortBy="#{model.unitName}">
+										<h:outputText id="unitName" value="#{model.unitName}" />
+										<p:tooltip for="unitName" value="#{model.unitName}" />
+									</p:column>
+									<!--<p:column headerText="Trạng thái" style="text-align: left" sortBy="#{model.statusStr}">-->
+										<!--<h:outputText id="statusStr" value="#{model.statusStr}">-->
+										<!--</h:outputText>-->
+										<!--<p:tooltip for="statusStr" value="#{model.statusStr}" />-->
+									<!--</p:column>-->
+									<p:column headerText="Số dư đầu kỳ" style="text-align: right" sortBy="#{model.oldBallance}">
+										<h:outputText id="scpt" value="#{model.oldBallance}">
+										</h:outputText>
+										<p:tooltip for="scpt" value="#{model.oldBallance}" />
+									</p:column>
+									<p:column headerText="Nhập trong kỳ" style="text-align: right" sortBy="#{model.importAmount}">
+										<h:outputText id="hmcl" value="#{model.importAmount}">
+										</h:outputText>
+										<p:tooltip for="hmcl" value="#{model.importAmount}" />
+									</p:column>
+									<p:column headerText="Xuất trong kỳ" style="text-align: right" sortBy="#{model.exportAmount}">
+										<h:outputText id="hmcd" value="#{model.exportAmount}">
+										</h:outputText>
+										<p:tooltip for="hmcd" value="#{model.exportAmount}" />
+									</p:column>
+									<p:column headerText="Tồn cuối kỳ" style="text-align: right" sortBy="#{model.newBallance}">
+										<h:outputText id="npsn" value="#{model.newBallance}" />
+										<p:tooltip for="npsn" value="#{model.newBallance}" />
+									</p:column>
+								</p:dataTable>
+							</p:panel>
+						</p:outputPanel>
+					</p:outputPanel>
+				</div>
+			</p:outputPanel>
+		</div>
+
+		</h:form>
+	</ui:define>
+</ui:composition>

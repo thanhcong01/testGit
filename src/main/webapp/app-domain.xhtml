@@ -1,0 +1,318 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:p="http://primefaces.org/ui"
+				template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<f:attribute name="RESOURCE" value="EQUIPMENT.KPI" />
+		<h:form id="frm">
+
+			<!-- BreadCumb -->
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:outputPanel styleClass="Container100 Responsive100">
+
+					<!-- Table Content -->
+					<div class="Container100 Responsive100">
+
+						<!-- Form layout-->
+						<p:outputPanel id="updateForm">
+							<div class="Container100 Responsive50">
+								<p:panel styleClass="Container100" header="#{msg['appdomain.header']}">
+									<div class="Pad5">
+										<div style="float: right;">
+											<p:commandLink oncomplete="PF('dlSave').show();"
+														   PRIVILEGE="INSERT" update="@([id$=dlSave])">
+												<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+												<p:resetInput target=":frmDialog:dlSave" />
+												<f:setPropertyActionListener target="#{appDomainBean.domainSelected}" value="#{appDomainBean.reset()}"/>
+												<f:setPropertyActionListener target="#{appDomainBean.type}" value="#{appDomainBean.TYPE_ADD}" />
+											</p:commandLink>
+											<p:commandLink action="#{appDomainBean.beforeSave}" update="@([id$=dlSave])" PRIVILEGE="UPDATE">
+												<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+												<p:resetInput target=":frmDialog:dlSave" />
+												<f:setPropertyActionListener target="#{appDomainBean.type}" value="#{appDomainBean.TYPE_EDIT}" />
+											</p:commandLink>
+											<p:commandButton id="confirmButton" style="display: none" action="#{appDomainBean.delete}" update="@([id$=tblDomain])">
+												<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+														   message="#{msg['common.confirm.message']}"	/>
+											</p:commandButton>
+											<p:commandLink  action="#{appDomainBean.beforeDelete}" PRIVILEGE="DELETE">
+												<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+											</p:commandLink>
+											<p:commandLink oncomplete="PF('dlSearch').show();" update="@([id$=dlSearch])">
+												<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+												<f:setPropertyActionListener target="#{appDomainBean.domainSelected}" value="#{appDomainBean.reset()}"/>
+												<f:setPropertyActionListener target="#{appDomainBean.type}" value="#{appDomainBean.TYPE_SEARCH}" />
+											</p:commandLink>
+											<p:spacer width="10" />
+										</div>
+
+										<div class="EmptyBox5" />
+										<p:dataTable var="dm" value="#{appDomainBean.listApDomains}" id="tblDomain"
+													 paginator="true" paginatorPosition="bottom"
+													 selection="#{appDomainBean.listAppDomainSelected}"
+													 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+													 rowsPerPageTemplate="5,10,20,50,100"
+													 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+													 rowKey="#{dm.id}" lazy="false" rows="10"
+													 emptyMessage="#{msg['common.table.emptymessage']}">
+											<!-- 									<p:ajax event="rowSelect" listener="#{appDomainBean.onRowSelect}"  /> -->
+
+											<p:ajax event="toggleSelect"
+													listener="#{appDomainBean.onRowSelected}" update="@this" />
+											<p:ajax event="rowSelectCheckbox"
+													listener="#{appDomainBean.onRowSelected}" update="@this" />
+											<p:ajax event="rowUnselectCheckbox"
+													listener="#{appDomainBean.onRowSelected}" update="@this" />
+
+											<f:facet name="header">
+												<p:commandButton styleClass="toggler" id="togglertblDomain"
+																 type="button" value="#{msg['chooseColumns']}"
+																 icon="ui-icon-calculator" />
+												<p:columnToggler datasource="tblDomain" trigger="togglertblDomain">
+													<p:ajax event="toggle" listener="#{appDomainBean.onToggleActiveEtag}"
+															update="@([id$=tblDomain])"/>
+												</p:columnToggler>
+											</f:facet>
+
+											<p:column selectionMode="multiple" visible="#{appDomainBean.visibleTable[0]}"
+													  style="text-align: center" styleClass="Wid3" />
+
+											<p:column sortBy="#{dm.type}" visible="#{appDomainBean.visibleTable[1]}"
+													  headerText="#{msg['appdomain.type']}">
+												<h:outputText id="dmtype" value="#{dm.type}" />
+												<p:tooltip for="dmtype"
+														   value="#{dm.type}" />
+											</p:column>
+											<p:column sortBy="#{dm.code}"
+													  visible="#{appDomainBean.visibleTable[2]}" headerText="#{msg['appdomain.code']}">
+												<h:outputText id="codeG" value="#{dm.code}" />
+												<p:tooltip for="codeG"
+														   value="#{dm.code}" />
+											</p:column>
+											<p:column sortBy="#{dm.name}"
+													  visible="#{appDomainBean.visibleTable[3]}" headerText="#{msg['appdomain.name']}">
+												<h:outputText id="nameG" value="#{dm.name}" />
+												<p:tooltip for="nameG"
+														   value="#{dm.name}" />
+											</p:column>
+											<p:column sortBy="#{dm.description}"
+													  visible="#{appDomainBean.visibleTable[4]}" headerText="#{msg['appdomain.note']}">
+												<h:outputText id="descriptionG" value="#{dm.description}" />
+												<p:tooltip for="descriptionG"
+														   value="#{dm.description}" />
+											</p:column>
+											<p:column sortBy="#{dm.status}" visible="#{appDomainBean.visibleTable[5]}"
+													  headerText="#{msg['common.status']}">
+												<h:outputText id="statusG" value="#{dm.status==1?msg['common.status.1']:msg['common.status.0']}" />
+												<p:tooltip for="statusG"
+														   value="#{dm.status==1?msg['common.status.1']:msg['common.status.0']}" />
+											</p:column>
+											<p:column sortBy="#{dm.value}" visible="#{appDomainBean.visibleTable[6]}"
+													  headerText="#{msg['appdomain.value']}">
+												<h:outputText id="valueG" value="#{dm.value}" />
+												<p:tooltip for="valueG"
+														   value="#{dm.value}" />
+											</p:column>
+										</p:dataTable>
+									</div>
+								</p:panel>
+							</div>
+						</p:outputPanel>
+					</div>
+				</p:outputPanel>
+			</div>
+		</h:form>
+		<div class="EmptyBox20"></div>
+		<h:form id="frmDialog">
+			<p:confirmDialog widgetVar="dlgDelete" global="true"
+							 showEffect="fade" hideEffect="fade">
+				<p:commandButton value="#{msg['common.confirmdialog.yes']}"
+								 styleClass="ui-confirmdialog-yes"
+								 icon="ui-icon-check" />
+				<p:commandButton value="#{msg['common.confirmdialog.no']}"
+								 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
+
+			<p:dialog widgetVar="dlSave" id="dlSave" modal="true" resizable="false" closable="true"
+					  height="300"
+					  header="#{msg['appdomain.header']}">
+				<p:panelGrid id="panelDomain" style="width:500px">
+					<p:row>
+						<p:column style="width:30%">
+							<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.type']} (*)" />
+						</p:column>
+						<p:column style="width:70%">
+							<p:inputText styleClass="Wid100" id="type" value="#{appDomainBean.domainSelected.type}"
+										 disabled="#{appDomainBean.domainSelected.status==0?true:false}"
+										 maxlength="30">
+								<f:attribute name="msglabel" value="#{msg['appdomain.type']}" />
+								<f:validator validatorId="emtyValidator" />
+							</p:inputText>
+							<p:outputLabel/> <p:message id="msgtype" for="type" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column style="width:30%">
+							<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.code']} (*)" />
+						</p:column>
+						<p:column style="width:70%">
+							<p:inputText styleClass="Wid100" id="code" value="#{appDomainBean.domainSelected.code}"
+										 disabled="#{appDomainBean.domainSelected.status==0?true:false}"
+										 maxlength="30">
+								<f:attribute name="msglabel" value="#{msg['appdomain.code']}" />
+								<f:validator validatorId="emtyValidator" />
+								<f:validator validatorId="spaceValidator" />
+								<f:validator validatorId="codeValidator"/>
+							</p:inputText>
+							<p:outputLabel/> <p:message id="msgCode" for="code" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.name']} (*)" />
+						</p:column>
+						<p:column>
+							<p:inputText styleClass="Wid100" id="name" value="#{appDomainBean.domainSelected.name}"
+										 disabled="#{appDomainBean.domainSelected.status==0?true:false}"
+										 maxlength="100">
+								<f:attribute name="msglabel" value="#{msg['appdomain.name']}" />
+								<f:validator validatorId="emtyValidator" />
+							</p:inputText>
+							<p:outputLabel/> <p:message id="msgName" for="name" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.note']}" />
+						</p:column>
+						<p:column>
+							<p:inputText styleClass="Wid100" id="desc" value="#{appDomainBean.domainSelected.description}"
+										 disabled="#{appDomainBean.domainSelected.status==0?true:false}"
+										 maxlength="100">
+							</p:inputText>
+							<p:outputLabel/> <p:message id="msgDesc" for="desc" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel style="font-size:12px;" value="#{msg['common.status']} (*)" />
+						</p:column>
+						<p:column>
+							<p:selectOneMenu id="status"
+											 styleClass="Wid100"
+											 disabled="true"
+											 value="#{appDomainBean.domainSelected.status}"
+											 style="width:300px">
+								<f:selectItem itemLabel="#{msg['common.status.1']}"
+											  itemValue="1" />
+								<f:selectItem itemLabel="#{msg['common.status.0']}"
+											  itemValue="0" />
+							</p:selectOneMenu>
+							<p:outputLabel/><p:message for="status" />
+						</p:column>
+					</p:row>
+					<p:row>
+						<p:column>
+							<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.value']} (*)" />
+						</p:column>
+						<p:column>
+							<p:inputText styleClass="Wid100" id="value" value="#{appDomainBean.domainSelected.value}"
+										 disabled="#{appDomainBean.domainSelected.status==0?true:false}"
+										 maxlength="10" converterMessage="#{msg['validator.message.number.content2']}">
+								<f:attribute name="msglabel" value="#{msg['appdomain.value']}" />
+								<f:validator validatorId="emtyValidator" />
+							</p:inputText>
+							<p:outputLabel/> <p:message id="msgValue" for="value" />
+						</p:column>
+					</p:row>
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-plus"
+									 disabled="#{appDomainBean.domainSelected.status==0?true:false}"
+									 action="#{appDomainBean.save}"
+									 value="#{msg['common.dialog.save']}"
+									 update="@([id$=tblDomain]),@([id$=panelDomain])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+									 value="#{msg['common.confirmdialog.no']}"
+									 oncomplete="PF('dlSave').hide()"
+					>
+						<p:resetInput target=":frmDialog:dlSave" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+
+		</h:form>
+
+		<h:form id="frmSearch">
+			<p:dialog widgetVar="dlSearch" id="dlSearch" modal="true" resizable="false" closable="true"
+					  height="300"
+					  header="#{msg['appdomain.header']}">
+				<p:panelGrid id="panelDoSearch" columns="2">
+					<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.type']}" />
+					<p:inputText style="width:250px;" value="#{appDomainBean.domainSelected.type}"
+								 maxlength="30">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.code']}" />
+					<p:inputText style="width:250px;" value="#{appDomainBean.domainSelected.code}"
+								 maxlength="30">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.name']}" />
+					<p:inputText style="width:250px;" value="#{appDomainBean.domainSelected.name}"
+								 maxlength="100">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.note']}" />
+					<p:inputText style="width:250px;" value="#{appDomainBean.domainSelected.description}"
+								 maxlength="100">
+					</p:inputText>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['common.status']}" />
+					<p:selectOneMenu
+							value="#{appDomainBean.domainSelected.status}"
+							style="width:250px">
+						<f:selectItem itemLabel="" itemValue="" />
+						<f:selectItem itemLabel="#{msg['common.status.1']}"
+									  itemValue="1" />
+						<f:selectItem itemLabel="#{msg['common.status.0']}"
+									  itemValue="0" />
+					</p:selectOneMenu>
+
+					<p:outputLabel style="font-size:12px;" value="#{msg['appdomain.value']}" />
+					<p:inputText style="width:250px;" value="#{appDomainBean.domainSelected.value}"
+								 maxlength="10">
+					</p:inputText>
+
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton icon="ui-icon-plus"
+									 action="#{appDomainBean.filterSearch}"
+									 value="#{msg['common.dialog.search']}"
+									 update="@([id$=tblDomain]),@([id$=panelDoSearch])">
+					</p:commandButton>
+					<p:commandButton icon="ui-icon-closethick"
+									 value="#{msg['common.dialog.cancel']}"
+									 oncomplete="PF('dlSearch').hide()"
+					>
+						<p:resetInput target=":frmSearch:dlSearch" />
+					</p:commandButton>
+				</f:facet>
+			</p:dialog>
+		</h:form>
+		<script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+		</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,443 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frmHandleType">
+            <p:outputLabel style="display: none" value="#{approveGoods.setHandleType(1)}"></p:outputLabel>
+        </h:form>
+        <h:form id="frm">
+
+
+            <title>#{msg['approveGoods']}</title>
+
+            <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+
+            <p:growl id="messages" showDetail="true" />
+
+            <div class="Pad10">
+                <p:panel header="#{msg['audit.info.search.invoice']}" styleClass="Container100">
+
+                    <p:panelGrid styleClass="Wid100" >
+                        <p:row >
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['equipment.transactionAction.PNK']}"></p:outputLabel>
+                            </p:column>
+
+                            <p:column styleClass="Wid203">
+                                <p:autoComplete  id="cmlOrder" styleClass="Wid100" value="#{approveGoods.oderCode}" minQueryLength="3" completeMethod="#{approveGoods.completeOrder}">
+                                    <p:ajax event="itemSelect" listener="#{approveGoods.oderSelect}" update="frm" />
+                                </p:autoComplete>
+                            </p:column>
+
+                            <!--<p:column styleClass="Wid13">-->
+                            <!--<p:outputLabel value="#{msg['reason']}"></p:outputLabel>-->
+                            <!--</p:column>    -->
+
+                            <!--<p:column styleClass="Wid203">-->
+                            <!--<p:selectOneMenu styleClass="select Wid100" value="#{approveGoods.reasonId}"  >-->
+                            <!--<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />-->
+                            <!--<f:selectItems value="#{approveGoods.listReason}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />-->
+                            <!--</p:selectOneMenu>-->
+                            <!--</p:column>-->
+
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel  value="#{msg['status']}"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid203">
+                                <p:selectOneMenu styleClass="select Wid100" value="#{approveGoods.status}" >
+                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{approveGoods.listStatus}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="#{msg['createDate']}"></p:outputLabel>
+                            </p:column>
+
+                            <p:column>
+                                <p:calendar styleClass="Wid100" id="button" showOn="button"
+                                            converterMessage="#{msg['errDateType']}"
+                                            yearRange="c-70:c+70" navigator="true"
+                                            value="#{approveGoods.createDate}" pattern="dd/MM/yyyy" >
+                                </p:calendar>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+
+
+                            <p:column>
+                                <p:outputLabel  value="#{msg['createStaff']}"></p:outputLabel>
+                            </p:column>
+
+                            <p:column colspan="3">
+                                <p:selectOneMenu styleClass="select Wid100" value="#{approveGoods.staffId}">
+                                    <f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />
+                                    <f:selectItems value="#{approveGoods.users}" var="c" itemLabel="#{c.staffName}" itemValue="#{c.staffId}" />
+                                </p:selectOneMenu>
+                            </p:column>
+
+                            <p:column>
+                                <p:outputLabel></p:outputLabel>
+                            </p:column>
+
+                            <p:column>
+                                <p:commandButton style="float:right;" value="#{msg['search']}" icon="fa fa-search Fs14 white" update=":frm, :frm:dtOrdersDetail"
+                                                 id="search" actionListener="#{approveGoods.search}" styleClass="ui-priority-primary" />
+                            </p:column>
+                        </p:row>
+
+                    </p:panelGrid>
+                    <div class="EmptyBox5"></div>
+                </p:panel>
+
+                <div class="EmptyBox10"></div>
+
+                <p:panel>
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{approveGoods.lsTa}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtOrders" lazy="true" selection="#{approveGoods.ta}"  rowKey="#{c.transactionActionId}" >
+                        <f:facet  name="header">
+                            <span class="dtHead"  style="">#{msg['transList']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtOrders"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+
+                            <p:columnToggler datasource="dtOrders" trigger="togglerdtOrders">
+                                <p:ajax event="toggle" listener="#{approveGoods.onToggleActiveEtag}"
+                                        update="@([id$=dtOrders])"/>
+                            </p:columnToggler>
+                            <!--<p:columnToggler datasource="dtOrders" trigger="togglerdtOrders" />-->
+                        </f:facet>
+                        <p:ajax event="rowSelectRadio" listener="#{approveGoods.viewDetail}" update=":frm, :frm:dtOrdersDetail" />
+
+                        <p:column styleClass="index"
+                                  visible="#{approveGoods.visibleTable[0]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column sortBy="#{c.transactionActionCode}"  visible="#{approveGoods.visibleTable[1]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipment.transactionAction.PNK']}" />
+                            </f:facet>
+                            <h:outputText id="transactionActionCode" value="#{c.transactionActionCode}" />
+                            <p:tooltip for="transactionActionCode"
+                                       value="#{c.transactionActionCode}" />
+                        </p:column>
+                        <!--<p:column >-->
+                        <!--<f:facet name="header">-->
+                        <!--<h:outputText value="#{msg['reason']}" />-->
+                        <!--</f:facet>-->
+                        <!--<h:outputText value="#{c.reasonName}" />-->
+                        <!--</p:column>-->
+                        <p:column sortBy="#{c.status}"  visible="#{approveGoods.visibleTable[2]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['status']}" />
+                            </f:facet>
+                            <h:outputText id="statusName" value="#{c.statusName}" />
+                            <p:tooltip for="statusName"
+                                       value="#{c.statusName}" />
+                        </p:column>
+                        <!--sortBy="#{c.createDatetime}"-->
+                        <p:column sortBy="#{c.createDatetime}"  visible="#{approveGoods.visibleTable[3]}"  >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['createDate']}" />
+                            </f:facet>
+                            <h:outputText id="createDateString" value="#{c.createDateString}" >
+                            </h:outputText>
+                            <p:tooltip for="createDateString"
+                                       value="#{c.createDateString}" />
+                        </p:column>
+                        <p:column sortBy="#{c.createStaffId}"  visible="#{approveGoods.visibleTable[4]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['createStaff']}" />
+                            </f:facet>
+                            <h:outputText id="staffName" value="#{c.staffName}" />
+                            <p:tooltip for="staffName"
+                                       value="#{c.staffName}" />
+                        </p:column>
+                        <p:column sortBy="#{c.assessmentDatetime}"  visible="#{approveGoods.visibleTable[5]}"  >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['assDate']}" />
+                            </f:facet>
+                            <h:outputText id="assDateString" value="#{c.assDateString}" >
+                            </h:outputText>
+                            <p:tooltip for="assDateString"
+                                       value="#{c.assDateString}" />
+                        </p:column>
+                        <p:column sortBy="#{c.assessmentStaffId}"  visible="#{approveGoods.visibleTable[6]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['assStaffName']}" />
+                            </f:facet>
+                            <h:outputText id="assStaffName" value="#{c.assStaffName}" />
+                            <p:tooltip for="assStaffName"
+                                       value="#{c.assStaffName}" />
+                        </p:column>
+                        <p:column  selectionMode="single" style="max-width: 70px"  visible="#{approveGoods.visibleTable[7]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['choosed']}" />
+                            </f:facet>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+
+                <div class="EmptyBox10"></div>
+                <p:panel styleClass="Container100">
+                    <p:panelGrid styleClass="Wid100">
+                        <!--                        <p:column styleClass="Wid13">
+                                                    <p:outputLabel value="#{msg['note']}"></p:outputLabel>
+                                                </p:column>
+                                                <p:column styleClass="Wid203">
+                                                    <p:inputText maxlength="200" styleClass="textArena2" value="#{approveGoods.ta.description}"></p:inputText>
+                                                </p:column>-->
+                        <p:column >
+
+                            <div class="Fright">
+                                <p:commandButton value="#{msg['approve']}" icon="fa fa-check Fs14 white" disabled="#{approveGoods.disableApp}" id="approve" update="frm"  actionListener="#{approveGoods.save}" styleClass="ui-priority-primary" >
+
+                                </p:commandButton>
+                                <p:commandButton value="#{msg['reject']}" icon="fa fa-ban Fs14 white"  disabled="#{approveGoods.disableDel}" id="cancel" update="frm"  actionListener="#{approveGoods.reject}" styleClass="ui-priority-primary reject" >
+
+                                </p:commandButton>
+                                <!--<p:commandButton value="#{msg['print']}" icon="fa fa-fa fa-print Fs14 white"-->
+                                <!--&gt;</p:commandButton>-->
+                                <p:commandButton value="#{msg['Exit']}"  icon="fa fa-times Fs14 white" action="index?faces-redirect=true" styleClass="ui-priority-primary" >
+                                </p:commandButton>
+
+                                <p:dialog widgetVar="cfImNCC">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{approveGoods.confirm}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid styleClass="pngConfirm">
+                                        <p:row></p:row>
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update="@all"
+                                                         actionListener="#{approveGoods.action()}"
+                                                         styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"
+                                                         onclick="PF('cfImNCC').hide();"
+                                                         styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+
+
+                                <p:dialog widgetVar="cfApp" >
+                                    <f:facet name="header">
+                                        <p:outputLabel value="#{approveGoods.confirm}"></p:outputLabel>
+                                    </f:facet>
+                                    <p:panelGrid styleClass="pngConfirm">
+                                        <p:row>
+                                            <p:column><p:outputLabel value="#{msg['orderCode']}"></p:outputLabel></p:column>
+                                            <p:column><p:inputText disabled="true" styleClass="disableText" value="#{approveGoods.ta.transactionActionCode}"></p:inputText></p:column>
+                                            <p:column><p:outputLabel value="#{msg['reason']}"></p:outputLabel></p:column>
+                                            <p:column><p:inputText disabled="true" styleClass="disableText" value="#{approveGoods.ta.reasonName}"></p:inputText></p:column>
+                                        </p:row>
+                                        <p:row>
+                                            <p:column><p:outputLabel value="#{msg['note']}"></p:outputLabel></p:column>
+                                            <p:column colspan="3"> <p:inputTextarea rows="3" maxlength="300" value="#{approveGoods.ta.description}"></p:inputTextarea></p:column>
+                                        </p:row>
+                                    </p:panelGrid>
+                                    <div class="Fright">
+                                        <p:commandButton value="#{msg['yes']}" update="@all"
+                                                         actionListener="#{approveGoods.action}" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton value="#{msg['no']}"  onclick="PF('cfApp').hide();" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </div>
+                                </p:dialog>
+                            </div>
+
+                        </p:column>
+                    </p:panelGrid>
+
+                </p:panel>
+                <div class="EmptyBox10"></div>
+                <p:panel styleClass="Container100" >
+                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{approveGoods.lsTad}"
+                                 paginator="true" rows="5"
+                                 paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 id="dtOrdersDetail" lazy="false" selection="#{approveGoods.tad}"
+                                 selectionMode="single" rowKey="#{c.transactionActionDetailId}">
+                        <f:facet  name="header">
+                            <span class="dtHead"  style="">#{msg['transDetailInfo']}</span>
+                            <p:commandButton styleClass="toggler" id="togglerdtOrdersDetail"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="dtOrdersDetail" trigger="togglerdtOrdersDetail">
+                                <p:ajax event="toggle" listener="#{approveGoods.onToggleActiveEtag2}"
+                                        update="@([id$=dtOrdersDetail])"/>
+                            </p:columnToggler>
+                            <!--<p:columnToggler datasource="dtOrdersDetail" trigger="togglerdtOrdersDetail" />-->
+                        </f:facet>
+                        <p:ajax event="rowSelect" listener="#{approveGoods.viewSerial}" update=":frm" />
+                        <!--<p:ajax event="rowSelectRadio" listener="#{approveGoods.viewSerial}" update=":frm" />-->
+                        <!--<p:column  selectionMode="single" style="max-width: 70px">-->
+                        <!--<f:facet name="header">-->
+                        <!--<h:outputText value="#{msg['choosed']}" />-->
+                        <!--</f:facet>-->
+                        <!--</p:column>-->
+                        <p:column styleClass="index" visible="#{approveGoods.visibleTable2[0]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsId}" visible="#{approveGoods.visibleTable2[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['equipmentsDetail.group.euqipment']}" />
+                            </f:facet>
+                            <h:outputText id="euqipment" value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                            <p:tooltip  for="euqipment"
+                                        value="#{sessionBean.getGoodsGroupNameByGoods(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsId}" visible="#{approveGoods.visibleTable2[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['audit.equipment.code']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileCode" value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                            <p:tooltip  for="getEquipProfileCode"
+                                        value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsId}" visible="#{approveGoods.visibleTable2[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['audit.equipment.name']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipProfileName" value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                            <p:tooltip  for="getEquipProfileName"
+                                        value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" />
+                        </p:column>
+                        <!--<p:column >-->
+                        <!--<f:facet name="header">-->
+                        <!--<h:outputText value="#{msg['profileCode']}" />-->
+                        <!--</f:facet>-->
+                        <!--<h:outputText value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" />-->
+                        <!--</p:column>-->
+                        <p:column sortBy="#{c.providerId}" visible="#{approveGoods.visibleTable2[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['provider']}" />
+                            </f:facet>
+                            <h:outputText id="getProviderName" value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                            <p:tooltip  for="getProviderName"
+                                        value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{c.goodsId}" visible="#{approveGoods.visibleTable2[5]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goods.tableProfile.column.origin']}" />
+                            </f:facet>
+                            <h:outputText id="getOriginName" value="#{equipmentsProfileBean.getOriginName(sessionBean.getEquipProfileOrigin(c.goodsId.toString()))}" />
+                            <p:tooltip  for="getOriginName"
+                                        value="#{equipmentsProfileBean.getOriginName(sessionBean.getEquipProfileOrigin(c.goodsId.toString()))}" />
+                        </p:column>
+                        <p:column sortBy="#{c.total}" visible="#{approveGoods.visibleTable2[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['inven.numberic']}" />
+                            </f:facet>
+                            <h:outputText id="total" value="#{c.total}" />
+                            <p:tooltip  for="total"
+                                        value="#{c.total}" />
+                        </p:column>
+                        <!--<p:column >-->
+                        <!--<f:facet name="header">-->
+                        <!--<h:outputText value="#{msg['totalErrGoods']}" />-->
+                        <!--</f:facet>-->
+                        <!--<h:outputText value="#{c.totalErr}" />-->
+                        <!--</p:column>-->
+                        <p:column  sortBy="#{c.goodsId}" visible="#{approveGoods.visibleTable2[7]}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goods.tableProfile.column.unit']}" />
+                            </f:facet>
+                            <!--<h:outputText value="#{equipmentsProfileBean.getUnitName(c.goodsId.toString())}" />-->
+                            <h:outputText id="getEquipProfileUnit" value="#{sessionBean.getEquipProfileUnit(c.goodsId.toString())}" />
+                            <p:tooltip  for="getEquipProfileUnit"
+                                        value="#{sessionBean.getEquipProfileUnit(c.goodsId.toString())}" />
+                        </p:column>
+                    </p:dataTable>
+                    <div class="EmptyBox5"></div>
+                </p:panel>
+                <div class="EmptyBox10"></div>
+                <p:panel header="#{msg['transSerialInfo']}" >
+                    <p:panelGrid styleClass="Wid100">
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="Serial"></p:outputLabel>
+                            </p:column>
+                            <p:column styleClass="Wid35">
+                                <p:inputText value="#{approveGoods.fromSerial}" onkeypress="if (event.keyCode == 13) { return false; }"  ></p:inputText>
+                            </p:column>
+                            <!--<p:column styleClass="Wid13">-->
+                            <!--<p:outputLabel value="#{msg['toSerial']}"></p:outputLabel>-->
+                            <!--</p:column>-->
+                            <p:column styleClass="Wid203" style="text-align: left">
+                                <p:commandButton icon="fa fa-search Fs14 white" value="#{msg['search']}" styleClass="Fright" update=":frm:dtOrdersSerial" actionListener ="#{approveGoods.searchSerial}"></p:commandButton>
+                            </p:column>
+                            <!--<p:column styleClass="Wid203">-->
+                            <!--<p:inputText value="#{approveGoods.toSerial}" onkeypress="if (event.keyCode == 13) { return false; }" ></p:inputText>-->
+                            <!--</p:column>-->
+                            <!--<p:column styleClass="Wid13">-->
+                            <!--<p:outputLabel value="#{msg['status']}"></p:outputLabel>-->
+                            <!--</p:column>-->
+                            <!--<p:column styleClass="Wid203">-->
+                            <!--<p:selectOneMenu styleClass="Wid100" value="#{approveGoods.goodsStatus}" >-->
+                            <!--<f:selectItem itemLabel="" itemValue="" noSelectionOption="true" />-->
+                            <!--<f:selectItems value="#{approveGoods.listGoodsStatus}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />-->
+                            <!--</p:selectOneMenu>-->
+                            <!--</p:column>-->
+                        </p:row>
+                        <!--<p:row>-->
+                        <!--<p:column colspan="5"></p:column>   -->
+                        <!--<p:column>-->
+                        <!--<p:commandButton icon="fa fa-search Fs14 white" value="#{msg['search']}" styleClass="Fright" update="frm" actionListener ="#{approveGoods.searchSerial}"></p:commandButton>-->
+                        <!--</p:column>-->
+
+                        <!--</p:row>-->
+                    </p:panelGrid>
+                    <div class="Pad5">
+                        <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex"
+                                     value="#{approveGoods.lsData}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                     paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                     id="dtOrdersSerial" lazy="true">
+                            <f:facet  name="header">
+                                <p:commandButton styleClass="toggler" id="togglerdtOrdersSerial"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                                <p:columnToggler datasource="dtOrdersSerial" trigger="togglerdtOrdersSerial">
+                                    <p:ajax event="toggle" listener="#{approveGoods.onToggleActiveEtag3}"
+                                            update="@([id$=dtOrdersSerial])"/>
+                                </p:columnToggler>
+                                <!--<p:columnToggler datasource="dtOrdersSerial" trigger="togglerdtOrdersSerial" />-->
+                            </f:facet>
+                            <p:column styleClass="index" visible="#{approveGoods.visibleTable3[0]}">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg['index']}" />
+                                </f:facet>
+                                <h:outputText value="#{rowIndex+1}" />
+                            </p:column>
+                            <!--sortBy="#{c.serial}"-->
+                            <p:column sortBy="#{c.serial}" visible="#{approveGoods.visibleTable3[1]}" >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg['serial']}" />
+                                </f:facet>
+                                <h:outputText id="serial" value="#{c.serial}" />
+                                <p:tooltip for="serial"
+                                           value="#{c.serial}" />
+                            </p:column>
+                            <!--<p:column >-->
+                            <!--<f:facet name="header">-->
+                            <!--<h:outputText value="#{msg['status']}" />-->
+                            <!--</f:facet>-->
+                            <!--<h:outputText value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />-->
+                            <!--</p:column>-->
+                        </p:dataTable>
+                    </div>
+                </p:panel>
+            </div>
+
+        </h:form>
+        <script>
+            $(document.body).mousedown(function(event) {
+                var target = $(event.target);
+                if (!target.parents().andSelf().is('.ui-columntoggler')) { // Clicked outside
+                    $('.ui-columntoggler').hide('slide', {direction: 'right'}, 500);
+                }
+            });
+        </script>
+    </ui:define>
+</ui:composition>

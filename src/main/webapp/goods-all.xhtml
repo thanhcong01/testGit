@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+
+	<ui:define name="content">
+		<h:form id="frmBr">
+			<!-- BreadCumb -->
+			 <div class="EmptyBox5"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            
+		</h:form>
+        <div class="Pad7">
+		<p:outputPanel styleClass="Container100 Responsive100">
+
+			<!-- Table Content -->
+			<div class="Container100 Responsive100">
+				<!-- Tree layout-->
+				<h:form id="frmTree">
+					<div class="Container20 Pad3 Responsive50">
+						<p:panel styleClass="Wid100" style="min-height:480px"
+							header="#{msg['goodsall.header']}">
+							<p:outputPanel id="tree">
+								<p:tree value="#{goodsAllBean.root}" var="node"
+									id="groupTree" selectionMode="single"
+									selection="#{goodsAllBean.selectedNode}">
+									<p:treeNode>
+										<h:outputText value="#{node}" />
+									</p:treeNode>
+									<p:ajax event="select" update="@([id$=tblG]),@([id$=tblGP])"
+										listener="#{goodsAllBean.onNodeSelect}">
+									</p:ajax>
+								</p:tree>
+							</p:outputPanel>
+						</p:panel>
+					</div>
+				</h:form>
+				<div class="Container80 Pad3 Responsive50">
+					<p:tabView widgetVar="tabView" activeIndex="#{goodsAllBean.index}" id="tv" styleClass="Container100">
+						<p:ajax event="tabChange" listener="#{goodsAllBean.onTabChanged}" update="@([id$=tblG]),@([id$=tree])" />
+						 <!-- update="@previous"/> -->
+						<p:tab id="ggtab" title="#{msg['goodsall.header']}">
+							<ui:insert name="goodsgroup">
+								<ui:include src="goods-group.xhtml" />
+							</ui:insert>
+						</p:tab>
+						<p:tab id="gtab" title="#{msg['goodsall.tap.goods']}">
+							<ui:insert name="goods">
+								<ui:include src="goods.xhtml" />
+							</ui:insert>
+						</p:tab>
+						<!-- <p:tab id="gptab" title="#{msg['goodsall.tap.price']}" disabled="true">
+							<ui:insert name="goodsPrice">
+								<ui:include src="goods-price.xhtml" />
+							</ui:insert>
+						</p:tab> -->
+					</p:tabView>
+				</div>
+			</div>
+		</p:outputPanel>  
+	  </div>	
+	</ui:define>
+</ui:composition>

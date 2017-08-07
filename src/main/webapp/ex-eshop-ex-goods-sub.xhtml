@@ -1,0 +1,236 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/template/inventory-template/common/template_layout.xhtml">
+    <ui:define name="content">
+        <h:form id="frm">
+            <title>#{msg['exEShopExGoods']}</title>
+            <div class="EmptyBox10"></div>
+            <p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+            <div class="EmptyBox10"></div>
+            <div class="Pad10">
+                <p:growl id="messages" showDetail="true" />
+                <p:panel header="#{msg['transInfo']}">
+                    <p:panelGrid>
+                        <p:row>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['orderCode']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText styleClass="Wid100 disableText" value="#{exEShopExGoods.orderCode}" disabled="true"></p:inputText></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel value="#{msg['reason']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:selectOneMenu disabled="true" styleClass="select Wid100 disableText" value="#{exEShopExGoods.reasonId}"  >
+                                    <f:selectItems value="#{exEShopExGoods.listReason}" var="c" itemLabel="#{c.name}" itemValue="#{c.value}" />
+                                </p:selectOneMenu></p:column>
+                            <p:column styleClass="Wid13"><p:outputLabel  value="#{msg['goods']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid203"><p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.getGoodsName(exEShopExGoods.stDetail.goodsId.toString())}" ></p:inputText></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column><p:outputLabel  value="#{msg['goodsCode']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText styleClass="Wid100 disableText" disabled="true" value="#{sessionBean.getGoodsCode(exEShopExGoods.stDetail.goodsId.toString())}" ></p:inputText></p:column>
+                            <p:column><p:outputLabel value="#{msg['status']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText styleClass="Wid100 disableText" disabled="true"  value="#{sessionBean.service.getGoodsStatusName(exEShopExGoods.stDetail.goodsStatus.toString())}" ></p:inputText></p:column>
+                            <p:column><p:outputLabel value="#{msg['quantity']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText styleClass="Wid100 disableText" disabled="true"  value="#{exEShopExGoods.stDetail.quantity}" ></p:inputText></p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:panel>
+                <p:panel header="#{msg['serialList']}">
+                    <p:panelGrid>
+                        <p:row>
+                            <p:column><p:outputLabel  value="#{msg['fromSerial']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText styleClass="Wid100" value="#{exEShopExGoods.fromSerial}" onkeypress="if (event.keyCode == 13) { return false; }" validatorMessage="#{msg['fromSerialReq']}"  ></p:inputText></p:column>
+                            <p:column><p:outputLabel  value="#{msg['toSerial']}"></p:outputLabel></p:column>
+                            <p:column><p:inputText styleClass="Wid100" value="#{exEShopExGoods.toSerial}" onkeypress="if (event.keyCode == 13) { return false; }" ></p:inputText></p:column>
+                            <p:column><p:outputLabel  value="#{msg['quantity']} (*)"></p:outputLabel></p:column>
+                            <p:column><p:inputText styleClass="Wid100" maxlength="5" value="#{exEShopExGoods.quantity}" ></p:inputText></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="5"></p:column>
+                            <p:column><p:commandButton style="float: right" value="#{msg['search']}" update="frm" actionListener="#{exEShopExGoods.search}" ></p:commandButton></p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <table>
+                        <tr>
+                            <td style="vertical-align: top;width: 50%">
+                                <p:panel>
+                                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{exEShopExGoods.setLsData}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                                 id="dtSearch" selection="#{exEShopExGoods.setLsDataSelect}" rowKey="#{c.rowKey}">
+                                        <f:facet  name="header">
+                                            <span class="dtHead"  style="">#{msg['searchResult']}</span>
+                                            <p:commandButton styleClass="toggler" id="togglerdtSearch"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                                            <p:columnToggler datasource="dtSearch" trigger="togglerdtSearch" />
+                                        </f:facet>
+                                        <p:column styleClass="index">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['index']}" />
+                                            </f:facet>
+                                            <h:outputText value="#{rowIndex+1}" />
+                                        </p:column>
+                                        <p:column sortBy="#{c.fromSerial}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['fromSerial']}" />
+                                            </f:facet>
+                                            <h:outputText id="fromSerial" value="#{c.fromSerial}" />
+                                            <p:tooltip for="fromSerial"
+                                                       value="#{c.fromSerial}" />
+                                        </p:column>
+                                        <p:column sortBy="#{c.toSerial}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['toSerial']}" />
+                                            </f:facet>
+                                            <h:outputText id="toSerial" value="#{c.toSerial}" />
+                                            <p:tooltip for="toSerial"
+                                                       value="#{c.fromSerial}" />
+                                        </p:column>
+                                        <p:column sortBy="#{c.count}" >
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['quantity']}" />
+                                            </f:facet>
+                                            <h:outputText id="quantity" value="#{c.count}" />
+                                            <p:tooltip for="quantity"
+                                                       value="#{c.count}" />
+                                        </p:column>
+                                        <p:column  selectionMode="multiple" style="text-align: center">
+                                        </p:column>
+                                    </p:dataTable>  
+                                    <p:panelGrid>
+                                        <p:column styleClass="Wid203"></p:column>
+                                        <p:column style="width:79.6%">
+                                            <div class="Fright">
+                                                <p:commandButton value="#{msg['add']}" update=":frm"  actionListener="#{exEShopExGoods.add}" styleClass="ui-priority-primary" >
+                                                </p:commandButton>
+                                                <p:commandButton value="#{msg['addAll']}" update=":frm"  actionListener="#{exEShopExGoods.addAll}" styleClass="ui-priority-primary" >
+                                                </p:commandButton>
+                                            </div>
+                                        </p:column>
+                                    </p:panelGrid>
+                                </p:panel>
+                            </td>
+                            <td style="vertical-align: top;width: 50%">
+                                <p:panel>
+
+                                    <p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{exEShopExGoods.setAnaSerial}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                                 id="dtSearchResult" >
+                                        <f:facet  name="header">
+                                            <span class="dtHead"  style="">#{msg['chooseList']}</span>
+                                            <p:commandButton styleClass="toggler" id="togglerdtSearchResult"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                                            <p:columnToggler datasource="dtSearchResult" trigger="togglerdtSearchResult" />
+                                        </f:facet>
+                                        <p:column styleClass="index">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['index']}" />
+                                            </f:facet>
+                                            <h:outputText value="#{rowIndex+1}" />
+                                        </p:column>
+                                        <p:column sortBy="#{c.fromSerial}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['fromSerial']}" />
+                                            </f:facet>
+                                            <h:outputText id="fromSerial2" value="#{c.fromSerial}" />
+                                            <p:tooltip for="fromSerial2"
+                                                       value="#{c.fromSerial}" />
+                                        </p:column>
+                                        <p:column sortBy="#{c.toSerial}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['toSerial']}" />
+                                            </f:facet>
+                                            <h:outputText id="toSerial2" value="#{c.toSerial}" />
+                                            <p:tooltip for="toSerial2"
+                                                       value="#{c.toSerial}" />
+                                        </p:column>
+                                        <p:column sortBy="#{c.count}">
+                                            <f:facet name="header">
+                                                <h:outputText value="#{msg['quantity']}" />
+                                            </f:facet>
+                                            <h:outputText id="quantity2" value="#{c.count}" />
+                                            <p:tooltip for="quantity2"
+                                                       value="#{c.count}" />
+                                        </p:column>
+                                    </p:dataTable> </p:panel>
+                                <p:panelGrid styleClass="Wid100">
+                                    <p:column styleClass="Wid203"></p:column>
+                                    <p:column style="width:79.6%">
+                                        <div class="Fright">
+                                            <p:commandButton value="#{msg['cancel']}"  actionListener="#{exEShopExGoods.refreshStd}" update=":frm" styleClass="ui-priority-primary cancel" >
+                                            </p:commandButton>
+                                            <p:commandButton value="#{msg['Exit']}" action="#{exEShopExGoods.exitSub}" styleClass="ui-priority-primary" >
+                                            </p:commandButton>
+                                        </div>
+                                    </p:column>
+                                </p:panelGrid>
+                            </td>
+                        </tr>
+                    </table>
+                </p:panel>
+                <p:panel header="#{msg['transSerialInfo']}" id="infoChose" >
+                    <p:panelGrid>
+                        <p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['totalSerial']}"></p:outputLabel></p:column>
+                            <p:column styleClass="Wid13"> <p:inputText styleClass="texbox disableText" disabled="true" value="#{exEShopExGoods.sizers}"></p:inputText></p:column>
+                            <p:column style="width: 74%"></p:column>
+                        </p:row>
+
+                    </p:panelGrid>
+                    <p:dataTable id="dtChoose" emptyMessage="#{msg['noRecordFound']}" var="c" rowIndexVar="rowIndex" value="#{exEShopExGoods.stDetail.setSerial}" paginator="true" rows="5" paginatorPosition="bottom" resizableColumns="true"
+                                 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+                                 lazy="false" >
+                        <f:facet  name="header">
+                            <p:commandButton styleClass="toggler" id="togglerdtChoose"  value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+                            <p:columnToggler datasource="dtChoose" trigger="togglerdtChoose" />
+                        </f:facet>
+                        <p:column styleClass="index" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['index']}" />
+                            </f:facet>
+                            <h:outputText value="#{rowIndex+1}" />
+                        </p:column>
+                        <p:column sortBy="#{c.serial}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['serial']}" />
+                            </f:facet>
+                            <h:outputText id="serial" value="#{c.serial}" />
+                            <p:tooltip for="serial"
+                                       value="#{c.serial}" />
+                        </p:column>
+                        <p:column sortBy="#{sessionBean.getGoodsName(c.goodsId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goods']}" />
+                            </f:facet>
+                            <h:outputText value="#{sessionBean.getGoodsName(c.goodsId.toString())}" />
+                            <p:tooltip for="getGoodsName"
+                                       value="#{sessionBean.getGoodsName(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{sessionBean.getGoodsCode(c.goodsId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['goodsCode']}" />
+                            </f:facet>
+                            <h:outputText id="goodsCode" value="#{sessionBean.getGoodsCode(c.goodsId.toString())}" />
+                            <p:tooltip for="goodsCode"
+                                       value="#{sessionBean.getGoodsCode(c.goodsId.toString())}" />
+                        </p:column>
+                        <p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['provider']}" />
+                            </f:facet>
+                            <h:outputText id="getProviderName" value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                            <p:tooltip for="getProviderName"
+                                       value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+                        </p:column>
+
+                        <p:column sortBy="#{sessionBean.service.getGoodsStatusName(c.goodsStatus.toString())}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['status']}" />
+                            </f:facet>                       
+                            <h:outputText id="status3" value="#{sessionBean.service.getGoodsStatusName(c.goodsStatus.toString())}" />
+                            <p:tooltip for="status3"
+                                       value="#{sessionBean.service.getGoodsStatusName(c.goodsStatus.toString())}" />
+                        </p:column>
+                    </p:dataTable>  
+                </p:panel>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

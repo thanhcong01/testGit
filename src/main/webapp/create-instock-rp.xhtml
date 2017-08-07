@@ -1,0 +1,361 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+
+		<h:form id="frm">
+			<title>#{msg['inven.instock.report']}</title>
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:outputPanel styleClass="Container100 Responsive100">
+					<!-- Table Content -->
+					<div class="Container100 Responsive100">
+						<!-- Tree layout-->
+						<div class="Container20 Pad5 Responsive50">
+							<p:panel styleClass="DispBlock Fleft Wid100"
+									 header="#{msg['positon.left.shop.title2']}">
+								<div
+										style="clear: both; display: block; width: 100%; height: 35px">
+									<p:outputPanel>
+										<p:inputText styleClass="Fleft Wid100" id="txtKeyFilter"
+													 label="Lọc dữ liệu" placeholder="Tìm kiến kho"
+													 onkeypress="if (event.keyCode == 13) { return false; }"
+													 value="#{createInstockGeneralReport.strKeyFilter}">
+											<p:ajax event="keyup" listener="#{createInstockGeneralReport.treesSelect}"
+													update="@([id$=shopTree])" />
+										</p:inputText>
+									</p:outputPanel>
+								</div>
+								<div class="treeShop" style="clear: both">
+									<p:outputPanel id="tree">
+										<p:tree value="#{createInstockGeneralReport.root}" var="node" id="shopTree"
+												selectionMode="single" selection="#{createInstockGeneralReport.selectedNode}">
+											<p:treeNode>
+												<h:outputText value="#{node.shopCode} - #{node.shopName}" />
+											</p:treeNode>
+											<p:ajax event="select"  update="frm"
+													listener="#{createInstockGeneralReport.onNodeSelect}">
+											</p:ajax>
+										</p:tree>
+									</p:outputPanel>
+								</div>
+							</p:panel>
+						</div>
+
+						<p:outputPanel styleClass="Container80 Pad5 Responsive20">
+							<p:panel header="#{msg['stockGoodsInfo']}"
+								styleClass="Container100">
+								<div class="max-width-cbb">
+								<p:panelGrid styleClass="Wid100">
+									<!--<p:row>-->
+										<!--<p:column styleClass="Wid15">-->
+											<!--<p:outputLabel for="tungay6" value="#{msg['export.fromdate']}"></p:outputLabel>-->
+										<!--</p:column>-->
+										<!--<p:column styleClass="Wid203">-->
+											<!--<p:calendar id="tungay6" mindate="16/05/2017"-->
+														<!--value="#{createInstockGeneralReport.fromCreateDate}"></p:calendar>-->
+										<!--</p:column>-->
+										<!--<p:column styleClass="Wid15">-->
+											<!--<p:outputLabel for="denngay6" value="#{msg['export.toDate']}"></p:outputLabel>-->
+										<!--</p:column>-->
+										<!--<p:column styleClass="Wid203">-->
+											<!--<p:calendar id="denngay6"-->
+														<!--value="#{createInstockGeneralReport.toCreateDate}"></p:calendar>-->
+										<!--</p:column>-->
+
+										<!--<p:column colspan="2"></p:column>-->
+									<!--</p:row>-->
+									<p:row>
+										<p:column styleClass="Wid15">
+											<p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+										</p:column>
+										<p:column styleClass="Wid203">
+											<p:selectOneMenu styleClass="select Wid100"
+												value="#{createInstockGeneralReport.groupId}">
+												<f:selectItem itemLabel="Tất cả" itemValue=""
+													noSelectionOption="true" />
+												<p:ajax event="valueChange" update="frm"
+													listener="#{createInstockGeneralReport.changeGoodsGroup}"></p:ajax>
+												<f:selectItems value="#{sessionBean.getLsgGroupOrder()}" var="c"
+													itemLabel="#{c.equipmentsGroupCode} | #{c.equipmentsGroupName}"
+													itemValue="#{c.equipmentsGroupId}" />
+											</p:selectOneMenu>
+										</p:column>
+										<p:column styleClass="Wid15">
+											<p:outputLabel value="#{msg['goods']}"></p:outputLabel>
+										</p:column>
+										<p:column styleClass="Wid203">
+											<!--<p:selectOneMenu styleClass="select Wid100" id="listGoods"-->
+												<!--value="#{createInstockGeneralReport.goodsId}">-->
+												<!--<f:selectItem itemLabel="Tất cả" itemValue=""-->
+													<!--noSelectionOption="true" />-->
+												<!--<p:ajax event="valueChange"-->
+													<!--update="@([id$=dtEtagSerial]), @([id$=dtStockGoods])"></p:ajax>-->
+												<!--<f:selectItems value="#{createInstockGeneralReport.lsGoods}"-->
+													<!--var="c" itemLabel="#{c.profileCode} | #{c.profileName}"-->
+													<!--itemValue="#{c.profileId}" />-->
+											<!--</p:selectOneMenu>-->
+											<p:autoComplete styleClass="ui-autocomplete-select" dropdown="true" id="listGoods"
+															value="#{createInstockGeneralReport.goods}"
+															completeMethod="#{createInstockGeneralReport.completeGoods}" >
+												<p:ajax event="itemSelect" listener="#{createInstockGeneralReport.goodsSelect}"
+														update="@([id$=dtEtagSerial]), @([id$=dtStockGoods])" />
+											</p:autoComplete>
+										</p:column>
+										<p:column styleClass="Wid13">
+											<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+										</p:column>
+										<p:column styleClass="Wid15">
+											<p:selectOneMenu styleClass="select"
+															 value="#{createInstockGeneralReport.stockGoodsStatus}">
+												<!--<p:ajax event="valueChange"-->
+												<!--listener="#{createInstockGeneralReport.searchStockGood}"-->
+												<!--update="frm"></p:ajax>-->
+												<f:selectItem itemLabel="" itemValue=""
+															  noSelectionOption="true" />
+												<f:selectItems
+														value="#{createInstockGeneralReport.listGoodStt}" var="c"
+														itemLabel="#{c.name}" itemValue="#{c.value}" />
+											</p:selectOneMenu>
+										</p:column>
+									</p:row>
+
+									<p:row>
+										<p:column styleClass="Wid15">
+											<p:outputLabel value="#{msg['availableQuan']}"></p:outputLabel>
+										</p:column>
+										<p:column styleClass="Wid203">
+											<p:inputText disabled="true"
+												value="#{createInstockGeneralReport.inStockSum}"></p:inputText>
+										</p:column>
+										<p:column styleClass="Wid15">
+											<p:outputLabel value="#{msg['blockQuan']}"></p:outputLabel>
+										</p:column>
+										<p:column styleClass="Wid203">
+											<p:inputText disabled="true"
+												value="#{createInstockGeneralReport.blockSum}"></p:inputText>
+										</p:column>
+										<p:column colspan="2">
+											<p:commandButton icon="fa fa-search Fs14 white"
+															 value="#{msg['search']}" style="float: right"  update=":frm"
+															 actionListener="#{createInstockGeneralReport.searchStockGood()}">
+											</p:commandButton>
+										</p:column>
+									</p:row>
+								</p:panelGrid>
+								</div>
+							</p:panel>
+
+							<div class="EmptyBox10" />
+							<p:panel styleClass="Container100">
+								<p:outputLabel id="updateWaranty" style="display: none" value="#{imPShopExGoods.initWaranty()}"></p:outputLabel>
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+									rowIndexVar="rowIndex"
+									value="#{createInstockGeneralReport.lsStockGoods}"
+									paginator="true" rows="5" paginatorPosition="bottom"
+									selection="#{createInstockGeneralReport.sg}" rowKey="#{c.rowKey}"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									id="dtStockGoods">
+									<p:ajax event="rowSelectRadio"
+										listener="#{createInstockGeneralReport.viewClick}"
+										update=":frm:dtEtagSerial, :frm:updateWaranty" />
+									<f:facet name="header">
+										<span class="dtHead" style="">#{msg['searchResult']}</span>
+										<!-- <p:commandButton styleClass="toggler" id="togglerdtStockGoods"
+										value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+									<p:columnToggler datasource="dtStockGoods"
+										trigger="togglerdtStockGoods" /> -->
+									</f:facet>
+									<p:column styleClass="Wid5" style="text-align: center" >
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column styleClass="Wid9" sortBy="#{c.equipmentsGroup}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.group']}" />
+										</f:facet>
+										<h:outputText id="equipmentsGroup" value="#{c.equipmentsGroup}" />
+										<p:tooltip  for="equipmentsGroup"
+													value="#{c.equipmentsGroup}" />
+									</p:column>
+									<p:column styleClass="Wid9" sortBy="#{c.profileCode}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.code']}" />
+										</f:facet>
+										<h:outputText id="profileCode" value="#{c.profileCode}" />
+										<p:tooltip  for="profileCode"
+													value="#{c.profileCode}" />
+									</p:column>
+									<p:column styleClass="Wid13" sortBy="#{c.profileName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.name']}" />
+										</f:facet>
+										<h:outputText id="lbname" value="#{c.profileName}" />
+										<p:tooltip for="lbname" value="#{c.profileName}" />
+									</p:column>
+									<p:column styleClass="Wid203" sortBy="#{c.specification}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.spec']}" />
+										</f:facet>
+										<h:outputText id="lbspec" value="#{c.specification}" />
+										<p:tooltip for="lbspec" value="#{c.specification}" />
+									</p:column>
+									<p:column styleClass="Wid9" style="text-align: center" sortBy="#{c.goodsStatusName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.status']}" />
+										</f:facet>
+										<h:outputText id="goodsStatusName" value="#{c.goodsStatusName}" />
+										<p:tooltip  for="goodsStatusName"
+													value="#{c.goodsStatusName}" />
+									</p:column>
+									<p:column styleClass="Wid13" sortBy="#{c.availableQuantity}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['availableQuan']}" />
+										</f:facet>
+										<!--<h:outputText value="#{c.availableQuantity}" />-->
+										<h:outputText id="availableQuantity" value="#{c.availableQuantity}" />
+										<p:tooltip  for="availableQuantity"
+													value="#{c.availableQuantity}" />
+									</p:column>
+									<p:column styleClass="Wid13" sortBy="#{c.quantityBlock}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['blockQuan']}" />
+										</f:facet>
+										<h:outputText id="quantityBlock"  value="#{c.quantityBlock}" />
+										<p:tooltip  for="quantityBlock"
+													value="#{c.quantityBlock}" />
+									</p:column>
+									<p:column styleClass="Wid5" selectionMode="single"
+										style="text-align: center" >
+										<f:facet name="header">
+											<h:outputText value="#{msg['choosed']}" />
+										</f:facet>
+									</p:column>
+									<f:facet name="footer">
+										<div class="Fright">
+											<p:commandButton icon="fa fa-file-excel-o Fs14 white"
+												value="#{msg['export.general']}" ajax="true"
+												onclick="PrimeFaces.monitorDownload(start, stop);"
+															 disabled="#{(createInstockGeneralReport.lsStockGoods.size() > 0 ? false:true)}"
+												actionListener="#{createInstockGeneralReport.exportInstockGoodsGeneralReport}"
+												styleClass="ui-priority-primary">
+												<p:fileDownload
+													value="#{createInstockGeneralReport.fileExport}" />
+											</p:commandButton>
+											<p:commandButton icon="fa fa-file-excel-o Fs14 white"
+															 value="#{msg['export.general.kk.hh']}" ajax="true"
+															 onclick="PrimeFaces.monitorDownload(start, stop);"
+															 disabled="#{(createInstockGeneralReport.lsStockGoods.size() > 0 ? false:true)}"
+															 actionListener="#{createInstockGeneralReport.exportInstockGoodsGeneralReportKKTB}"
+															 styleClass="ui-priority-primary">
+												<p:fileDownload
+														value="#{createInstockGeneralReport.fileExport}" />
+											</p:commandButton>
+										</div>
+									</f:facet>
+								</p:dataTable>
+							</p:panel>
+							<div class="EmptyBox10" />
+							
+							<p:panel styleClass="Container100">
+								<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+									disabledTextSelection="false" rowIndexVar="rowIndex"
+									value="#{createInstockGeneralReport.lsData}" disabledSelection="false"
+									paginator="true" rows="10" paginatorPosition="bottom"
+									resizableColumns="false"
+									paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+									id="dtEtagSerial" lazy="true">
+									<f:facet name="header">
+										<span class="dtHead" style="">#{msg['transSerialInfo']}</span>
+										<!-- <p:commandButton styleClass="toggler" id="togglerdtEtagSerial"
+										value="#{msg['chooseColumns']}" icon="ui-icon-calculator" />
+									<p:columnToggler datasource="dtEtagSerial"
+										trigger="togglerdtEtagSerial" /> -->
+									</f:facet>
+									<p:column styleClass="Wid5" style="text-align: center">
+										<f:facet name="header">
+											<h:outputText value="#{msg['index']}" />
+										</f:facet>
+										<h:outputText value="#{rowIndex+1}" />
+									</p:column>
+									<p:column sortBy="#{c.serial}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['serial']}" />
+										</f:facet>
+										<h:outputText id="serial2" value="#{c.serial}" />
+										<p:tooltip   for="serial2"
+													value="#{c.serial}" />
+									</p:column>
+									<p:column sortBy="#{c.warrantyStatus}">
+										<f:facet name="header">
+											<h:outputText value="Trạng thái bảo hành" />
+										</f:facet>
+										<h:outputText id="getWarranStatus"
+											value="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+										<p:tooltip   for="getWarranStatus"
+													 value="#{imPShopExGoods.getWarranStatus(c.equipmentProfileId, c.serial)}" />
+									</p:column>
+									<p:column sortBy="#{c.warantyExpiredDate}">
+										<f:facet name="header">
+											<h:outputText value="Hết hạn bảo hành" />
+										</f:facet>
+										<h:outputText id="getWarranExpriDate"
+											value="#{c.warantyExpiredDateStr}" />
+										<p:tooltip   for="getWarranExpriDate"
+													 value="#{c.warantyExpiredDateStr}" />
+									</p:column>
+									<p:column sortBy="#{c.reasonsWarranty}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.warrantyReason']}" />
+										</f:facet>
+										<!--<h:outputText value="#{c.reasonName}" />-->
+										<h:outputText id="getWarrantyReason" value="#{c.reasonsWarranty}" />
+										<p:tooltip   for="getWarrantyReason"
+													 value="#{c.reasonsWarranty}" />
+									</p:column>
+									<p:column sortBy="#{c.providerName}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.provider']}" />
+										</f:facet>
+										<h:outputText id="getProviderName"
+											value="#{c.providerName}" />
+										<p:tooltip   for="getProviderName"
+													 value="#{c.providerName}" />
+									</p:column>
+									<p:column sortBy="#{c.origin}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['equipment.origin']}" />
+										</f:facet>
+										<h:outputText id="origin" value="#{sessionBean.getOrigin(c.origin)}" />
+										<p:tooltip   for="origin"
+													 value="#{sessionBean.getOrigin(c.origin)}" />
+									</p:column>
+									<f:facet name="footer">
+										<div class="Fright">
+											<p:commandButton icon="fa fa-file-excel-o Fs14 white"
+												value="#{msg['export.detail']}" ajax="true"
+												onclick="PrimeFaces.monitorDownload(start, stop);"
+												actionListener="#{createInstockGeneralReport.exportInstockGoodsDetailReport}"
+												styleClass="ui-priority-primary">
+												<p:fileDownload
+													value="#{createInstockGeneralReport.fileExport}" />
+											</p:commandButton>
+										</div>
+									</f:facet>
+								</p:dataTable>
+							</p:panel>
+						</p:outputPanel>
+					</div>
+				</p:outputPanel>
+			</div>
+			<div class="EmptyBox10"></div>
+		</h:form>
+	</ui:define>
+</ui:composition>

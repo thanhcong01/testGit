@@ -1,0 +1,354 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:ui="http://java.sun.com/jsf/facelets"
+				xmlns:h="http://java.sun.com/jsf/html"
+				xmlns:f="http://java.sun.com/jsf/core"
+				xmlns:p="http://primefaces.org/ui"
+				template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchEtag']}</title>
+			<!--                <h2 ><p:outputLabel value="#{msg['searchEtag']}"></p:outputLabel></h2>-->
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['searchInfo']}" styleClass="Container100">
+					<div class="EmptyBox5" />
+					<p:panelGrid styleClass="Wid100" id="info">
+						<p:row>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['shop']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<!--                                 <p:selectOneMenu styleClass="select Wid100" value="#{createBlockSerialRp.shopId}"  > -->
+								<!--                                     <f:selectItems value="#{createBlockSerialRp.listShop}" var="c" itemLabel="#{c.shopName}" itemValue="#{c.shopId}" /> -->
+								<!--                                 </p:selectOneMenu> -->
+								<p:autoComplete styleClass="ui-autocomplete-select"
+												forceSelection="true" dropdown="true" scrollHeight="150"
+												style="width:300px;" maxlength="50"
+												value="#{createBlockSerialRp.createShop}"
+												emptyMessage="#{msg['common.table.emptymessage']}"
+												completeMethod="#{createBlockSerialRp.CompleteCreateShop}">
+									<p:ajax event="itemSelect"
+											listener="#{createBlockSerialRp.CreateShopSelect}"
+											update="@this" />
+								</p:autoComplete>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goodsGroup']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{createBlockSerialRp.goodsGroupId}">
+									<f:selectItem itemLabel="" itemValue=""
+												  noSelectionOption="true" />
+									<p:ajax event="valueChange" update=":frm:info"
+											listener="#{createBlockSerialRp.changeGoodsGroup()}"></p:ajax>
+									<f:selectItems value="#{sessionBean.lsgGroup}" var="c"
+												   itemLabel="#{c.goodsGroupName}" itemValue="#{c.goodsGroupId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column styleClass="Wid13">
+								<p:outputLabel value="#{msg['goods']}"></p:outputLabel>
+							</p:column>
+							<p:column styleClass="Wid203">
+								<p:autoComplete styleClass="ui-autocomplete-select"
+												dropdown="true" value="#{createBlockSerialRp.goods}"
+												completeMethod="#{createBlockSerialRp.completeGoods}">
+									<p:ajax event="itemSelect"
+											listener="#{createBlockSerialRp.goodsSelect}" update="@this" />
+								</p:autoComplete>
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel value="#{msg['status']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{createBlockSerialRp.goodsStatusId}">
+									<f:selectItem itemLabel="" itemValue=""
+												  noSelectionOption="true" />
+									<f:selectItems value="#{sessionBean.listStatus}" var="c"
+												   itemLabel="#{c.name}" itemValue="#{c.value}" />
+								</p:selectOneMenu>
+							</p:column>
+							<!-- 							<p:column> -->
+							<!-- 								<p:outputLabel value="#{msg['stockStatus']}"></p:outputLabel> -->
+							<!-- 							</p:column> -->
+							<!-- 							<p:column> -->
+							<!-- 								<p:selectOneMenu styleClass="select Wid100" -->
+							<!-- 									value="#{createBlockSerialRp.stockStatusId}"> -->
+							<!-- 									<f:selectItem itemLabel="" itemValue="" -->
+							<!-- 										noSelectionOption="true" /> -->
+							<!-- 									<f:selectItems value="#{createBlockSerialRp.listStockStatus}" -->
+							<!-- 										var="c" itemLabel="#{c.name}" itemValue="#{c.value}" /> -->
+							<!-- 								</p:selectOneMenu> -->
+							<!-- 							</p:column> -->
+							<p:column>
+								<p:outputLabel value="#{msg['provider']}"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:selectOneMenu styleClass="select Wid100"
+												 value="#{createBlockSerialRp.providerId}">
+									<f:selectItem itemLabel="" itemValue=""
+												  noSelectionOption="true" />
+									<f:selectItems value="#{createBlockSerialRp.listProvider}"
+												   var="c" itemLabel="#{c.providerName}"
+												   itemValue="#{c.providerId}" />
+								</p:selectOneMenu>
+							</p:column>
+							<p:column></p:column>
+							<p:column>
+								<p:commandButton icon="fa fa-search Fs14 white"
+												 value="#{msg['search']}" style="float:right" update=":frm"
+												 actionListener="#{createBlockSerialRp.search}">
+								</p:commandButton>
+							</p:column>
+						</p:row>
+						<!-- 						<p:row> -->
+						<!-- 							<p:column> -->
+						<!-- 								<p:outputLabel value="#{msg['fromSerial']}"></p:outputLabel> -->
+						<!-- 							</p:column> -->
+						<!-- 							<p:column> -->
+						<!-- 								<p:inputText styleClass="Wid100" -->
+						<!-- 									value="#{createBlockSerialRp.fromSerial}"></p:inputText> -->
+						<!-- 							</p:column> -->
+						<!-- 							<p:column> -->
+						<!-- 								<p:outputLabel value="#{msg['toSerial']}"></p:outputLabel> -->
+						<!-- 							</p:column> -->
+						<!-- 							<p:column> -->
+						<!-- 								<p:inputText styleClass="Wid100" -->
+						<!-- 									value="#{createBlockSerialRp.toSerial}"></p:inputText> -->
+						<!-- 							</p:column> -->
+						<!-- 							<p:column></p:column> -->
+						<!-- 							<p:column> -->
+						<!-- 								<p:commandButton icon="fa fa-search Fs14 white" -->
+						<!-- 									value="#{msg['search']}" style="float:right" update=":frm" -->
+						<!-- 									actionListener="#{createBlockSerialRp.search}"> -->
+						<!-- 								</p:commandButton> -->
+						<!-- 							</p:column> -->
+						<!-- 						</p:row> -->
+					</p:panelGrid>
+					<div class="EmptyBox5" />
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel styleClass="Container100">
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+								 rowIndexVar="rowIndex" value="#{createBlockSerialRp.lsGeneralData}"
+								 selectionMode="single" rowKey="#{c.transactionAction.toShopId}"
+								 paginator="true" rows="5" paginatorPosition="bottom"
+								 resizableColumns="true"
+								 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+								 id="etag">
+						<f:facet name="header">
+							<span class="dtHead" style="">Số lượng tổng hợp</span>
+							<p:commandButton styleClass="toggler"
+											 id="toggleEtag" value="#{msg['chooseColumns']}"
+											 icon="ui-icon-calculator" />
+							<p:columnToggler datasource="etag"
+											 trigger="toggleEtag" />
+						</f:facet>
+						<p:ajax event="rowSelect" listener="#{createBlockSerialRp.onRowSelect}" update=":frm:dtSearchEtagSerial"/>
+						<!-- 						<p:ajax event="rowSelect" listener="#{createBlockSerialRp.view}" /> -->
+						<!-- 						<p:column styleClass="index"> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['index']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText value="#{rowIndex+1}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column style="width:20%"> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['shop']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText value="#{c.shopName}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['goods']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{sessionBean.getEquipProfileName(c.goodsId.toString())}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column style="width:6%"> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['profileCode']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{sessionBean.getEquipProfileCode(c.goodsId.toString())}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['provider']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{sessionBean.getProviderName(c.providerId.toString())}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column style="width:8%"> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['status']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{sessionBean.service.getEquipsStatusName(c.goodsStatus.toString())}" /> -->
+						<!-- 						</p:column> -->
+
+						<!-- 						<p:column> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['stockStatus']}" /> -->
+						<!-- 							</f:facet> -->
+
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{sessionBean.getStockStatusName(c.stockStatus.toString())}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['orderCode']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{c.transactionAction.transactionActionCode}" /> -->
+						<!-- 						</p:column> -->
+						<p:column sortBy="#{c.countBlockSerial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['inven.numberic']}" />
+							</f:facet>
+
+							<h:outputText id="countBlockSerial" value="#{c.countBlockSerial}" />
+							<p:tooltip for="countBlockSerial"
+									   value="#{c.countBlockSerial}" />
+						</p:column>
+						<!-- 						<p:column> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['requireShop']}" /> -->
+						<!-- 							</f:facet> -->
+
+						<!-- 							<h:outputText -->
+						<!-- 								value="#{sessionBean.service.getShopNameById(c.transactionAction.createShopId)}" /> -->
+						<!-- 						</p:column> -->
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="#{msg['inven.to.shop']}" />
+							</f:facet>
+							<h:outputText id="getShopNameById"
+										  value="#{sessionBean.service.getShopNameById(c.transactionAction.toShopId)}" />
+							<p:tooltip for="getShopNameById"
+									   value="#{c.getShopNameById}" />
+						</p:column>
+					</p:dataTable>
+					<div class="EmptyBox10"></div>
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+								 rowIndexVar="rowIndex" value="#{createBlockSerialRp.lsData}"
+								 paginator="true" rows="10" paginatorPosition="bottom"
+								 resizableColumns="true"
+								 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+								 id="dtSearchEtagSerial">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['equiment.detail.slct']}</span>
+							<p:commandButton styleClass="toggler"
+											 id="togglerdtSearchEtagSerial" value="#{msg['chooseColumns']}"
+											 icon="ui-icon-calculator" />
+							<p:columnToggler datasource="dtSearchEtagSerial"
+											 trigger="togglerdtSearchEtagSerial" />
+						</f:facet>
+						<!-- 						<p:ajax event="rowSelect" listener="#{createBlockSerialRp.view}" /> -->
+						<!-- 						<p:column styleClass="index"> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['index']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText value="#{rowIndex+1}" /> -->
+						<!-- 						</p:column> -->
+						<!-- 						<p:column style="width:20%"> -->
+						<!-- 							<f:facet name="header"> -->
+						<!-- 								<h:outputText value="#{msg['shop']}" /> -->
+						<!-- 							</f:facet> -->
+						<!-- 							<h:outputText value="#{c.shopName}" /> -->
+						<!-- 						</p:column> -->
+						<p:column sortBy="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['goods']}" />
+							</f:facet>
+							<h:outputText id="getEquipProfileName"
+										  value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+							<p:tooltip for="getEquipProfileName"
+									   value="#{sessionBean.getEquipProfileName(c.equipmentProfileId.toString())}" />
+						</p:column>
+						<p:column style="width:6%" sortBy="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['profileCode']}" />
+							</f:facet>
+							<h:outputText id="getEquipProfileCode"
+										  value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+							<p:tooltip for="getEquipProfileName"
+									   value="#{sessionBean.getEquipProfileCode(c.equipmentProfileId.toString())}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.getProviderName(c.providerId.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['provider']}" />
+							</f:facet>
+							<h:outputText  id="getProviderName"
+										   value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+							<p:tooltip for="getProviderName"
+									   value="#{sessionBean.getProviderName(c.providerId.toString())}" />
+						</p:column>
+						<p:column style="width:8%" sortBy="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['status']}" />
+							</f:facet>
+							<h:outputText id="getEquipsStatusName"
+										  value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+							<p:tooltip for="getEquipsStatusName"
+									   value="#{sessionBean.service.getEquipsStatusName(c.equipmentProfileStatus.toString())}" />
+						</p:column>
+
+						<p:column sortBy="#{sessionBean.getStockStatusName(c.stockStatus.toString())}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['stockStatus']}" />
+							</f:facet>
+
+							<h:outputText id="getStockStatusName"
+										  value="#{sessionBean.getStockStatusName(c.stockStatus.toString())}" />
+							<p:tooltip for="getStockStatusName"
+									   value="#{sessionBean.getStockStatusName(c.stockStatus.toString())}" />
+						</p:column>
+						<p:column sortBy="#{c.transactionAction.transactionActionCode}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['orderCode']}" />
+							</f:facet>
+							<h:outputText id="transactionActionCode"
+										  value="#{c.transactionAction.transactionActionCode}" />
+							<p:tooltip for="transactionActionCode"
+									   value="#{c.transactionAction.transactionActionCode}" />
+						</p:column>
+						<p:column sortBy="#{c.countBlockSerial}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['inven.numberic']}" />
+							</f:facet>
+
+							<h:outputText id="countBlockSerialG" value="#{c.countBlockSerial}" />
+							<p:tooltip for="countBlockSerialG"
+									   value="#{c.countBlockSerial}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.service.getShopNameById(c.transactionAction.createShopId)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['requireShop']}" />
+							</f:facet>
+
+							<h:outputText id="getShopNameByIdGF"
+										  value="#{sessionBean.service.getShopNameById(c.transactionAction.createShopId)}" />
+							<p:tooltip for="getShopNameByIdGF"
+									   value="#{sessionBean.service.getShopNameById(c.transactionAction.createShopId)}" />
+						</p:column>
+						<p:column sortBy="#{sessionBean.service.getShopNameById(c.transactionAction.toShopId)}">
+							<f:facet name="header">
+								<h:outputText value="#{msg['inven.to.shop']}" />
+							</f:facet>
+							<h:outputText id="getShopNameByIdG"
+										  value="#{sessionBean.service.getShopNameById(c.transactionAction.toShopId)}" />
+							<p:tooltip for="getShopNameByIdG"
+									   value="#{sessionBean.service.getShopNameById(c.transactionAction.toShopId)}" />
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

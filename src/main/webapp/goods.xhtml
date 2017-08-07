@@ -1,0 +1,205 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<h:form id="frmG">
+		<p:outputPanel id="updateFormG">
+			<div class="Container100 Responsive100">
+				<div class="EmptyBox5" />
+				<div style="float: right;">
+					<p:commandLink oncomplete="PF('dlSaveG').show();"
+						update="@([id$=dlSaveG])">
+						<i class="blue icon-plus" style="width: 20px; height: 20px;"></i>
+						<p:resetInput target=":tv:frmDialogG:dlSaveG" />
+						<f:setPropertyActionListener target="#{equipmentsProfileBean.goodSelected}"
+							value="#{equipmentsProfileBean.reset()}" />
+						<f:setPropertyActionListener target="#{equipmentsProfileBean.type}"
+							value="#{equipmentsProfileBean.TYPE_ADD}" />
+					</p:commandLink>
+					<p:commandLink action="#{equipmentsProfileBean.beforeSave}"
+						update="@([id$=dlSaveG])">
+						<i class="yellow icon-edit" style="width: 20px; height: 40px;"></i>
+						<p:resetInput target=":tv:frmDialogG:dlSaveG" />
+						<f:setPropertyActionListener target="#{equipmentsProfileBean.type}"
+							value="#{equipmentsProfileBean.TYPE_EDIT}" />
+					</p:commandLink>
+					<p:commandButton id="confirmButtonG" style="display: none"
+									 action="#{equipmentsProfileBean.delete}" update="@([id$=tblG]),@([id$=tree])">
+						<p:confirm header="#{msg['common.confirm.header']}" icon="ui-icon-alert"
+							message="#{msg['common.confirm.message']}" />
+					</p:commandButton>
+					<p:commandLink action="#{equipmentsProfileBean.beforeDelete}">
+						<i class="red icon-trash" style="width: 20px; height: 40px;"></i>
+					</p:commandLink>
+					<p:commandLink oncomplete="PF('dlSearchG').show();"
+						update="@([id$=dlSearchG])">
+						<i class="gray icon-search" style="width: 20px; height: 40px;"></i>
+						<f:setPropertyActionListener target="#{equipmentsProfileBean.goodSelected}"
+							value="#{equipmentsProfileBean.reset()}" />
+						<f:setPropertyActionListener target="#{equipmentsProfileBean.type}"
+							value="#{equipmentsProfileBean.TYPE_SEARCH}" />
+					</p:commandLink>
+					<p:spacer width="10" />
+				</div>
+				
+				<div class="EmptyBox10" />
+				
+				<p:dataTable var="g" value="#{equipmentsProfileBean.listGoods}" id="tblG"
+							 paginator="true" paginatorPosition="bottom"
+							 selection="#{equipmentsProfileBean.listGoodsSelected}"
+							 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+							 currentPageReportTemplate="{startRecord} - {endRecord} of {totalRecords}"
+							 rowKey="#{g.profileId}" lazy="false" rows="20"
+							 emptyMessage="#{msg['common.table.emptymessage']}">
+					<!-- <p:ajax event="rowSelect" listener="#{goodsBean.onRowSelect}"  update="@([id$=tree]),@this"/> -->
+					<p:ajax event="toggleSelect" listener="#{staffBean.onRowSelected}"
+						update="@this" />
+					<p:ajax event="rowSelectCheckbox"
+						listener="#{staffBean.onRowSelected}" update="@this" />
+					<p:ajax event="rowUnselectCheckbox"
+						listener="#{staffBean.onRowSelected}" update="@this" />
+
+					<p:column selectionMode="multiple" style="text-align: center" styleClass="Wid3" />
+
+					<p:column headerText="#{msg['goods.tablegoods.column.code']}" sortBy="#{g.profileCode}">
+						<h:outputText id="profileCode" value="#{g.profileCode}" />
+						<p:tooltip for="profileCode"
+									value="#{g.profileCode}" />
+					</p:column>
+					<p:column headerText="#{msg['goods.tablegoods.column.name']}" sortBy="#{g.profileName}">
+						<h:outputText id="profileName" value="#{g.profileName}" />
+						<p:tooltip for="profileName"
+								   value="#{g.profileName}" />
+					</p:column>
+					<p:column headerText="#{msg['goods.tablegoods.column.management']}" sortBy="#{g.managementType}">
+						<h:outputText id="managementType" value="#{g.managementType}" />
+						<p:tooltip for="managementType"
+								   value="#{g.managementType}" />
+					</p:column>
+					<p:column headerText="#{msg['goods.tablegoods.column.group']}" sortBy="#{g.equipmentsGroup.equipmentsGroupName}">
+						<h:outputText id="equipmentsGroupName" value="#{g.equipmentsGroup.equipmentsGroupName}" />
+						<p:tooltip for="equipmentsGroupName"
+								   value="#{g.equipmentsGroup.equipmentsGroupName}" />
+					</p:column>
+				</p:dataTable>
+			</div>
+		</p:outputPanel>
+	</h:form>
+
+	<h:form id="frmDialogG">
+		<p:confirmDialog widgetVar="dlgDeleteG" global="true"
+			showEffect="fade" hideEffect="fade">
+			<p:commandButton value="#{msg['common.confirmdialog.yes']}" 
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="#{msg['common.confirmdialog.no']}" 
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+
+		<p:dialog widgetVar="dlSaveG" id="dlSaveG" modal="true"
+			resizable="false" closable="true" height="300"
+			header="#{msg['goods.header']}">
+			<p:panelGrid id="panelG" columns="2">
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.group']}" />
+				<p:selectOneMenu id="ggId" style="width:250px;"
+					value="#{equipmentsProfileBean.goodSelected.equipmentsGroupId}"
+					rendered="#{equipmentsProfileBean.goodSelected != null}">
+					<f:selectItems value="#{equipmentsProfileBean.listGroups}" var="gg"
+								   itemLabel="#{gg.equipmentsGroupName}" itemValue="#{gg.equipmentsGroupId}" />
+				</p:selectOneMenu>
+				<p:outputLabel />
+				<p:message for="ggId" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.management']}" />
+				<p:selectOneMenu id="mt" style="width:250px;"
+					value="#{equipmentsProfileBean.goodSelected.managementType}">
+					<f:selectItems value="#{equipmentsProfileBean.listDomains}" var="domain"
+								   itemLabel="#{domain.name}" itemValue="#{domain.name}" />
+				</p:selectOneMenu>
+				<p:outputLabel />
+				<p:message for="mt" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.code']}" />
+				<p:inputText style="width:250px;" id="codeG"
+							 validator="#{equipmentsProfileBean.validate}"
+							 value="#{equipmentsProfileBean.goodSelected.profileCode}" maxlength="100">
+					<f:attribute name="msglabel" value="#{msg['goods.tablegoods.column.code']}" />
+					<f:validator validatorId="emtyValidator" />
+					<f:validator validatorId="spaceValidator" />
+					<f:validator validatorId="codeValidator" />
+				</p:inputText>
+				<p:outputLabel />
+				<p:message id="msgCodeG" for="codeG" />
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.name']}" />
+				<p:inputText style="width:250px;" id="nameG"
+							 value="#{equipmentsProfileBean.goodSelected.profileName}" maxlength="100">
+					<f:attribute name="msglabel" value="#{msg['goods.tablegoods.column.name']}" />
+					<f:validator validatorId="emtyValidator" />
+				</p:inputText>
+				<p:outputLabel />
+				<p:message id="msgNameG" for="nameG" />
+
+			</p:panelGrid>
+
+			<f:facet name="footer">
+				<p:commandButton icon="ui-icon-plus" action="#{equipmentsProfileBean.save}"
+					value="#{msg['common.dialog.save']}"
+					update="@([id$=tblG]),@([id$=panelG]),@([id$=tree])">
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+					 oncomplete="PF('dlSaveG').hide()">
+					<p:resetInput target=":tv:frmDialogG:dlSaveG" />
+				</p:commandButton>
+			</f:facet>
+		</p:dialog>
+
+	</h:form>
+
+	<h:form id="frmSearchG">
+		<p:dialog widgetVar="dlSearchG" id="dlSearchG" modal="true"
+			resizable="false" closable="true" height="300"
+			header="#{msg['goods.header']}">
+			<p:panelGrid id="panelGSearch" columns="2">
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.group']}" />
+				<p:selectOneMenu style="width:250px;"
+					value="#{equipmentsProfileBean.goodSelected.equipmentsGroupId}"
+					rendered="#{equipmentsProfileBean.goodSelected != null}">
+					<f:selectItems value="#{equipmentsProfileBean.listGroups}" var="gg"
+								   itemLabel="#{gg.equipmentsGroupName}" itemValue="#{gg.equipmentsGroupId}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.management']}" />
+				<p:selectOneMenu style="width:250px;"
+					value="#{equipmentsProfileBean.goodSelected.managementType}">
+					<f:selectItem itemLabel="" itemValue="" />
+					<f:selectItems value="#{equipmentsProfileBean.listDomains}" var="domain"
+								   itemLabel="#{domain.name}" itemValue="#{domain.name}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.code']}" />
+				<p:inputText style="width:250px;" validator="#{equipmentsProfileBean.validate}"
+							 value="#{equipmentsProfileBean.goodSelected.profileCode}" maxlength="50">
+				</p:inputText>
+
+				<p:outputLabel style="font-size:12px;" value="#{msg['goods.tablegoods.column.name']}" />
+				<p:inputText style="width:250px;"
+							 value="#{equipmentsProfileBean.goodSelected.profileName}" maxlength="50">
+				</p:inputText>
+
+			</p:panelGrid>
+			<f:facet name="footer">
+				<p:commandButton icon="ui-icon-plus"
+								 action="#{equipmentsProfileBean.filterSearch}" value="#{msg['common.dialog.search']}"
+								 update="@([id$=tblG]),@([id$=panelGSearch])">
+				</p:commandButton>
+				<p:commandButton icon="ui-icon-closethick" value="#{msg['common.dialog.cancel']}"
+					 oncomplete="PF('dlSearchG').hide()">
+					<p:resetInput target="tv:frmSearchG:dlSearchG" />
+				</p:commandButton>
+			</f:facet>
+		</p:dialog>
+	</h:form>
+</ui:composition>

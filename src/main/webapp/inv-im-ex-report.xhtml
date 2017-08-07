@@ -1,0 +1,239 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/template/inventory-template/common/template_layout.xhtml">
+	<ui:define name="content">
+		<h:form id="frm">
+			<title>#{msg['searchEtag']}</title>
+			<!--                <h2 ><p:outputLabel value="#{msg['searchEtag']}"></p:outputLabel></h2>-->
+			<div class="EmptyBox5"></div>
+			<p:breadCrumb model="#{breadCrumbBean.model}"></p:breadCrumb>
+			<div class="Pad10">
+				<p:growl id="messages" showDetail="true" />
+				<p:panel header="#{msg['searchInfo']}" styleClass="Container100">
+					<div class="EmptyBox5" />
+					<p:panelGrid styleClass="Wid100" id="info">
+						<p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="Nhóm đơn hàng"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:selectOneMenu styleClass="select Wid100"
+                                                 value="#{invImExReport.orderGroup}">
+                                    <p:ajax event="valueChange"  listener="#{invImExReport.changeOrderGroup()}" update="ldh status" />
+                                    <f:selectItems value="#{invImExReport.mapOrderGroup.entrySet()}" var="c"
+                                                   itemLabel="#{c.value}" itemValue="#{c.key}" />
+
+                                </p:selectOneMenu>
+                            </p:column>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="Loại đơn hàng"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:selectOneMenu styleClass="select Wid100" id="ldh"
+                                                 value="#{invImExReport.orderType}">
+                                    <p:ajax event="valueChange" update="status toShop" listener="#{invImExReport.changeOrderType()}"></p:ajax>
+                                    <f:selectItems value="#{invImExReport.mapOrderType.entrySet()}" var="c"
+                                                   itemLabel="#{c.value}" itemValue="#{c.key}" />
+                                </p:selectOneMenu>
+                            </p:column>
+
+                            <p:column>
+                                <p:outputLabel value="#{msg['status']}"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:selectOneMenu styleClass="select Wid100" id="status"
+                                                 value="#{invImExReport.status}">
+                                    <f:selectItems value="#{invImExReport.mapOrderStatus.entrySet()}" var="c"
+                                                   itemLabel="#{c.value}" itemValue="#{c.key}" />
+                                </p:selectOneMenu>
+                            </p:column>
+
+
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="#{msg['orderCode']}"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:autoComplete id="cmlOrder" styleClass="select Wid100"
+                                                value="#{invImExReport.orderCode}"
+                                                minQueryLength="3"
+                                                completeMethod="#{invImExReport.completeOrder}">
+                                    <p:ajax event="itemSelect"
+                                            listener="#{invImExReport.oderSelect}"
+                                            update="frm" />
+                                </p:autoComplete>
+                            </p:column>
+
+						</p:row>
+						<p:row>
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="Từ kho"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:selectOneMenu styleClass="select Wid100"
+                                                 value="#{invImExReport.fromShopId}">
+
+                                    <f:selectItems value="#{invImExReport.listShopFrom}" var="c"
+                                                   itemLabel="#{c.shopName}" itemValue="#{c.shopId}" />
+                                </p:selectOneMenu>
+                            </p:column>
+
+                            <p:column styleClass="Wid13">
+                                <p:outputLabel value="Đến kho"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:selectOneMenu styleClass="select Wid100" id="toShop"
+                                                 value="#{invImExReport.toShopId}">
+                                    <f:selectItem  itemLabel="tất cả" itemValue="" />
+                                    <f:selectItems value="#{invImExReport.listShopTo}" var="c"
+                                                   itemLabel="#{c.shopName}" itemValue="#{c.shopId}" />
+                                </p:selectOneMenu>
+                            </p:column>
+
+                            <p:column>
+                                <p:outputLabel value="#{msg['fromCreateDate']}"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:calendar styleClass="Wid100" id="buttonf" showOn="button"
+                                            converterMessage="#{msg['errDateType']}"
+                                            value="#{invImExReport.fromDate}"
+                                            pattern="dd/MM/yyyy"></p:calendar>
+                            </p:column>
+                            <p:column>
+                                <p:outputLabel value="#{msg['toCreateDate']}"></p:outputLabel>
+                            </p:column>
+                            <p:column width="100px">
+                                <p:calendar styleClass="Wid100" id="button" showOn="button"
+                                            converterMessage="#{msg['errDateType']}"
+                                            value="#{invImExReport.toDate}"
+                                            pattern="dd/MM/yyyy"></p:calendar>
+                            </p:column>
+							
+						</p:row>
+						<p:row>
+						<p:column />
+						<p:column />
+						<p:column />
+						<p:column />
+						<p:column />
+						<p:column />
+						<p:column />
+						<p:column>
+								<p:commandButton icon="fa fa-search Fs14 white"
+									value="#{msg['search']}" style="float:right" update=":frm"
+									actionListener="#{invImExReport.search}">
+								</p:commandButton>
+							</p:column>
+						</p:row>
+
+					</p:panelGrid>
+					<div class="EmptyBox5" />
+				</p:panel>
+				<div class="EmptyBox10"></div>
+				<p:panel styleClass="Container100">
+					<p:dataTable emptyMessage="#{msg['noRecordFound']}" var="c"
+						rowIndexVar="rowIndex" value="#{invImExReport.lsData}"
+						paginator="true" rows="10" paginatorPosition="bottom"
+						resizableColumns="true"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks}  {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowsPerPageTemplate="5,10,20,50,100"
+						id="dtSearchEtagSerial">
+						<f:facet name="header">
+							<span class="dtHead" style="">#{msg['equiment.detail.ttct']}</span>
+							<p:commandButton styleClass="toggler"
+								id="togglerdtSearchEtagSerial" value="#{msg['chooseColumns']}"
+								icon="ui-icon-calculator" />
+							<p:columnToggler datasource="dtSearchEtagSerial"
+								trigger="togglerdtSearchEtagSerial" />
+						</f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="STT" />
+                            </f:facet>
+                            <h:outputText
+                                    value="#{rowIndex + 1}" />
+                        </p:column>
+                        <p:column sortBy="#{c.orderCode}">
+                            <f:facet name="header">
+                                <h:outputText value="Mã đơn hàng" />
+                            </f:facet>
+                            <h:outputText
+                                    value="#{c.orderCode}" />
+                        </p:column>
+                        <p:column sortBy="#{invImExReport.mapOrderGroup.get(invImExReport.orderGroup)}">
+                            <f:facet name="header">
+                                <h:outputText value="Nhóm đơn hàng" />
+                            </f:facet>
+                            <h:outputText id="orderGroup"
+                                    value="#{invImExReport.mapOrderGroup.get(invImExReport.orderGroup)}" />
+                            <p:tooltip for="orderGroup" value="#{invImExReport.mapOrderGroup.get(invImExReport.orderGroup)}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Loại đơn hàng" />
+                            </f:facet>
+                            <h:outputText id="orderType"
+                                    value="#{invImExReport.mapOrderType.get(invImExReport.orderType)}" />
+                            <p:tooltip for="orderType" value="#{invImExReport.mapOrderType.get(invImExReport.orderType)}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Từ kho" />
+                            </f:facet>
+                            <h:outputText id="fromShopId"
+                                    value="#{sessionBean.service.getShopNameById(c.fromShopId)}" />
+                            <p:tooltip for="orderType" value="#{sessionBean.service.getShopNameById(c.fromShopId)}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['inven.to.shop']}" />
+                            </f:facet>
+                            <h:outputText id="toShopId"
+                                    value="#{sessionBean.service.getShopNameById(c.toShopId)}" />
+                            <p:tooltip for="toShopId" value="#{sessionBean.service.getShopNameById(c.toShopId)}" />
+                        </p:column>
+
+                        <p:column style="width:8%">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['status']}" />
+                            </f:facet>
+                            <h:outputText id="getEquipsStatusName"
+                                    value="#{sessionBean.service.getEquipsStatusName(c.status.toString())}" />
+                            <p:tooltip for="getEquipsStatusName" value="#{sessionBean.service.getEquipsStatusName(c.status.toString())}" />
+                        </p:column>
+
+                        <p:column style="width:8%">
+                            <f:facet name="header">
+                                <h:outputText value="Ngày lập đơn" />
+                            </f:facet>
+                            <h:outputText id="createdDate"
+                                    value="#{c.createdDate}" />
+                            <p:tooltip for="createdDate" value="#{c.createdDate}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{msg['requireShop']}" />
+                            </f:facet>
+
+                            <h:outputText id="getShopNameById"
+                                    value="#{sessionBean.service.getShopNameById(c.createShopId)}" />
+                            <p:tooltip for="getShopNameById" value="#{sessionBean.service.getShopNameById(c.createShopId)}" />
+                        </p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Ghi chú" />
+							</f:facet>
+							<h:outputText
+								value="#{c.description}" />
+                            <p:tooltip for="description" value="#{c.description}" />
+						</p:column>
+					</p:dataTable>
+				</p:panel>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
